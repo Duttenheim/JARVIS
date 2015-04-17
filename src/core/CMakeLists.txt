@@ -1,0 +1,44 @@
+#-------------------------------------------------------------------------------
+# core
+#-------------------------------------------------------------------------------
+
+SET(core
+	class.h
+	config.h
+	debug.h
+	enum.h
+	mem.h
+	ptr.h
+	pqueue.h
+	queue.h
+	rand.h
+	ref.h
+	singleton.h	
+	thread.h
+	thread.cc
+)
+
+SOURCE_GROUP("core" FILES ${core})
+
+SET(core_util
+	util/allocator.h
+	util/array.h
+	util/map.h
+	util/string.h
+	util/timer.h
+)
+SOURCE_GROUP("core\\util" FILES ${core_util})
+
+IF(WIN32)
+	SET(core_win32
+		win32/pch.h
+	)
+	SOURCE_GROUP("core\\win32" FILES ${core_win32})
+	
+	SET(core_os ${core_win32})
+ENDIF()
+
+ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_os})
+TARGET_INCLUDE_DIRECTORIES(core PUBLIC ${JARVIS_SOURCE_DIR}/src/core)
+
+SET_TARGET_PROPERTIES(core PROPERTIES FOLDER "JARVIS")
