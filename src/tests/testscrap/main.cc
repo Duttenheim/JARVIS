@@ -11,9 +11,11 @@
 #include "config.h"
 #include "util/array.h"
 #include "util/string.h"
+#include "util/map.h"
 #include "rand.h"
 #include <iostream>
 #include <vector>
+#include <map>
 #include "enum.h"
 #include "util/timer.h"
 
@@ -40,6 +42,11 @@ public:
 	void Test() { printf("Hej!\n");  }
 };
 
+class NoDefaultConstructor
+{
+	NoDefaultConstructor(int32 i) {};
+};
+
 enum EnumTest
 {
     Foo,
@@ -57,6 +64,7 @@ EnumTest EnumTestFromString(const String& str)
         __FROMSTRING(Bar);
         __FROMSTRING(Foob);
         __FROMSTRING(Boof);
+		__DEFAULT(Foo);
     }
 }
 
@@ -81,26 +89,90 @@ main(int argc, const char** argv)
 	arr.Remove(arr.Search(test2));
 	arr.Append(test2);
 
-	auto sorter = [](const uint32& lhs, const uint32& rhs) -> bool { return lhs > rhs; };
 	Ptr<Timer> timer = Timer::Create();
 	uint32 i;
 
+	/*
 	Array<uint32> perfArr;
 	timer->Start();
-	perfArr.Resize(1000000);
 	for (i = 0; i < 1000000; i++)
 	{
 		perfArr.Append(j_randis(0, 65535, i));
 	}
-	//std::sort(perfArr.Start(), perfArr.End(), sorter);
-	perfArr.Sort(sorter);
 	timer->Stop();
 	printf("Time taken for custom array: %f\n", timer->Time());
+	*/
+	Map<uint32, String> dict;
 
-	String str("Test");
-	String blorf = (String)("Foobar - " + str + " - rabooF");
-    
-    EnumTest first = EnumTestFromString("Boof");
+	printf("--- Custom dictionary ---\n");
+	timer->Start();
+	for (i = 0; i < 1000000; i++)
+	{
+		dict.Insert(i, "Foobar");
+	}
+	timer->Stop();
+	printf("Dynamic realloc and sort per element insert took: %f\n", timer->Time());
+
+	// clear
+	dict.Clear();
+
+	timer->Start();
+	dict.Resize(1000000);
+	for (i = 0; i < 1000000; i++)
+	{
+		dict.Insert(i, "Foobar");
+	}
+	timer->Stop();
+	printf("Static alloc and sort per element insert took: %f\n", timer->Time());
+
+	dict.Clear();
+
+	timer->Start();
+	dict.BeginMassInsertion();
+	for (i = 0; i < 1000000; i++)
+	{
+		dict.InsertUnordered(i, "Foobar");
+	}
+	dict.EndMassInsertion();
+	timer->Stop();
+	printf("Dynamic realloc and mass insertion took: %f\n", timer->Time());
+
+	dict.Clear();
+
+	timer->Start();
+	dict.Resize(1000000);
+	dict.BeginMassInsertion();
+	for (i = 0; i < 1000000; i++)
+	{
+		dict.InsertUnordered(i, "Foobar");
+	}
+	dict.EndMassInsertion();
+	timer->Stop();
+	printf("Static alloc and mass insertion took: %f\n", timer->Time());
+
+	timer->Start();
+	for (i = 0; i < 1000000; i++)
+	{
+		uint32 index = 1000000 / 2;
+		if (dict.Contains(index))
+		{
+			String foo = dict[index];
+		}		
+	}
+	timer->Stop();
+	printf("Lookups took: %f\n", timer->Time());
+
+	printf("\n\n");
+
+	std::map<uint32, String> map;
+	printf("--- std dictionary ---\n");
+	timer->Start();
+	for (i = 0; i < 1000000; i++)
+	{
+		map[i] = "Foobar";
+	}
+	timer->Stop();
+	printf("Dynamic realloc and sort per element insert took: %f\n", timer->Time());
 
 	std::cin.get();
 	return 0;

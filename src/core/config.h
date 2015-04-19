@@ -22,10 +22,17 @@ typedef int16_t		int16;
 typedef uint8_t		uint8;
 typedef int8_t		int8;
 typedef uint8_t		uchar;
-typedef int8_t      byte;
+
+// eh, windows already defines byte, so don't redefine byte if we are running windows
+#ifndef __WIN32__
+typedef uint8_t      byte;
+#endif
+
 typedef uint8_t		ubyte;
 typedef float		float32;
 typedef double		float64;
+
+// hmm, this is questionable, we actually want SSE vectors to operate as classes
 typedef __m128		vec4;
 typedef __m128i		ivec4;
 typedef __m128d		dvec4;
