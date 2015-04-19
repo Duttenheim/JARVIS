@@ -69,9 +69,9 @@ private:
 
 	static const uint32 StackBufferSize = 64;
 
+	char stackBuffer[StackBufferSize];
 	char* heapBuffer;
 	uint32 heapBufferLength;
-	char stackBuffer[StackBufferSize];
 	uint32 length;
 };
 
@@ -84,7 +84,7 @@ String::String() :
 	heapBufferLength(0),
 	length(0)
 {
-	// empty
+	this->stackBuffer[0] = 0;
 }
 
 //------------------------------------------------------------------------------

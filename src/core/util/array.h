@@ -3,7 +3,11 @@
 /**
 	@class JARVIS::Core::Array
 	
-	Dynamically sized array. Uses a grow variable to increase the array size.
+	Dynamically sized array. Increases array size by doubling the capacity.
+	Can be resized so that appends doesn't modify its size.
+
+	Supports sorting using std::sort, and also with a custom comparison function lambda.
+	Uses element caching to save the last searched for index, which makes searching for the same value instant.
 	
 	(C) 2015 See the LICENSE file.
 */
@@ -11,6 +15,9 @@
 #include "mem.h"
 #include <functional>
 #include <algorithm>
+
+#define JARVIS_CACHED_ELEMENT 1
+
 namespace JARVIS { 
 namespace Core
 {
@@ -34,7 +41,9 @@ public:
 	/// move operator
 	void operator=(const Array<TYPE>&& rhs);
 	/// read-write access operator
-	TYPE& operator[](uint32 index) const;
+	TYPE& operator[](const uint32 index);
+	/// read-only access operator
+	const TYPE& operator[](const uint32 index) const;
 
 	/// resize array to have given capacity, and retains the content if it fits
 	void Resize(const uint32 size);
@@ -42,7 +51,11 @@ public:
 	void SetGrow(const uint32 grow);
 
 	/// add to array
-	void Append(const TYPE& key);
+	void Append(const TYPE& val);
+	/// add to array at a specific index
+	void Insert(const TYPE& val, uint32 index);
+	/// add to array, but make sure that the array retains sorting
+	void InsertOrdered(const TYPE& val);
 	/// merge with other array
 	void Merge(const Array<TYPE>& arr);
 	/// remove from array by searching for key
@@ -50,18 +63,20 @@ public:
 	/// remove from array using an iterator
 	void Remove(Iter iterator);
 	/// remove from array using index
-	void Remove(int32 index);
+	void Remove(uint32 index);
 	/// clear array
 	void Clear();
 
 	/// get iterator to first element
-	Iter Start();
+	Iter Start() const;
 	/// get iterator to lats element
-	Iter End();
+	Iter End() const;
+	/// get size of array
+	const uint32 Size() const;
 
 	/// search for key, return index in array, or -1 if not found
 	int32 Search(const TYPE& key);
-	/// search for key using binary search, but only works if array is sorted.
+	/// search for key using binary search, but only works if array is sorted. Returns -1 if no such element is found.
 	int32 SearchBinary(const TYPE& key);
 
 	/// sort array
@@ -80,6 +95,9 @@ private:
 	uint32 capacity;
 	uint32 size;
 	TYPE* data;
+#if JARVIS_CACHED_ELEMENT
+	TYPE* cachedElement;
+#endif
 };
 
 //------------------------------------------------------------------------------
@@ -91,6 +109,9 @@ Array<TYPE>::Array() :
 	grow(8),
     capacity(0),
     size(0)
+#if JARVIS_CACHED_ELEMENT
+	,cachedElement(nullptr)
+#endif
 {
 	this->data = nullptr;
 }
@@ -159,7 +180,18 @@ Array<TYPE>::operator=(const Array<TYPE>&& rhs)
 */
 template <class TYPE>
 inline TYPE&
-Array<TYPE>::operator[](uint32 index) const
+Array<TYPE>::operator[](const uint32 index)
+{
+	j_assert(index < this->size);
+	return this->data[index];
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+inline const TYPE&
+Array<TYPE>::operator[](const uint32 index) const
 {
 	j_assert(index < this->size);
 	return this->data[index];
@@ -214,6 +246,68 @@ Array<TYPE>::Append(const TYPE& key)
 */
 template <class TYPE>
 void
+Array<TYPE>::Insert(const TYPE& val, uint32 index)
+{
+	j_assert(index <= this->size);
+
+	// special case if we insert at the end of the list
+	if (index == this->size)
+	{
+		this->Append(val);
+	}
+	else
+	{
+		if (this->size == this->capacity) this->Grow();
+		Memory::Move<TYPE>(this->data + index, this->data + index + 1, this->size - index);
+		this->data[index] = val;
+		this->size++;
+	}
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+void
+Array<TYPE>::InsertOrdered(const TYPE& val)
+{
+	// if we don't have any room, then we make room!
+	if (this->size == this->capacity) this->Grow();
+
+	// very very similar to the lambda found in SearchBinary, but this one returns the closest index regardless if the value is found or not
+	std::function<uint32(TYPE*, int32, int32)> bin = [&](TYPE* data, int32 min, int32 max) -> uint32
+	{
+		// base case if our recursion is done with the binary search
+		if (max < min)
+		{
+			int32 mid = max;
+			const TYPE& cur = data[mid];
+			
+			// get value at min value (which is really the max value since they have passed each other)
+			// if we are bigger than min, then insert element into that slot, otherwise, place before min
+			if (cur < val)			return mid;
+			else					return mid + 1;
+		}
+		else
+		{
+			int32 mid = min + ((max - min) >> 1);
+			const TYPE& cur = data[mid];
+			if (cur > val)			return bin(data, min, mid - 1);
+			else if (cur < val)		return bin(data, mid + 1, max);
+			else					return mid;
+		}
+	};
+
+	// run lambda, get index, do insertion
+	uint32 index = bin(this->data, 0, this->size);
+	this->Insert(val, index);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+void
 Array<TYPE>::Merge(const Array<TYPE>& arr)
 {
 	// only do this if we have two different arrays
@@ -235,6 +329,7 @@ inline void
 Array<TYPE>::Remove(const TYPE& key)
 {
 	int32 index = this->Search(key);
+	j_assert(index != -1);
 	this->Remove(index);
 }
 
@@ -246,7 +341,7 @@ inline void
 Array<TYPE>::Remove(Iter iterator)
 {
 	j_assert(iterator != nullptr);
-	this->Remove(int32(iterator - this->data));
+	this->Remove(uint32(iterator - this->data));
 }
 
 //------------------------------------------------------------------------------
@@ -254,10 +349,12 @@ Array<TYPE>::Remove(Iter iterator)
 */
 template <class TYPE>
 void
-Array<TYPE>::Remove(int32 index)
+Array<TYPE>::Remove(uint32 index)
 {
-	j_assert(index >= 0 && uint32(index) < this->size);
-	uint32 dist = this->size - index - 1;
+	j_assert(index >= 0 && index < this->size);
+
+	// convert index to size and calculate how many elements we must move
+	uint32 dist = this->size - (index + 1);
 
 	// run destructor (make sure the virtual destructor can run!
 	(&this->data[index])->~TYPE();
@@ -272,8 +369,21 @@ Array<TYPE>::Remove(int32 index)
 /**
 */
 template <class TYPE>
+void
+Array<TYPE>::Clear()
+{
+	Memory::Free((void*)this->data);
+	this->capacity = 0;
+	this->size = 0;
+	this->data = nullptr;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
 inline typename Array<TYPE>::Iter
-Array<TYPE>::Start()
+Array<TYPE>::Start() const
 {
 	return this->data;
 }
@@ -283,9 +393,19 @@ Array<TYPE>::Start()
 */
 template <class TYPE>
 inline typename Array<TYPE>::Iter
-Array<TYPE>::End()
+Array<TYPE>::End() const
 {
 	return this->data + this->size;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+const uint32
+Array<TYPE>::Size() const
+{
+	return this->size;
 }
 
 //------------------------------------------------------------------------------
@@ -295,9 +415,19 @@ template <class TYPE>
 int32
 Array<TYPE>::Search(const TYPE& key)
 {
+#if JARVIS_CACHED_ELEMENT
+	if (this->cachedElement != nullptr && *this->cachedElement == key) return int32(this->cachedElement - this->data);
+#endif
+
 	for (uint32 i = 0; i < this->size; i++)
 	{
-		if (this->data[i] == key) return i;
+		if (this->data[i] == key)
+		{
+#if JARVIS_CACHED_ELEMENT
+			this->cachedElement = &this->data[i];
+#endif
+			return i;
+		}
 	}
 	return -1;
 }
@@ -309,21 +439,32 @@ template <class TYPE>
 int32
 Array<TYPE>::SearchBinary(const TYPE& key)
 {
-	// lambda function which recurses the array to find the index, if none is found it simply returns -1
-	std::function<int32(TYPE*, uint32, int32)> bin = [&, key](TYPE* data, uint32 range, int32 index)
-	{
-		uint32 halfRange = (range / 2) + 1;
-		const TYPE& val = data[index];
+#if JARVIS_CACHED_ELEMENT
+	if (this->cachedElement != nullptr && *this->cachedElement == key) return int32(this->cachedElement - this->data);
+#endif
 
-		if (halfRange > 0)
+	// lambda function which recurses the array to find the index, if none is found it simply returns -1
+	std::function<int32(TYPE*, int32, int32)> bin = [&, key](TYPE* data, int32 min, int32 max) -> int32
+	{
+		if (max < min) return -1;
+		else
 		{
-			if (val > key)		return bin(data, halfRange, index - halfRange);
-			else if (val < key) return bin(data, halfRange, index + halfRange);
-		}		
-		return val == key ? index : -1;
+			int32 mid = min + ((max - min) >> 1);
+			const TYPE& cur = data[mid];
+			if (cur > key)			return bin(data, min, mid - 1);
+			else if (cur < key)		return bin(data, mid + 1, max);
+			else					return mid;
+		}
 	};
 
-	return bin(this->data, this->size/2, this->size/2);	
+	int32 index = bin(this->data, 0, this->size);
+#if JARVIS_CACHED_ELEMENT
+	if (index != -1)
+	{
+		this->cachedElement = &this->data[index];
+	}
+#endif
+	return index;
 }
 
 //------------------------------------------------------------------------------

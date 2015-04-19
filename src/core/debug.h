@@ -28,7 +28,7 @@ namespace Debug
 void 
 Error(const char* exp, const char* file, int line)
 {
-	const char* format = "JARVIS encountered an exception from which it cannot recover. \n\n Expression (%s) triggered a breakpoint in:\n  file '%s'\n  line %d";
+	const char* format = "JARVIS encountered an exception from which it cannot recover. \n\n Expression: \n    %s \ntriggered a breakpoint in:\n  file '%s'\n  line %d";
 #if __WIN32__
 	uint32 len = std::strlen(exp) + strlen(file) + strlen(format);
 	char* buf = new char[len];
