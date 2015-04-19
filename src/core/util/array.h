@@ -88,9 +88,9 @@ private:
 template <class TYPE>
 inline
 Array<TYPE>::Array() :
-	size(0),
-	capacity(0),
-	grow(8)
+	grow(8),
+    capacity(0),
+    size(0)
 {
 	this->data = nullptr;
 }
@@ -394,7 +394,7 @@ Array<TYPE>::Shrink()
 		Memory::Copy<TYPE>(this->data, buf, this->size);
 		Memory::Free(this->data);
 		this->data = buf;
-		this->capacity = newCapacity
+        this->capacity = newCapacity;
 	}	
 }
 

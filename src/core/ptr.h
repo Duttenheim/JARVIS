@@ -25,7 +25,7 @@ public:
 	/// copy constructor
 	Ptr(const Ptr<TYPE>& rhs);
 	/// move constructor
-	Ptr(const Ptr<TYPE>&& rhs);
+	Ptr(Ptr<TYPE>&& rhs);
 	/// copy constructor from raw pointer
 	Ptr(TYPE* rhs);
 
@@ -150,7 +150,7 @@ Ptr<TYPE>::Ptr(const Ptr<TYPE>& rhs) :
 */
 template <class TYPE>
 inline
-Ptr<TYPE>::Ptr(const Ptr<TYPE>&& rhs)
+Ptr<TYPE>::Ptr(Ptr<TYPE>&& rhs)
 {
 	this->ptr = rhs.ptr;
 	rhs.ptr = nullptr;
@@ -221,7 +221,7 @@ Ptr<TYPE>::operator=(TYPE* rhs)
 	{
 		if (this->ptr) this->ptr->Release();
 		this->ptr = rhs;
-		if (this->ptr) = this->ptr->Retain();
+		if (this->ptr) this->ptr->Retain();
 	}
 }
 

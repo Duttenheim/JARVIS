@@ -11,6 +11,10 @@
 #include "config.h"
 #include <string.h>
 
+#if !__WIN32__
+#include <stdio.h>
+#endif
+
 #define j_assert(exp) { if (!(exp)) JARVIS::Core::Debug::Error(#exp, __FILE__, __LINE__); }
 
 namespace JARVIS {

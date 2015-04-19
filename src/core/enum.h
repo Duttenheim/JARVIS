@@ -3,29 +3,17 @@
 /**
 	@file core/enum.h
 
-	Macros useful for managing enums. Faster if constexpr is available.
+	Macros useful for managing enums. Instant if constexpr is available.
 
 	(C) 2015 See the LICENSE file.
 */
 #include <string.h>
 
-#if JARVIS_USE_CONSTEXPR
-constexpr int __EnumStringHash(const char* ptr)
+#if __CONST_EXPR_SUPPORTED__
+// const expression for string hashing
+constexpr uint32 __EnumStringHash(const char* ptr)
 {
-	int hash = 0;
-	int len = strlen(ptr);
-	int i;
-	for (i = 0; i < len; i++)
-	{
-		hash += ptr[i];
-		hash += hash << 10;
-		hash ^= hash >> 6;
-	}
-	hash += hash << 3;
-	hash ^= hash >> 11;
-	hash += hash << 15;
-	hash &= ~(1 << 31);
-	return hash;
+    return !*ptr ? 5381 : (__EnumStringHash(ptr + 1) * 33) ^ *ptr;
 }
 
 #define __SWITCHSTRING(x) switch (__EnumStringHash(x))

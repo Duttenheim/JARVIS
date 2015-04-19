@@ -1,4 +1,3 @@
-#pragma once
 //------------------------------------------------------------------------------
 /**
     @file testscrap/main.cc
@@ -15,6 +14,7 @@
 #include "rand.h"
 #include <iostream>
 #include <vector>
+#include "enum.h"
 #include "util/timer.h"
 
 using namespace JARVIS::Core;
@@ -39,6 +39,27 @@ class Blorf : public Ref
 public:
 	void Test() { printf("Hej!\n");  }
 };
+
+enum EnumTest
+{
+    Foo,
+    Bar,
+    Foob,
+    Boof
+};
+
+
+EnumTest EnumTestFromString(const String& str)
+{
+    __SWITCHSTRING(str)
+    {
+        __FROMSTRING(Foo);
+        __FROMSTRING(Bar);
+        __FROMSTRING(Foob);
+        __FROMSTRING(Boof);
+    }
+}
+
 
 __SingletonDef(Blorf);
 
@@ -78,6 +99,8 @@ main(int argc, const char** argv)
 
 	String str("Test");
 	String blorf = (String)("Foobar - " + str + " - rabooF");
+    
+    EnumTest first = EnumTestFromString("Boof");
 
 	std::cin.get();
 	return 0;

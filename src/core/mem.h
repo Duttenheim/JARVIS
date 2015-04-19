@@ -8,6 +8,8 @@
 	(C) 2015 See the LICENSE file.
 */
 #include "config.h"
+#include <cstdlib>
+#include <cstring>
 
 #define JARVIS_MEM_INIT	 0xFF
 #define JARVIS_MEM_DEBUG (1)
@@ -76,7 +78,7 @@ template <class TYPE>
 inline static void
 Copy(const TYPE* from, TYPE* to, uint32 elements)
 {
-	std::memcpy(to, from, sizeof(TYPE) * elements);
+	std::memcpy((void*)to, (void*)from, sizeof(TYPE) * elements);
 }
 
 //------------------------------------------------------------------------------
@@ -103,7 +105,7 @@ template <class TYPE>
 inline static void
 Move(TYPE* from, TYPE* to, uint32 elements)
 {
-	std::memmove(to, from, sizeof(TYPE) * elements);
+	std::memmove((void*)to, (void*)from, sizeof(TYPE) * elements);
 }
 
 //------------------------------------------------------------------------------
@@ -130,10 +132,10 @@ template <class TYPE>
 inline static void
 Fill(TYPE* buf, uint32 elements, const TYPE& val)
 {
-	register TYPE *to = buf;
-	register count = elements;
+	TYPE *to = buf;
+    auto count = elements;
 	{
-		register n = (count + 7) / 8;
+		auto n = (count + 7) / 8;
 		switch (count % 8)
 		{
 			case 0: do {	*to++ = val;
