@@ -46,6 +46,10 @@ public:
 	void operator+=(const char* str);
 	/// addition-assign operator with other string
 	void operator+=(const String& str);
+    /// assignment operator with c string
+    void operator=(const char* str);
+    /// assignment operator with other string
+    void operator=(const String& str);
 	/// implicit conversion to c string
 	operator const char*() const;
 
@@ -133,6 +137,8 @@ String::String(String&& rhs) :
 	length(0)
 {
 	this->Set(rhs.CharPtr());
+    rhs.length = 0;
+    rhs.stackBuffer[0] = 0;
 	rhs.heapBuffer = nullptr;
 }
 
@@ -169,7 +175,7 @@ String::Set(const char* str, uint32 length)
 	else if (length < StackBufferSize)
 	{
 		// we can fit the string within the local buffer
-		if (nullptr != this->heapBuffer) this->Delete();
+        this->Delete();
 		Memory::Copy<char>(str, this->stackBuffer, length);
 		this->stackBuffer[length] = 0;
 	}
@@ -259,6 +265,26 @@ inline void
 String::operator+=(const String& str)
 {
 	this->Append(str, str.length);
+}
+
+//------------------------------------------------------------------------------
+/**
+ */
+inline void
+String::operator=(const char* str)
+{
+    this->Delete();
+    this->Set(str);
+}
+    
+//------------------------------------------------------------------------------
+/**
+ */
+inline void
+String::operator=(const String& str)
+{
+    this->Delete();
+    this->Set(str);
 }
 
 //------------------------------------------------------------------------------
@@ -358,5 +384,4 @@ String::Delete()
 	this->stackBuffer[0] = 0;
 }
 
-}
-} // namespace JARVIS::Core
+}} // namespace JARVIS::Core

@@ -205,14 +205,17 @@ inline void
 Array<TYPE>::Resize(const uint32 size)
 {
 	// only do something if the resize is valid
-	if (this->size != size)
+	if (this->capacity != size)
 	{
 		this->capacity = size;
-		if (this->size > this->capacity) this->size = this->capacity;
 		TYPE* buf = Memory::Alloc<TYPE>(size);
 		j_assert(buf != nullptr);
+        this->size = j_min(this->size, this->capacity);
+        
+        // run constructor on newly created elements
+        for (uint32 i = this->size; i < this->capacity; i++) new (buf + i) TYPE();
 		Memory::Copy<TYPE>(this->data, buf, this->size);
-		Memory::Free(this->data);
+        Memory::Free(this->data);
 		this->data = buf;
 	}	
 }

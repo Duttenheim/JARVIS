@@ -178,7 +178,7 @@ inline const KEY&
 Map<KEY, VALUE>::Key(const uint32 index) const
 {
 	j_assert(index < this->data.size);
-	return std::get<0>this->data[index];
+	return std::get<0>(this->data[index]);
 }
 
 //------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ inline const VALUE&
 Map<KEY, VALUE>::Value(const uint32 index) const
 {
 	j_assert(index < this->data.size);
-	return std::get<1>this->data[index];
+	return std::get<1>(this->data[index]);
 }
 
 //------------------------------------------------------------------------------
@@ -199,7 +199,7 @@ template <class KEY, class VALUE>
 inline void
 Map<KEY, VALUE>::Insert(const KEY& key, const VALUE& value)
 {
-	this->data.InsertOrdered(std::tuple<KEY, VALUE>(key, value));
+	this->data.InsertOrdered(std::forward_as_tuple(key, value));
 }
 
 //------------------------------------------------------------------------------

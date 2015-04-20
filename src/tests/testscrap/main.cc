@@ -173,6 +173,18 @@ main(int argc, const char** argv)
 	}
 	timer->Stop();
 	printf("Dynamic realloc and sort per element insert took: %f\n", timer->Time());
+    
+    timer->Start();
+    for (i = 0; i < 1000000; i++)
+    {
+        uint32 index = 1000000 / 2;
+        if (map.find(index) != map.end())
+        {
+            String foo = map[i];
+        }
+    }
+    timer->Stop();
+    printf("Lookups took: %f\n", timer->Time());
 
 	std::cin.get();
 	return 0;
