@@ -1,4 +1,3 @@
-#pragma once
 //------------------------------------------------------------------------------
 /**
     @file core/config.h
@@ -48,3 +47,5 @@ typedef __m128d		dvec4;
 #include "class.h"
 #include "singleton.h"
 #include "debug.h"
+#include "ref.h"
+#include "ptr.h"

@@ -9,7 +9,6 @@
 	(C) 2015 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
-#include "config.h"
 namespace JARVIS { 
 namespace Core
 {

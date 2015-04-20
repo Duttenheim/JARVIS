@@ -8,7 +8,6 @@
 	(C) 2015 See the LICENSE file.
 */
 #include <assert.h>
-#include "config.h"
 #include <string.h>
 
 #if !__WIN32__
@@ -25,7 +24,7 @@ namespace Debug
 //------------------------------------------------------------------------------
 /**
 */
-void 
+static void
 Error(const char* exp, const char* file, int line)
 {
 	const char* format = "JARVIS encountered an exception from which it cannot recover. \n\n Expression: \n    %s \ntriggered a breakpoint in:\n  file '%s'\n  line %d";

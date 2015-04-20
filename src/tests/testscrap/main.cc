@@ -6,12 +6,12 @@
 	
 	(C) 2015 See the LICENSE file.
 */
-#include "ptr.h"
-#include "ref.h"
 #include "config.h"
+#include "ptr.h"
 #include "util/array.h"
 #include "util/string.h"
 #include "util/map.h"
+#include "threads/thread.h"
 #include "rand.h"
 #include <iostream>
 #include <vector>
@@ -21,73 +21,10 @@
 
 using namespace JARVIS::Core;
 
-class Foobar : public Ref
-{
-	__ClassDecl(Foobar);
-
-public:
-	Foobar(uint32 i) : var(i) {};
-
-private:
-	uint32 var;
-};
-
-class Blorf : public Ref
-{
-	__SingletonDecl(Blorf);
-
-	Blorf() { __SingletonCtor(); }
-	~Blorf() { __SingletonDtor(); }
-public:
-	void Test() { printf("Hej!\n");  }
-};
-
-class NoDefaultConstructor
-{
-	NoDefaultConstructor(int32 i) {};
-};
-
-enum EnumTest
-{
-    Foo,
-    Bar,
-    Foob,
-    Boof
-};
-
-
-EnumTest EnumTestFromString(const String& str)
-{
-    __SWITCHSTRING(str)
-    {
-        __FROMSTRING(Foo);
-        __FROMSTRING(Bar);
-        __FROMSTRING(Foob);
-        __FROMSTRING(Boof);
-		__DEFAULT(Foo);
-    }
-}
-
-
-__SingletonDef(Blorf);
 
 int __cdecl
 main(int argc, const char** argv)
 {
-	Array<Ptr<Foobar>> arr;
-
-	Ptr<Foobar> test1 = Foobar::Create(10);
-	Ptr<Foobar> test2 = Foobar::Create(15);
-	Ptr<Foobar> test3 = Foobar::Create(20);
-	arr.Append(test1);
-	arr.Append(test2);
-	arr.Append(test3);
-
-	j_assert(arr.Search(test1) >= 0);
-	j_assert(arr.Search(test2) >= 0);
-	j_assert(arr.Search(test3) >= 0);
-	arr.Remove(arr.Search(test2));
-	arr.Append(test2);
 
 	Ptr<Timer> timer = Timer::Create();
 	uint32 i;
@@ -153,11 +90,10 @@ main(int argc, const char** argv)
 	timer->Start();
 	for (i = 0; i < 1000000; i++)
 	{
-		uint32 index = 1000000 / 2;
 		if (dict.Contains(i))
 		{
 			String foo = dict[i];
-		}		
+		}
 	}
 	timer->Stop();
 	printf("Lookups took: %f\n", timer->Time());
@@ -172,12 +108,11 @@ main(int argc, const char** argv)
 		map[i] = "Foobar";
 	}
 	timer->Stop();
-	printf("Dynamic realloc and sort per element insert took: %f\n", timer->Time());
+	printf("Insertions took: %f\n", timer->Time());
     
     timer->Start();
     for (i = 0; i < 1000000; i++)
     {
-        uint32 index = 1000000 / 2;
         if (map.find(i) != map.end())
         {
             String foo = map[i];
@@ -185,6 +120,13 @@ main(int argc, const char** argv)
     }
     timer->Stop();
     printf("Lookups took: %f\n", timer->Time());
+    
+    Ptr<Thread> thread = Thread::Create();
+    auto threadProc = []()
+    {
+        printf("Hej!");
+    };
+    thread->Start(threadProc);
 
 	std::cin.get();
 	return 0;

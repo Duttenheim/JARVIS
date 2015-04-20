@@ -73,6 +73,8 @@ public:
 	Iter End() const;
 	/// get size of array
 	const uint32 Size() const;
+    /// get internal buffer
+    const TYPE* Buffer() const;
 
 	/// search for key, return index in array, or -1 if not found
 	int32 Search(const TYPE& key);
@@ -123,7 +125,7 @@ template <class TYPE>
 inline
 Array<TYPE>::~Array()
 {
-	if (this->data != nullptr) Memory::Free(this->data);
+	if (this->data != nullptr) delete [] this->data;
 }
 
 //------------------------------------------------------------------------------
@@ -409,6 +411,16 @@ const uint32
 Array<TYPE>::Size() const
 {
 	return this->size;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+const TYPE*
+Array<TYPE>::Buffer() const
+{
+	return this->data;
 }
 
 //------------------------------------------------------------------------------

@@ -7,7 +7,6 @@
 
 	(C) 2015 See the LICENSE file.
 */
-#include "config.h"
 #include <ctime>
 
 #define j_randi(min, max) JARVIS::Core::Random::RandomInteger(min, max)
