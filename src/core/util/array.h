@@ -280,25 +280,27 @@ Array<TYPE>::InsertOrdered(const TYPE& val)
 	// very very similar to the lambda found in SearchBinary, but this one returns the closest index regardless if the value is found or not
 	std::function<uint32(TYPE*, int32, int32)> bin = [&](TYPE* data, int32 min, int32 max) -> uint32
 	{
-		// base case if our recursion is done with the binary search
-		if (max < min)
+		int32 mid;
+		while (max > min)
 		{
-			int32 mid = max;
+			mid = min + ((max - min) >> 1);
 			const TYPE& cur = data[mid];
-			
-			// get value at min value (which is really the max value since they have passed each other)
-			// if we are bigger than min, then insert element into that slot, otherwise, place before min
-			if (cur < val)			return mid;
-			else					return mid + 1;
+			if (cur < val)		min = mid + 1;
+			else				max = mid;
 		}
+
+		// get the max value which should either be equal to min if found, or LESS than min if not
+		const TYPE& cur = data[max];
+
+		// if we found the value, simply return it
+		if ((max == min) && (data[max] == val)) return min;
 		else
 		{
-			int32 mid = min + ((max - min) >> 1);
-			const TYPE& cur = data[mid];
-			if (cur > val)			return bin(data, min, mid - 1);
-			else if (cur < val)		return bin(data, mid + 1, max);
-			else					return mid;
-		}
+			// get the max value, which was the previous upper limit.
+			// since we stopped, our value must be either at max, or beyond max
+			if (cur < val)			return max;
+			else					return max + 1;
+		}		
 	};
 
 	// run lambda, get index, do insertion
@@ -449,15 +451,16 @@ Array<TYPE>::SearchBinary(const TYPE& key)
 	// lambda function which recurses the array to find the index, if none is found it simply returns -1
 	std::function<int32(TYPE*, int32, int32)> bin = [&, key](TYPE* data, int32 min, int32 max) -> int32
 	{
-		if (max < min) return -1;
-		else
+		int32 mid;
+		while (max > min)
 		{
-			int32 mid = min + ((max - min) >> 1);
+			mid = min + ((max - min) >> 1);
 			const TYPE& cur = data[mid];
-			if (cur > key)			return bin(data, min, mid - 1);
-			else if (cur < key)		return bin(data, mid + 1, max);
-			else					return mid;
+			if (cur < key)		min = mid + 1;
+			else				max = mid;
 		}
+		if ((max == min) && (data[min] == key)) return min;
+		else									return -1;
 	};
 
 	int32 index = bin(this->data, 0, this->size);
