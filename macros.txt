@@ -1,0 +1,14 @@
+#-------------------------------------------------------------------------------
+# JARVIS macros
+#-------------------------------------------------------------------------------
+
+MACRO(JARVIS_SETUP_TARGET target)
+
+IF(WIN32)
+ELSEIF(APPLE)
+	#SET_TARGET_PROPERTIES(${target} PROPERTIES XCODE_ATTRIBUTE_LLVM_LTO[variant=Release] YES)
+ELSE()
+ENDIF()
+
+ENDMACRO(JARVIS_SETUP_TARGET)
+
