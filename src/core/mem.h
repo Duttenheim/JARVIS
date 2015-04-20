@@ -7,7 +7,6 @@
 
 	(C) 2015 See the LICENSE file.
 */
-#include "config.h"
 #include <cstdlib>
 #include <cstring>
 
@@ -54,6 +53,17 @@ Alloc(uint32 size)
 	Memory::Fill(buf, size, JARVIS_MEM_INIT);
 #endif
 	return buf;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Allocate new instance of class.
+*/
+template <class TYPE, class ...ARGS>
+inline static TYPE*
+New(ARGS&&... args)
+{
+    return new TYPE(args...);
 }
 
 //------------------------------------------------------------------------------

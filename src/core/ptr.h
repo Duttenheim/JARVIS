@@ -13,7 +13,6 @@
 	(C) 2015 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
-#include "config.h"
 template <class TYPE>
 class Ptr
 {
