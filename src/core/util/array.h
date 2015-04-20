@@ -213,7 +213,7 @@ Array<TYPE>::Resize(const uint32 size)
         this->size = j_min(this->size, this->capacity);
         
         // run constructor on newly created elements
-        for (uint32 i = this->size; i < this->capacity; i++) new (buf + i) TYPE();
+        for (uint32 i = this->size; i < this->capacity; i++) new (buf + i) TYPE;
 		Memory::Copy<TYPE>(this->data, buf, this->size);
         Memory::Free(this->data);
 		this->data = buf;
@@ -520,7 +520,7 @@ Array<TYPE>::Grow()
 	}	
 
 	// run constructor on newly created elements
-	for (uint32 i = this->size; i < newCapacity; i++) new (buf + i) TYPE();
+	for (uint32 i = this->size; i < newCapacity; i++) new (buf + i) TYPE;
 
 	this->capacity = newCapacity;
 	this->data = buf;
