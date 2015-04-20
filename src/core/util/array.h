@@ -276,36 +276,33 @@ Array<TYPE>::InsertOrdered(const TYPE& val)
 {
 	// if we don't have any room, then we make room!
 	if (this->size == this->capacity) this->Grow();
+    
+    int32 min = 0;
+    int32 max = this->size;
+    int32 result;
+    int32 mid;
+    while (max > min)
+    {
+        mid = min + ((max - min) >> 1);
+        const TYPE& cur = data[mid];
+        if (cur < val)		min = mid + 1;
+        else				max = mid;
+    }
+    
+    // get the max value which should either be equal to min if found, or LESS than min if not
+    const TYPE& cur = data[max];
+    
+    // if we found the value, simply return it
+    if ((max == min) && (data[max] == val)) result = min;
+    else
+    {
+        // get the max value, which was the previous upper limit.
+        // since we stopped, our value must be either at max, or beyond max
+        if (cur < val)			result = max;
+        else					result = max + 1;
+    }
 
-	// very very similar to the lambda found in SearchBinary, but this one returns the closest index regardless if the value is found or not
-	std::function<uint32(TYPE*, int32, int32)> bin = [&](TYPE* data, int32 min, int32 max) -> uint32
-	{
-		int32 mid;
-		while (max > min)
-		{
-			mid = min + ((max - min) >> 1);
-			const TYPE& cur = data[mid];
-			if (cur < val)		min = mid + 1;
-			else				max = mid;
-		}
-
-		// get the max value which should either be equal to min if found, or LESS than min if not
-		const TYPE& cur = data[max];
-
-		// if we found the value, simply return it
-		if ((max == min) && (data[max] == val)) return min;
-		else
-		{
-			// get the max value, which was the previous upper limit.
-			// since we stopped, our value must be either at max, or beyond max
-			if (cur < val)			return max;
-			else					return max + 1;
-		}		
-	};
-
-	// run lambda, get index, do insertion
-	uint32 index = bin(this->data, 0, this->size);
-	this->Insert(val, index);
+	this->Insert(val, result);
 }
 
 //------------------------------------------------------------------------------
@@ -447,30 +444,28 @@ Array<TYPE>::SearchBinary(const TYPE& key)
 #if JARVIS_CACHED_ELEMENT
 	if (this->cachedElement != nullptr && *this->cachedElement == key) return int32(this->cachedElement - this->data);
 #endif
+    
+    int32 min = 0;
+    int32 max = this->size;
+    int32 mid;
+    int32 result = -1;
+    while (max > min)
+    {
+        mid = min + ((max - min) >> 1);
+        const TYPE& cur = data[mid];
+        if (cur < key)		min = mid + 1;
+        else				max = mid;
+    }
+    if ((max == min) && (data[min] == key)) result = min;
 
-	// lambda function which recurses the array to find the index, if none is found it simply returns -1
-	std::function<int32(TYPE*, int32, int32)> bin = [&, key](TYPE* data, int32 min, int32 max) -> int32
-	{
-		int32 mid;
-		while (max > min)
-		{
-			mid = min + ((max - min) >> 1);
-			const TYPE& cur = data[mid];
-			if (cur < key)		min = mid + 1;
-			else				max = mid;
-		}
-		if ((max == min) && (data[min] == key)) return min;
-		else									return -1;
-	};
-
-	int32 index = bin(this->data, 0, this->size);
+	//int32 index = bin(this->data, 0, this->size);
 #if JARVIS_CACHED_ELEMENT
-	if (index != -1)
+	if (result != -1)
 	{
-		this->cachedElement = &this->data[index];
+		this->cachedElement = &this->data[result];
 	}
 #endif
-	return index;
+	return result;
 }
 
 //------------------------------------------------------------------------------

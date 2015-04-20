@@ -154,9 +154,9 @@ main(int argc, const char** argv)
 	for (i = 0; i < 1000000; i++)
 	{
 		uint32 index = 1000000 / 2;
-		if (dict.Contains(index))
+		if (dict.Contains(i))
 		{
-			String foo = dict[index];
+			String foo = dict[i];
 		}		
 	}
 	timer->Stop();
@@ -178,7 +178,7 @@ main(int argc, const char** argv)
     for (i = 0; i < 1000000; i++)
     {
         uint32 index = 1000000 / 2;
-        if (map.find(index) != map.end())
+        if (map.find(i) != map.end())
         {
             String foo = map[i];
         }
