@@ -302,6 +302,7 @@ Array<TYPE>::InsertOrdered(const TYPE& val)
         else					result = max + 1;
     }
 
+	// insert, result must be a valid result here
 	this->Insert(val, result);
 }
 
