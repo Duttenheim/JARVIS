@@ -3,6 +3,7 @@
     @class JARVIS::Core::Thread
  	(C) 2015 See the LICENSE file.
 */
+#include "config.h"
 #include "thread.h"
 #include "mem.h"
 namespace JARVIS {
@@ -13,7 +14,7 @@ namespace Core
 /**
 */
 Thread::Thread() :
-    stop({0}),
+    running({false}),
     thread(nullptr)
 {
     // empty
@@ -35,7 +36,8 @@ void
 Thread::Stop()
 {
     j_assert(nullptr != this->thread);
-    Memory::Free(this->thread);
+	delete this->thread;
+	this->thread = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -46,7 +48,8 @@ Thread::Wait()
 {
     j_assert(nullptr != this->thread);
     this->thread->join();
-    Memory::Free(this->thread);
+	delete this->thread;
+	this->thread = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -56,7 +59,13 @@ void
 Thread::Start(const std::function<void()> &func)
 {
     j_assert(nullptr == this->thread);
-    this->thread = Memory::New<std::thread>(func);
+	auto threadProc = [this, &func]()
+	{
+		func();
+		this->running.exchange(false);
+	};
+	this->thread = Memory::New<std::thread>(threadProc);
+	this->running.exchange(true);
 }
 
 }} // namespace JARVIS::Core

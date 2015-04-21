@@ -63,7 +63,7 @@ public:
 	/// remove from array using an iterator
 	void Remove(Iter iterator);
 	/// remove from array using index
-	void Remove(uint32 index);
+	void RemoveIndex(uint32 index);
 	/// clear array
 	void Clear();
 
@@ -335,7 +335,7 @@ Array<TYPE>::Remove(const TYPE& key)
 {
 	int32 index = this->Search(key);
 	j_assert(index != -1);
-	this->Remove(index);
+	this->RemoveIndex(index);
 }
 
 //------------------------------------------------------------------------------
@@ -346,7 +346,7 @@ inline void
 Array<TYPE>::Remove(Iter iterator)
 {
 	j_assert(iterator != nullptr);
-	this->Remove(uint32(iterator - this->data));
+	this->RemoveIndex(uint32(iterator - this->data));
 }
 
 //------------------------------------------------------------------------------
@@ -354,7 +354,7 @@ Array<TYPE>::Remove(Iter iterator)
 */
 template <class TYPE>
 void
-Array<TYPE>::Remove(uint32 index)
+Array<TYPE>::RemoveIndex(uint32 index)
 {
 	j_assert(index >= 0 && index < this->size);
 

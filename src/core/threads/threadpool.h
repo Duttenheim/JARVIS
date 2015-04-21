@@ -22,19 +22,32 @@ class ThreadPool : public Ref
 {
     __ClassDecl(ThreadPool);
 public:
+
+	/// typedef a typical thread function
+	typedef std::function<void(byte*, byte*, byte*)> ThreadPoolFunc;
+
     /// constructor
     ThreadPool(uint32 threads);
     /// destructor
     virtual ~ThreadPool();
     
     /// enqueue thread function
-    void Enqueue(const std::function<void(byte*, byte*, byte*)>& func);
+	void Enqueue(const ThreadPoolFunc& func, byte* inputs, byte* outputs, byte* uniforms);
     /// update thread pool, this causes the threads to update their status, and finished threads to attain new tasks
     void Update();
 private:
+
+	struct ThreadFuncContext
+	{
+		byte* inputs;
+		byte* outputs;
+		byte* uniforms;
+	};
+
     Array<Ptr<Thread>> activeThreads;
     Array<Ptr<Thread>> freeThreads;
-    Array<std::function<void(byte*, byte*, byte*)>> funcs;
+	Array<ThreadPoolFunc> funcs;
+	Array<ThreadFuncContext> contexts;
 };
 
 }} // namespace JARVIS::Core

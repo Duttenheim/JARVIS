@@ -18,6 +18,7 @@
 #include <map>
 #include "enum.h"
 #include "util/timer.h"
+#include "threads/threadpool.h"
 
 using namespace JARVIS::Core;
 
@@ -127,6 +128,18 @@ main(int argc, const char** argv)
         printf("Hej!");
     };
     thread->Start(threadProc);
+	while (thread->Running());
+	thread->Stop();
+
+	auto specialThreadProc = [](byte* input, byte* output, byte* uniforms) -> void
+	{
+		printf("Special hej!");
+	};
+
+	byte* inputs = (byte*)String("Inputs").CharPtr();
+	byte* outputs = (byte*)String("Outputs").CharPtr();
+	byte* uniforms = (byte*)String("Uniforms").CharPtr();
+	thread->Start<ThreadPool::ThreadPoolFunc>(specialThreadProc, inputs, outputs, uniforms);
 
 	std::cin.get();
 	return 0;
