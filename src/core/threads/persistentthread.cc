@@ -33,7 +33,7 @@ PersistentThread::~PersistentThread()
 /**
 */
 void
-PersistentThread::Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadFuncContext& context)
+PersistentThread::Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadJobContext& context)
 {
 	this->working.exchange(true);
     this->funcs.AppendThreadSafe(func);
@@ -54,7 +54,7 @@ PersistentThread::Start()
             while (this->funcs.Size() > 0)
             {
 				const Ptr<Threading::ThreadJobFunc>& func = this->funcs[0];
-                const Threading::ThreadFuncContext& ctx = this->contexts[0];
+                const Threading::ThreadJobContext& ctx = this->contexts[0];
                 func->Call(ctx.inputs, ctx.outputs, ctx.uniforms);
                 this->funcs.RemoveIndexThreadSafe(0);
             }

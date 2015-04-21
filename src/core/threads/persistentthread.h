@@ -25,7 +25,7 @@ public:
     virtual ~PersistentThread();
     
     /// enqueue function to run
-	void Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadFuncContext& context);
+	void Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadJobContext& context);
     
     /// start the thread
     void Start();
@@ -39,7 +39,7 @@ public:
     
 private:
 	Array<Ptr<Threading::ThreadJobFunc>> funcs;
-    Array<Threading::ThreadFuncContext> contexts;
+    Array<Threading::ThreadJobContext> contexts;
     std::atomic<bool> running;
     std::atomic<bool> working;
     std::thread* thread;

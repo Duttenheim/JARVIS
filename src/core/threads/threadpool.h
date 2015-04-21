@@ -31,7 +31,7 @@ public:
     virtual ~ThreadPool();
     
     /// enqueue thread function and its execution context
-	void Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadFuncContext& ctx);
+	void Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadJobContext& ctx);
     /// update thread pool, this causes the threads to update their status, and finished threads to attain new tasks
     void Update();
 private:
@@ -39,7 +39,7 @@ private:
     Array<Ptr<Thread>> activeThreads;
     Array<Ptr<Thread>> freeThreads;
 	Array<Ptr<Threading::ThreadJobFunc>> funcs;
-    Array<Threading::ThreadFuncContext> contexts;
+    Array<Threading::ThreadJobContext> contexts;
 };
 
 }} // namespace JARVIS::Core
