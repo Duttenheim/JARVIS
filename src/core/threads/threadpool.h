@@ -14,7 +14,9 @@
 //------------------------------------------------------------------------------
 #include <functional>
 #include "util/array.h"
+#include "functional/function.h"
 #include "thread.h"
+#include "threading.h"
 namespace JARVIS {
 namespace Core
 {
@@ -23,31 +25,22 @@ class ThreadPool : public Ref
     __ClassDecl(ThreadPool);
 public:
 
-	/// typedef a typical thread function
-	typedef std::function<void(byte*, byte*, byte*)> ThreadPoolFunc;
-
     /// constructor
     ThreadPool(uint32 threads);
     /// destructor
     virtual ~ThreadPool();
     
-    /// enqueue thread function
-	void Enqueue(const ThreadPoolFunc& func, byte* inputs, byte* outputs, byte* uniforms);
+    /// enqueue thread function and its execution context
+	void Enqueue(const Ptr<Function<Threading::ThreadJobFunc>>& func, const Threading::ThreadFuncContext& ctx);
     /// update thread pool, this causes the threads to update their status, and finished threads to attain new tasks
     void Update();
 private:
 
-	struct ThreadFuncContext
-	{
-		byte* inputs;
-		byte* outputs;
-		byte* uniforms;
-	};
 
     Array<Ptr<Thread>> activeThreads;
     Array<Ptr<Thread>> freeThreads;
-	Array<ThreadPoolFunc> funcs;
-	Array<ThreadFuncContext> contexts;
+	Array<Ptr<Function<Threading::ThreadJobFunc>>> funcs;
+    Array<Threading::ThreadFuncContext> contexts;
 };
 
 }} // namespace JARVIS::Core

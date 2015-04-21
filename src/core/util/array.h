@@ -15,6 +15,7 @@
 #include "mem.h"
 #include <functional>
 #include <algorithm>
+#include <mutex>
 
 #define JARVIS_CACHED_ELEMENT 1
 
@@ -85,6 +86,15 @@ public:
 	void Sort();
 	/// sort array using a special sorting function
 	void Sort(const std::function<bool(const TYPE&, const TYPE&)>& func);
+    
+    /// thread safe append function
+    void AppendThreadSafe(const TYPE& val);
+    /// thread safe remove function
+    void RemoveThreadSafe(const TYPE& key);
+    /// thread safe remove index function
+    void RemoveIndexThreadSafe(uint32 index);
+    /// thread safe size function
+    const uint32 SizeThreadSafe();
 	
 private:
 
@@ -100,6 +110,7 @@ private:
 #if JARVIS_CACHED_ELEMENT
 	TYPE* cachedElement;
 #endif
+    std::mutex mutex;
 };
 
 //------------------------------------------------------------------------------
@@ -125,7 +136,7 @@ template <class TYPE>
 inline
 Array<TYPE>::~Array()
 {
-	if (this->data != nullptr) delete [] this->data;
+    this->Clear();
 }
 
 //------------------------------------------------------------------------------
@@ -361,7 +372,7 @@ Array<TYPE>::RemoveIndex(uint32 index)
 	// convert index to size and calculate how many elements we must move
 	uint32 dist = this->size - (index + 1);
 
-	// run destructor (make sure the virtual destructor can run!
+	// run destructor (make sure the virtual destructor can run!)
 	(&this->data[index])->~TYPE();
 
 	// if we're not at the end of the list, move the data
@@ -377,7 +388,13 @@ template <class TYPE>
 void
 Array<TYPE>::Clear()
 {
-	Memory::Free((void*)this->data);
+    uint32 i;
+    for (i = 0; i < this->size; i++)
+    {
+        (&this->data[i])->~TYPE();
+    }
+    
+    if (nullptr != this->data && this->size > 0) Memory::Free((void*)this->data);
 	this->capacity = 0;
 	this->size = 0;
 	this->data = nullptr;
@@ -551,6 +568,50 @@ Array<TYPE>::Shrink()
 		this->data = buf;
         this->capacity = newCapacity;
 	}	
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+inline void
+Array<TYPE>::AppendThreadSafe(const TYPE& val)
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    this->Append(val);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+inline void
+Array<TYPE>::RemoveThreadSafe(const TYPE &key)
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    this->Remove(key);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+inline void
+Array<TYPE>::RemoveIndexThreadSafe(uint32 index)
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    this->RemoveIndex(index);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+const uint32
+Array<TYPE>::SizeThreadSafe()
+{
+    std::lock_guard<std::mutex> lock(this->mutex);
+    return this->Size();
 }
 
 }} // namespace JARVIS::Core

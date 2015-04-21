@@ -8,10 +8,12 @@
 */
 #include "config.h"
 #include "ptr.h"
+#include "functional/function.h"
 #include "util/array.h"
 #include "util/string.h"
 #include "util/map.h"
 #include "threads/thread.h"
+#include "threads/persistentthread.h"
 #include "rand.h"
 #include <iostream>
 #include <vector>
@@ -22,10 +24,27 @@
 
 using namespace JARVIS::Core;
 
-
 int __cdecl
 main(int argc, const char** argv)
 {
+    Array<uint32> blorf;
+    uint32 florf;
+    florf = 55;
+    blorf.Append(florf);
+    blorf.Append(florf);
+    blorf.Append(florf);
+    blorf.Append(florf);
+    blorf.Append(florf);
+    blorf.Append(florf);
+    blorf.RemoveIndex(0);
+    
+    auto foofunc = [] () { printf("foo"); };
+    Array<std::function<void()>> foofuncarr;
+    foofuncarr.Append(foofunc);
+    foofuncarr.Append(foofunc);
+    foofuncarr.Append(foofunc);
+    foofuncarr.RemoveIndex(0);
+    foofuncarr.RemoveIndex(0);
 
 	Ptr<Timer> timer = Timer::Create();
 	uint32 i;
@@ -123,23 +142,37 @@ main(int argc, const char** argv)
     printf("Lookups took: %f\n", timer->Time());
     
     Ptr<Thread> thread = Thread::Create();
-    auto threadProc = []()
+    Ptr<Function<std::function<void()>>> threadProc = Function<std::function<void()>>::Create([]()
     {
-        printf("Hej!");
-    };
+        printf("Hej!\n");
+    });
     thread->Start(threadProc);
-	while (thread->Running());
-	thread->Stop();
+    thread->Wait();
+	//while (thread->Running());
+	//thread->Stop();
 
-	auto specialThreadProc = [](byte* input, byte* output, byte* uniforms) -> void
-	{
-		printf("Special hej!");
-	};
 
 	byte* inputs = (byte*)String("Inputs").CharPtr();
 	byte* outputs = (byte*)String("Outputs").CharPtr();
 	byte* uniforms = (byte*)String("Uniforms").CharPtr();
-	thread->Start<ThreadPool::ThreadPoolFunc>(specialThreadProc, inputs, outputs, uniforms);
+    
+    Ptr<Function<Threading::ThreadJobFunc>> specialThreadProc =
+    Function<Threading::ThreadJobFunc>::Create([](byte* input, byte* output, byte* uniform) -> void
+	{
+        printf("Hej från specialfunktion!\n");
+    });
+    
+    auto ctx = Threading::ThreadFuncContext{inputs, outputs, uniforms};
+	thread->Start<decltype(specialThreadProc)>(specialThreadProc, inputs, outputs, uniforms);
+    
+    Ptr<PersistentThread> pthread = PersistentThread::Create();
+    pthread->Start();
+    pthread->Enqueue(specialThreadProc, ctx);
+    pthread->Enqueue(specialThreadProc, ctx);
+    pthread->Enqueue(specialThreadProc, ctx);
+    pthread->Enqueue(specialThreadProc, ctx);
+    while (pthread->Working());
+    printf("Färdig!\n");
 
 	std::cin.get();
 	return 0;

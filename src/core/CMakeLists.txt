@@ -34,8 +34,15 @@ SET(core_threads
 	threads/threading.h
 	threads/threadpool.h
 	threads/threadpool.cc
+	threads/persistentthread.h
+	threads/persistentthread.cc
 )
 SOURCE_GROUP("core\\threads" FILES ${core_threads})
+
+SET(core_functional
+    functional/function.h
+)
+SOURCE_GROUP("core\\functional" FILES ${core_functional})
 
 IF(WIN32)
 	SET(core_win32
@@ -46,7 +53,7 @@ IF(WIN32)
 	SET(core_os ${core_win32})
 ENDIF()
 
-ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_threads} ${core_os})
+ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_threads} ${core_functional} ${core_os})
 JARVIS_SETUP_TARGET(core)
 TARGET_INCLUDE_DIRECTORIES(core PUBLIC ${JARVIS_SOURCE_DIR}/src/core)
 SET_TARGET_PROPERTIES(core PROPERTIES FOLDER "JARVIS")

@@ -26,18 +26,7 @@ Thread::Thread() :
 Thread::~Thread()
 {
     // forcefully stop the thread, which kills it and results in a call to std::terminate()
-    this->Stop();
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-void
-Thread::Stop()
-{
-    j_assert(nullptr != this->thread);
-	delete this->thread;
-	this->thread = nullptr;
+    if (nullptr != this->thread) this->Wait();
 }
 
 //------------------------------------------------------------------------------

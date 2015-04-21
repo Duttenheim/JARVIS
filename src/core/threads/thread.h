@@ -7,6 +7,8 @@
  */
 //------------------------------------------------------------------------------
 #include <thread>
+#include "threading.h"
+#include "functional/function.h"
 namespace JARVIS {
 namespace Core
 {
@@ -20,19 +22,18 @@ public:
     /// destructor
     virtual ~Thread();
     
-    /// tell the thread to stop
-    void Stop();
-    /// wait for thread to finish
-    void Wait();
+    /// wait for thread to finish, also deletes the thread
+    virtual void Wait();
 
 	/// returns true if thread is running
 	const bool Running() const;
     
     /// start thread
     void Start(const std::function<void()>& func);
-	/// start thread with templated function
-	template <typename THREADPROC, class... ARGS> void Start(const THREADPROC& functor, ARGS&&... args);
-private:
+	/// start thread with templated function and argument list
+	template <class THREADPROC, class ...PARAMS> void Start(const THREADPROC& func, PARAMS&& ...args);
+    
+protected:
     std::atomic<bool> running;
     std::thread* thread;
 };
@@ -49,14 +50,14 @@ Thread::Running() const
 //------------------------------------------------------------------------------
 /**
 */
-template <typename THREADPROC, class... ARGS>
+template <class THREADPROC, class ...PARAMS>
 void
-Thread::Start(const THREADPROC& functor, ARGS&&... args)
+Thread::Start(const THREADPROC& func, PARAMS&& ...args)
 {
 	j_assert(nullptr == this->thread);
 	auto threadProc = [&]()
 	{
-		functor(args...);
+        func->Call(args...);
 		this->running.exchange(false);
 	};
 	this->thread = Memory::New<std::thread>(threadProc);

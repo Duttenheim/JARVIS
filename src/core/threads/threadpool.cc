@@ -16,7 +16,6 @@ ThreadPool::ThreadPool(uint32 threads)
 {
     this->activeThreads.Resize(threads);
     this->freeThreads.Resize(threads);
-	this->contexts.Resize(threads);
     
     // setup threads as active
     uint32 i;
@@ -39,10 +38,10 @@ ThreadPool::~ThreadPool()
 /**
 */
 void
-ThreadPool::Enqueue(const std::function<void(byte*, byte*, byte*)>& func, byte* inputs, byte* outputs, byte* uniforms)
+ThreadPool::Enqueue(const Ptr<Function<Threading::ThreadJobFunc>>& func, const Threading::ThreadFuncContext& ctx)
 {
     this->funcs.Append(func);
-	this->contexts.Append(ThreadFuncContext{ inputs, outputs, uniforms });
+    this->contexts.Append(ctx);
 }
 
 //------------------------------------------------------------------------------
@@ -54,13 +53,19 @@ ThreadPool::Update()
 	uint32 i;
 	while (this->freeThreads.Size() > 0 && this->funcs.Size() > 0)
 	{
+        // aquire thread, function and thread context
 		const Ptr<Thread>& thread = this->freeThreads[0];
-		const ThreadPoolFunc& func = this->funcs[0];
-		const ThreadFuncContext& context = this->contexts[0];
-		thread->Start<ThreadPoolFunc>(func, context.inputs, context.outputs, context.uniforms);
+		const Ptr<Function<Threading::ThreadJobFunc>>& func = this->funcs[0];
+        const Threading::ThreadFuncContext& ctx = this->contexts[0];
+        
+        // start thread
+		thread->Start<decltype(func)>(func, ctx.inputs, ctx.outputs, ctx.uniforms);
+        
+        // remove thread, context and function from the todo-lists
 		this->funcs.RemoveIndex(0);
 		this->freeThreads.RemoveIndex(0);
-		this->contexts.RemoveIndex(0);
+        
+        // add currently running thread to the active thread list
 		this->activeThreads.Append(thread);
 	}
 
@@ -71,7 +76,7 @@ ThreadPool::Update()
 		// stop thread and move to other list if done
 		if (!thread->Running())
 		{
-			thread->Stop();
+			thread->Wait();
 			this->freeThreads.Append(thread);
 			this->activeThreads.RemoveIndex(i);
 			i--;

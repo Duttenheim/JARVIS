@@ -11,6 +11,16 @@ namespace Core {
 namespace Threading
 {
 
+/// typedef a typical thread function
+typedef std::function<void(byte*, byte*, byte*)> ThreadJobFunc;
+
+struct ThreadFuncContext
+{
+    byte* inputs;
+    byte* outputs;
+    byte* uniforms;
+};
+    
 //------------------------------------------------------------------------------
 /**
     Sleep current thread.

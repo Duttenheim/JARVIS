@@ -49,3 +49,4 @@ typedef __m128d		dvec4;
 #include "debug.h"
 #include "ref.h"
 #include "ptr.h"
+#include "mem.h"
