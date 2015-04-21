@@ -11,7 +11,6 @@
 	(C) 2015 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
-#include "mem.h"
 #include <string.h>
 namespace JARVIS { 
 namespace Core

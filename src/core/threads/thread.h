@@ -28,9 +28,7 @@ public:
 	/// returns true if thread is running
 	const bool Running() const;
     
-    /// start thread
-    void Start(const std::function<void()>& func);
-	/// start thread with templated function and argument list
+	/// execute thread given a function and a list of arguments
 	template <class THREADPROC, class ...PARAMS> void Start(const THREADPROC& func, PARAMS&& ...args);
     
 protected:

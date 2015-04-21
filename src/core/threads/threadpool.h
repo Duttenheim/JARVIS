@@ -31,15 +31,14 @@ public:
     virtual ~ThreadPool();
     
     /// enqueue thread function and its execution context
-	void Enqueue(const Ptr<Function<Threading::ThreadJobFunc>>& func, const Threading::ThreadFuncContext& ctx);
+	void Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadFuncContext& ctx);
     /// update thread pool, this causes the threads to update their status, and finished threads to attain new tasks
     void Update();
 private:
 
-
     Array<Ptr<Thread>> activeThreads;
     Array<Ptr<Thread>> freeThreads;
-	Array<Ptr<Function<Threading::ThreadJobFunc>>> funcs;
+	Array<Ptr<Threading::ThreadJobFunc>> funcs;
     Array<Threading::ThreadFuncContext> contexts;
 };
 

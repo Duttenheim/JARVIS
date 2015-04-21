@@ -3,6 +3,7 @@
     @class JARVIS::Core::PersistentThread
  	(C) 2015 See the LICENSE file.
 */
+#include "config.h"
 #include "threads/persistentthread.h"
 namespace JARVIS {
 namespace Core
@@ -13,9 +14,10 @@ namespace Core
 */
 PersistentThread::PersistentThread() :
     running({false}),
-    working({false})
+    working({false}),
+	thread(nullptr)
 {
-
+	// empty
 }
 
 //------------------------------------------------------------------------------
@@ -31,11 +33,11 @@ PersistentThread::~PersistentThread()
 /**
 */
 void
-PersistentThread::Enqueue(const Ptr<Function<Threading::ThreadJobFunc>>& func, const Threading::ThreadFuncContext& context)
+PersistentThread::Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadFuncContext& context)
 {
+	this->working.exchange(true);
     this->funcs.AppendThreadSafe(func);
     this->contexts.AppendThreadSafe(context);
-    this->working.exchange(true);
 }
 
 //------------------------------------------------------------------------------
@@ -49,9 +51,9 @@ PersistentThread::Start()
     {
         while (this->running.load())
         {
-            while (this->funcs.SizeThreadSafe() > 0)
+            while (this->funcs.Size() > 0)
             {
-                const Ptr<Function<Threading::ThreadJobFunc>>& func = this->funcs[0];
+				const Ptr<Threading::ThreadJobFunc>& func = this->funcs[0];
                 const Threading::ThreadFuncContext& ctx = this->contexts[0];
                 func->Call(ctx.inputs, ctx.outputs, ctx.uniforms);
                 this->funcs.RemoveIndexThreadSafe(0);
@@ -66,8 +68,8 @@ PersistentThread::Start()
         this->running.exchange(false);
     };
     
+	this->running.exchange(true);
     this->thread = Memory::New<std::thread>(proc);
-    this->running.exchange(true);
 }
 
 //------------------------------------------------------------------------------

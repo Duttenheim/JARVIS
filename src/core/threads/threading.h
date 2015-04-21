@@ -5,16 +5,17 @@
  
 	(C) 2015 See the LICENSE file.
 */
-
+#include "functional/function.h"
 namespace JARVIS {
 namespace Core {
 namespace Threading
 {
 
 /// typedef a typical thread function
-typedef std::function<void(byte*, byte*, byte*)> ThreadJobFunc;
+typedef Function<void(byte*, byte*, byte*)> ThreadJobFunc;
 
-struct ThreadFuncContext
+/// define struct for common case use of thread jobs
+struct ThreadJobContext
 {
     byte* inputs;
     byte* outputs;

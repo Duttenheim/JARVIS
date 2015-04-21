@@ -6,8 +6,17 @@
     Encapsulates an std function bind into a ref counted object
     so that it may be added and removed from lists without losing validity.
     
-    Since std::function doesn't have a copy constructor,
-    this container class will handle reference counting explicitly.
+	This wraps an std::function but without having to use another 
+	template do describe itself as containing a function, which results in a cleaner
+	initialization of the class.
+
+	Instead of writing Function<std::function<void()>> we can instead just write Function<void()>
+	and get it as a refcounted function container. 
+	
+	Instantiate this class by using the std::function syntax, and using Create to feed it a lambda function.
+	Example:
+		Function<void()> func = Function<void()>::Create([]() { printf("Refcounted lambda!"); });
+		func->Call();
 	
 	(C) 2015 See the LICENSE file.
  */
@@ -16,40 +25,41 @@
 namespace JARVIS {
 namespace Core
 {
-template<class FUNC>
-class Function : public Ref
+template <class>
+class Function;
+
+template<class RET, class... PARAMS> 
+class Function<RET(PARAMS...)> : public Ref
 {
-    __ClassDecl(Function);
+	__ClassDecl(Function);
 public:
-    /// constructor
-    Function(const FUNC& func);
-    /// destructor
-    virtual ~Function();
-    
-    /// call function
-    template <class... PARAMS> void Call(PARAMS&&... args) const;
-    
-    /// run function
-    void operator()();
-    
+	/// constructor from function
+	template <class FUNC> Function(FUNC&& func);
+	/// destructor
+	virtual ~Function();
+
+	/// call function
+	template <class... ARGS> void Call(ARGS&&... args) const;
+
 private:
-    FUNC function;
+	std::function<RET(PARAMS...)> func;
 };
 
 //------------------------------------------------------------------------------
 /**
 */
-template <class FUNC>
-Function<FUNC>::Function(const FUNC& func)
+template<class RET, class... PARAMS>
+template<class FUNC>
+Function<RET(PARAMS...)>::Function(FUNC&& func)
 {
-    this->function = func;
+	this->func = std::function<RET(PARAMS...)>(func);
 }
 
 //------------------------------------------------------------------------------
 /**
 */
-template <class FUNC>
-Function<FUNC>::~Function()
+template<class RET, class... PARAMS>
+Function<RET(PARAMS...)>::~Function()
 {
     // empty
 }
@@ -57,22 +67,12 @@ Function<FUNC>::~Function()
 //------------------------------------------------------------------------------
 /**
 */
-template <class FUNC>
-template <class... PARAMS>
+template<class RET, class... PARAMS>
+template <class... ARGS>
 void
-Function<FUNC>::Call(PARAMS&&... args) const
+Function<RET(PARAMS...)>::Call(ARGS&&... args) const
 {
-    this->function(args...);
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-template <class FUNC>
-void
-Function<FUNC>::operator()()
-{
-    this->function();
+	this->func(args...);
 }
 
 }} // namespace JARVIS::Core

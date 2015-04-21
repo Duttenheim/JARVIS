@@ -5,7 +5,6 @@
 */
 #include "config.h"
 #include "thread.h"
-#include "mem.h"
 namespace JARVIS {
 namespace Core
 {
@@ -39,22 +38,6 @@ Thread::Wait()
     this->thread->join();
 	delete this->thread;
 	this->thread = nullptr;
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-void
-Thread::Start(const std::function<void()> &func)
-{
-    j_assert(nullptr == this->thread);
-	auto threadProc = [this, &func]()
-	{
-		func();
-		this->running.exchange(false);
-	};
-	this->thread = Memory::New<std::thread>(threadProc);
-	this->running.exchange(true);
 }
 
 }} // namespace JARVIS::Core

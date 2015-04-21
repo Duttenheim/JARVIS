@@ -27,25 +27,6 @@ using namespace JARVIS::Core;
 int __cdecl
 main(int argc, const char** argv)
 {
-    Array<uint32> blorf;
-    uint32 florf;
-    florf = 55;
-    blorf.Append(florf);
-    blorf.Append(florf);
-    blorf.Append(florf);
-    blorf.Append(florf);
-    blorf.Append(florf);
-    blorf.Append(florf);
-    blorf.RemoveIndex(0);
-    
-    auto foofunc = [] () { printf("foo"); };
-    Array<std::function<void()>> foofuncarr;
-    foofuncarr.Append(foofunc);
-    foofuncarr.Append(foofunc);
-    foofuncarr.Append(foofunc);
-    foofuncarr.RemoveIndex(0);
-    foofuncarr.RemoveIndex(0);
-
 	Ptr<Timer> timer = Timer::Create();
 	uint32 i;
 
@@ -142,7 +123,7 @@ main(int argc, const char** argv)
     printf("Lookups took: %f\n", timer->Time());
     
     Ptr<Thread> thread = Thread::Create();
-    Ptr<Function<std::function<void()>>> threadProc = Function<std::function<void()>>::Create([]()
+    Ptr<Function<void()>> threadProc = Function<void()>::Create([]()
     {
         printf("Hej!\n");
     });
@@ -155,15 +136,15 @@ main(int argc, const char** argv)
 	byte* inputs = (byte*)String("Inputs").CharPtr();
 	byte* outputs = (byte*)String("Outputs").CharPtr();
 	byte* uniforms = (byte*)String("Uniforms").CharPtr();
-    
-    Ptr<Function<Threading::ThreadJobFunc>> specialThreadProc =
-    Function<Threading::ThreadJobFunc>::Create([](byte* input, byte* output, byte* uniform) -> void
+   
+    Ptr<Threading::ThreadJobFunc> specialThreadProc =
+	Threading::ThreadJobFunc::Create([](byte* input, byte* output, byte* uniform) -> void
 	{
         printf("Hej från specialfunktion!\n");
     });
     
-    auto ctx = Threading::ThreadFuncContext{inputs, outputs, uniforms};
-	thread->Start<decltype(specialThreadProc)>(specialThreadProc, inputs, outputs, uniforms);
+    auto ctx = Threading::ThreadJobContext{inputs, outputs, uniforms};
+	thread->Start(specialThreadProc, inputs, outputs, uniforms);
     
     Ptr<PersistentThread> pthread = PersistentThread::Create();
     pthread->Start();

@@ -12,7 +12,6 @@
 	(C) 2015 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
-#include "mem.h"
 #include <functional>
 #include <algorithm>
 #include <mutex>
@@ -93,8 +92,6 @@ public:
     void RemoveThreadSafe(const TYPE& key);
     /// thread safe remove index function
     void RemoveIndexThreadSafe(uint32 index);
-    /// thread safe size function
-    const uint32 SizeThreadSafe();
 	
 private:
 
@@ -601,17 +598,6 @@ Array<TYPE>::RemoveIndexThreadSafe(uint32 index)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     this->RemoveIndex(index);
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-template <class TYPE>
-const uint32
-Array<TYPE>::SizeThreadSafe()
-{
-    std::lock_guard<std::mutex> lock(this->mutex);
-    return this->Size();
 }
 
 }} // namespace JARVIS::Core

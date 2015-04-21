@@ -38,7 +38,7 @@ ThreadPool::~ThreadPool()
 /**
 */
 void
-ThreadPool::Enqueue(const Ptr<Function<Threading::ThreadJobFunc>>& func, const Threading::ThreadFuncContext& ctx)
+ThreadPool::Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadFuncContext& ctx)
 {
     this->funcs.Append(func);
     this->contexts.Append(ctx);
@@ -55,11 +55,11 @@ ThreadPool::Update()
 	{
         // aquire thread, function and thread context
 		const Ptr<Thread>& thread = this->freeThreads[0];
-		const Ptr<Function<Threading::ThreadJobFunc>>& func = this->funcs[0];
+		const Ptr<Threading::ThreadJobFunc>& func = this->funcs[0];
         const Threading::ThreadFuncContext& ctx = this->contexts[0];
         
         // start thread
-		thread->Start<decltype(func)>(func, ctx.inputs, ctx.outputs, ctx.uniforms);
+		thread->Start(func, ctx.inputs, ctx.outputs, ctx.uniforms);
         
         // remove thread, context and function from the todo-lists
 		this->funcs.RemoveIndex(0);
