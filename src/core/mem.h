@@ -9,10 +9,10 @@
 */
 #include <cstdlib>
 #include <cstring>
+#include <iterator>
 
 #define JARVIS_MEM_INIT	 0xFF
-#define JARVIS_MEM_DEBUG (1)
-#define JARVIS_FILL_DUFFSDEVICE (1)
+#define JARVIS_MEM_DEBUG (0)
 
 namespace JARVIS {
 namespace Core {
@@ -20,7 +20,7 @@ namespace Memory
 {
 
 static void Fill(void* buf, uint32 size, uint8 val);
-template <class TYPE> static void Fill(TYPE* buf, uint32 elements, uint8 val);
+template <class TYPE> static void Fill(TYPE* buf, uint32 elements, const TYPE& val);
 template <class TYPE> static void FillDuffs(TYPE* buf, uint32 elements, const TYPE& val);
 
 //------------------------------------------------------------------------------
@@ -116,7 +116,12 @@ template <class TYPE>
 inline static void
 Move(TYPE* from, TYPE* to, uint32 elements)
 {
-	std::memmove((void*)to, (void*)from, sizeof(TYPE) * elements);
+	TYPE* end = from + elements;
+	while (from != end)
+	{
+		*to = std::move(*from);
+		++from; ++to;
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -171,9 +176,9 @@ FillDuffs(TYPE* buf, uint32 elements, const TYPE& val)
 */
 template <class TYPE>
 inline static void
-Fill(TYPE* buf, uint32 elements, uint8 val)
+Fill(TYPE* buf, uint32 elements, const TYPE& val)
 {
-	std::memset((void*)buf, val, elements * sizeof(TYPE));
+	std::fill(buf, buf + elements, val);
 }
 
 //------------------------------------------------------------------------------

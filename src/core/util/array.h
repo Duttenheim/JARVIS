@@ -223,8 +223,14 @@ Array<TYPE>::Resize(const uint32 size)
         this->size = j_min(this->size, this->capacity);
         
         // run constructor on newly created elements
-        for (uint32 i = this->size; i < this->capacity; i++) new (buf + i) TYPE;
-		Memory::Copy<TYPE>(this->data, buf, this->size);
+		for (uint32 i = 0; i < this->size; i++)
+		{
+			new (buf + i) TYPE(std::move(this->data[i]));
+			(&this->data[i])->~TYPE();
+		}
+        //for (uint32 i = this->size; i < this->capacity; i++) new (buf + i) TYPE;
+		//Memory::Copy<TYPE>(this->data, buf, this->size);
+		Memory::Fill(buf + this->size, (this->capacity - this->size) * sizeof(TYPE), 0);
         Memory::Free(this->data);
 		this->data = buf;
 	}	
@@ -250,7 +256,7 @@ Array<TYPE>::Append(const TYPE& key)
 {	
 	// if we don't have any room, then we make room!
 	if (this->size == this->capacity) this->Grow();
-	this->data[this->size] = key;
+	new (this->data + this->size) TYPE(std::move(key));
 	this->size++;
 }
 
@@ -369,7 +375,7 @@ Array<TYPE>::RemoveIndex(uint32 index)
 	// convert index to size and calculate how many elements we must move
 	uint32 dist = this->size - (index + 1);
 
-	// run destructor (make sure the virtual destructor can run!)
+	// run destructor on element we remove
 	(&this->data[index])->~TYPE();
 
 	// if we're not at the end of the list, move the data
@@ -378,8 +384,8 @@ Array<TYPE>::RemoveIndex(uint32 index)
 		// move data
 		Memory::Move<TYPE>(this->data + index + 1, this->data + index, dist);
 
-		// run constructor on freed element (doesn't actually alloc anything)
-		new (&this->data[this->size-1]) TYPE;
+		// run constructor on freed element
+		//new (&this->data[this->size-1]) TYPE;
 	}
 
 	// decrease size
@@ -543,14 +549,24 @@ Array<TYPE>::Grow()
 
 	uint32 newCapacity = this->capacity + growSize;
 	TYPE* buf = Memory::Alloc<TYPE>(newCapacity);
-	if (this->data != nullptr)
-	{
-		Memory::Copy<TYPE>(this->data, buf, this->size);
-		Memory::Free(this->data);
-	}	
 
 	// run constructor on newly created elements
-	for (uint32 i = this->size; i < newCapacity; i++) new (buf + i) TYPE;
+	//for (uint32 i = this->size; i < newCapacity; i++) new (buf + i) TYPE;
+
+	//for (uint32 i = this->size; i < newCapacity; i++) new (buf + i) TYPE;
+	Memory::Fill(buf + this->size, (newCapacity - this->size) * sizeof(TYPE), 0);
+
+	if (this->data != nullptr)
+	{
+		for (uint32 i = 0; i < this->size; i++)
+		{
+			new (buf + i) TYPE(std::move(this->data[i]));
+			(&this->data[i])->~TYPE();
+		}
+		//Memory::Move<TYPE>(this->data, buf, this->size);
+		//Memory::Copy<TYPE>(this->data, buf, this->size);
+		Memory::Free(this->data);
+	}	
 
 	this->capacity = newCapacity;
 	this->data = buf;
