@@ -15,7 +15,7 @@
 	
 	Instantiate this class by using the std::function syntax, and using Create to feed it a lambda function.
 	Example:
-		Function<void()> func = Function<void()>::Create([]() { printf("Refcounted lambda!"); });
+		Function<void()> func = Function<void()>::Create([]() { printf("Reference counted lambda function!"); });
 		func->Call();
 	
 	(C) 2015 See the LICENSE file.

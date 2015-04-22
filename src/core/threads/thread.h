@@ -21,6 +21,16 @@ public:
     Thread();
     /// destructor
     virtual ~Thread();
+
+	/// copy constructor
+	Thread(const Thread& rhs);
+	/// move constructor
+	Thread(Thread&& rhs);
+
+	/// assign operator
+	void operator=(const Thread& rhs);
+	/// move operator
+	void operator=(Thread&& rhs);
     
     /// wait for thread to finish, also deletes the thread
     virtual void Wait();

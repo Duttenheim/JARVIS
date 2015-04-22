@@ -20,7 +20,8 @@ namespace Memory
 {
 
 static void Fill(void* buf, uint32 size, uint8 val);
-template <class TYPE> static void Fill(TYPE* buf, uint32 size, const TYPE& val);
+template <class TYPE> static void Fill(TYPE* buf, uint32 elements, uint8 val);
+template <class TYPE> static void FillDuffs(TYPE* buf, uint32 elements, const TYPE& val);
 
 //------------------------------------------------------------------------------
 /**
@@ -34,7 +35,7 @@ Alloc(uint32 elements)
 	TYPE* buf = (TYPE*)std::malloc(sizeof(TYPE) * elements);
 	j_assert(buf != nullptr);
 #if JARVIS_MEM_DEBUG
-	Memory::Fill(buf, sizeof(TYPE) * elements, JARVIS_MEM_INIT);
+	Memory::Fill(buf, elements, JARVIS_MEM_INIT);
 #endif
 	return buf;
 }
@@ -140,7 +141,7 @@ Move(void* from, void* to, uint32 size)
 */
 template <class TYPE>
 inline static void
-Fill(TYPE* buf, uint32 elements, const TYPE& val)
+FillDuffs(TYPE* buf, uint32 elements, const TYPE& val)
 {
 	TYPE *to = buf;
     auto count = elements;
@@ -159,6 +160,20 @@ Fill(TYPE* buf, uint32 elements, const TYPE& val)
 			} while (--n > 0);
 		}
 	}
+}
+
+//------------------------------------------------------------------------------
+/**
+	Fills buffer.
+	@param buf			The buffer we want to fill.
+	@param elements		The number of elements we want to fill.
+	@param val			The byte value we want to fill with.
+*/
+template <class TYPE>
+inline static void
+Fill(TYPE* buf, uint32 elements, uint8 val)
+{
+	std::memset((void*)buf, val, elements * sizeof(TYPE));
 }
 
 //------------------------------------------------------------------------------

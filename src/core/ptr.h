@@ -141,7 +141,7 @@ inline
 Ptr<TYPE>::Ptr(const Ptr<TYPE>& rhs) :
 	ptr(rhs.ptr)
 {
-	if (0 != this->ptr) this->ptr->Retain();
+	if (nullptr != this->ptr) this->ptr->Retain();
 }
 
 //------------------------------------------------------------------------------
@@ -189,9 +189,9 @@ Ptr<TYPE>::operator=(const Ptr<TYPE>& rhs)
 {
 	if (this->ptr != rhs.ptr)
 	{
-		if (this->ptr) this->ptr->Release();
+		if (nullptr != this->ptr) this->ptr->Release();
 		this->ptr = rhs.ptr;
-		if (this->ptr) this->ptr->Retain();
+		if (nullptr != this->ptr) this->ptr->Retain();
 	}
 }
 
@@ -218,9 +218,9 @@ Ptr<TYPE>::operator=(TYPE* rhs)
 {
 	if (this->ptr != rhs)
 	{
-		if (this->ptr) this->ptr->Release();
+		if (nullptr != this->ptr) this->ptr->Release();
 		this->ptr = rhs;
-		if (this->ptr) this->ptr->Retain();
+		if (nullptr != this->ptr) this->ptr->Retain();
 	}
 }
 
@@ -283,7 +283,6 @@ Ptr<TYPE>::Pointer() const
 {
 	return this->ptr;
 }
-
 
 //------------------------------------------------------------------------------
 /**

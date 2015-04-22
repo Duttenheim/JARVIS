@@ -373,8 +373,16 @@ Array<TYPE>::RemoveIndex(uint32 index)
 	(&this->data[index])->~TYPE();
 
 	// if we're not at the end of the list, move the data
-	if (dist > 0) Memory::Move<TYPE>(this->data + index + 1, this->data + index, dist);
+	if (dist > 0)
+	{
+		// move data
+		Memory::Move<TYPE>(this->data + index + 1, this->data + index, dist);
 
+		// run constructor on freed element (doesn't actually alloc anything)
+		new (&this->data[this->size-1]) TYPE;
+	}
+
+	// decrease size
 	this->size--;
 }
 
@@ -388,7 +396,7 @@ Array<TYPE>::Clear()
     uint32 i;
     for (i = 0; i < this->size; i++)
     {
-        (&this->data[i])->~TYPE();
+		(&this->data[i])->~TYPE();
     }
     
     if (nullptr != this->data && this->size > 0) Memory::Free((void*)this->data);

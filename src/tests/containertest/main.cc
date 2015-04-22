@@ -8,19 +8,15 @@
 */
 #include "config.h"
 #include "ptr.h"
-#include "functional/function.h"
 #include "util/array.h"
 #include "util/string.h"
 #include "util/map.h"
-#include "threads/thread.h"
-#include "threads/persistentthread.h"
 #include "rand.h"
 #include <iostream>
 #include <vector>
 #include <map>
 #include "enum.h"
 #include "util/timer.h"
-#include "threads/threadpool.h"
 
 using namespace JARVIS::Core;
 
@@ -29,17 +25,6 @@ main(int argc, const char** argv)
 {
 	Ptr<Timer> timer = Timer::Create();
 	uint32 i;
-
-	/*
-	Array<uint32> perfArr;
-	timer->Start();
-	for (i = 0; i < 1000000; i++)
-	{
-		perfArr.Append(j_randis(0, 65535, i));
-	}
-	timer->Stop();
-	printf("Time taken for custom array: %f\n", timer->Time());
-	*/
 	Map<uint32, String> dict;
 
 	printf("--- Custom dictionary ---\n");
@@ -122,53 +107,6 @@ main(int argc, const char** argv)
     timer->Stop();
     printf("Lookups took: %f\n", timer->Time());
     
-    Ptr<Thread> thread = Thread::Create();
-    Ptr<Function<void()>> threadProc = Function<void()>::Create([]()
-    {
-        printf("Hej!\n");
-    });
-    thread->Start(threadProc);
-    thread->Wait();
-	//while (thread->Running());
-	//thread->Stop();
-
-	byte* inputs = (byte*)String("Inputs").CharPtr();
-	byte* outputs = (byte*)String("Outputs").CharPtr();
-	byte* uniforms = (byte*)String("Uniforms").CharPtr();
-   
-    Ptr<Threading::ThreadJobFunc> specialThreadProc =
-	Threading::ThreadJobFunc::Create([](byte* input, byte* output, byte* uniform) -> void
-	{
-        printf("Hej från specialfunktion!\n");
-    });
-    
-    auto ctx = Threading::ThreadJobContext{inputs, outputs, uniforms};
-	thread->Start(specialThreadProc, inputs, outputs, uniforms);
-    
-    Ptr<PersistentThread> pthread = PersistentThread::Create();
-    pthread->Start();
-    pthread->Enqueue(specialThreadProc, ctx);
-    pthread->Enqueue(specialThreadProc, ctx);
-    pthread->Enqueue(specialThreadProc, ctx);
-    pthread->Enqueue(specialThreadProc, ctx);
-    while (pthread->Working());
-
-	// create some bogus jobs
-	
-
-	Ptr<ThreadPool> pool = ThreadPool::Create(16);
-	for (i = 0; i < 16; i++)
-	{
-		// create bogus job
-		auto poolProc1 = Threading::ThreadJobFunc::Create([=](byte* input, byte* output, byte* uniform)
-		{
-			printf("Pool job #%d", i);
-		});
-		pool->Enqueue(poolProc1, ctx);
-	}
-	pool->Update();
-    printf("Färdig!\n");
-
 	std::cin.get();
 	return 0;
 }

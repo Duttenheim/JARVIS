@@ -60,14 +60,14 @@ ThreadPool::Update()
         
         // start thread
 		thread->Start(func, ctx.inputs, ctx.outputs, ctx.uniforms);
-        
+    
+		// add currently running thread to the active thread list
+		this->activeThreads.Append(thread);
+
         // remove thread, context and function from the todo-lists
 		this->funcs.RemoveIndex(0);
 		this->freeThreads.RemoveIndex(0);
-        
-        // add currently running thread to the active thread list
-		this->activeThreads.Append(thread);
-	}
+    }
 
 	for (i = 0; i < this->activeThreads.Size(); i++)
 	{
