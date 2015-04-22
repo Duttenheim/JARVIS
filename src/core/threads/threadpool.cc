@@ -67,6 +67,7 @@ ThreadPool::Update()
         // remove thread, context and function from the todo-lists
 		this->funcs.RemoveIndex(0);
 		this->freeThreads.RemoveIndex(0);
+        this->contexts.RemoveIndex(0);
     }
 
 	for (i = 0; i < this->activeThreads.Size(); i++)

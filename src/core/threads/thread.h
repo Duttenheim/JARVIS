@@ -63,7 +63,9 @@ void
 Thread::Start(const THREADPROC& func, PARAMS&& ...args)
 {
 	j_assert(nullptr == this->thread);
-	auto threadProc = [&]()
+    
+    // create lambda, remember to copy the function because it may be removed before it can get called
+	auto threadProc = [&, func]()
 	{
         func->Call(args...);
 		this->running.exchange(false);

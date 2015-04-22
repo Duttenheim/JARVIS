@@ -48,7 +48,7 @@ public:
 
 	/// move constructor from smart pointer of other type
 	template<class OTHERTYPE> 
-	Ptr(const Ptr<OTHERTYPE>&& rhs)
+	Ptr(Ptr<OTHERTYPE>&& rhs)
 	{
 		this->ptr = static_cast<TYPE*>(rhs.Pointer());
 		rhs.ptr = nullptr;
@@ -83,7 +83,7 @@ public:
 	}
 
 	/// assignment operator for smart pointer of other type
-	template<class OTHERTYPE> void operator=(const Ptr<OTHERTYPE>&& rhs)
+	template<class OTHERTYPE> void operator=(Ptr<OTHERTYPE>&& rhs)
 	{
 		TYPE* p = static_cast<TYPE*>(rhs.Pointer());
 		if (p != this->ptr)
