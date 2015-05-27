@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iterator>
+#include <algorithm>
 
 #define JARVIS_MEM_INIT	 0xFF
 #define JARVIS_MEM_DEBUG (0)

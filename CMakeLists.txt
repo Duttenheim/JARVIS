@@ -10,7 +10,7 @@ PROJECT(JARVIS)
 include(CMakeDependentOption)
 
 # interface library, every lib including this will also copy this libraries settings
-ADD_LIBRARY(JARVIS INTERFACE)
+#ADD_LIBRARY(JARVIS INTERFACE)
 
 IF(WIN32)
 	ADD_DEFINITIONS(-D__WIN32__)	
@@ -36,3 +36,4 @@ FOREACH(i ${CMAKE_CXX_COMPILE_FEATURES})
 ENDFOREACH()
 
 ADD_SUBDIRECTORY(src)
+ADD_SUBDIRECTORY(ext)

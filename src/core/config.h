@@ -8,6 +8,10 @@
 */
 #ifdef __WIN32__
 #include "win32/pch.h"
+#elif __APPLE__
+#include "apple/pch.h"
+#elif __UNIX__
+#include "posix/pch.h"
 #endif
 
 #include <stdint.h>
@@ -36,6 +40,13 @@ typedef __m128		vec4;
 typedef __m128i		ivec4;
 typedef __m128d		dvec4;
 
+// hmm, maybe move this to each platforms pch.h
+#if __WIN32__
+#define JARVIS_MAIN int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd)
+#else
+#define JARVIS_MAIN int main(int argc, const char** argv)
+#endif
+
 #define j_min(x, y) x < y ? x : y
 #define j_max(x, y) x > y ? x : y
 
@@ -50,3 +61,4 @@ typedef __m128d		dvec4;
 #include "ref.h"
 #include "ptr.h"
 #include "mem.h"
+#include "enum.h"

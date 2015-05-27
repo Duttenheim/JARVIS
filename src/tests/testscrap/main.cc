@@ -7,27 +7,25 @@
 	(C) 2015 See the LICENSE file.
 */
 #include "config.h"
-#include "ptr.h"
 #include "functional/function.h"
 #include "util/array.h"
-#include "util/string.h"
-#include "util/map.h"
-#include "threads/thread.h"
-#include "threads/persistentthread.h"
-#include "rand.h"
+#include "application.h"
 #include <iostream>
 #include <vector>
 #include <map>
-#include "enum.h"
-#include "util/timer.h"
-#include "threads/threadpool.h"
 
 using namespace JARVIS::Core;
 
-int __cdecl
-main(int argc, const char** argv)
+JARVIS_MAIN
 {
 	Array<std::function<void()>> arr;
+    Ptr<Function<void()>> blorf = Function<void()>::Create([]() { printf("BLORF\n"); });
+    blorf->Call();
+    Ptr<Function<void()>> florb = Function<void()>::Create([]() { printf("FLORB\n"); });
+    florb->Call();
+    blorf = florb;
+    blorf->Call();
+    florb->Call();
 	uint32 foobar = 5;
 	std::function<void()> proc = [&]() { printf("Hej! %d", foobar); };
 	arr.Append([&]() { printf("Hej! %d", foobar); });

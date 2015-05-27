@@ -12,14 +12,13 @@
 #include "util/string.h"
 #include "threads/thread.h"
 #include "threads/persistentthread.h"
-#include "rand.h"
-#include <iostream>
 #include "threads/threadpool.h"
+#include "application.h"
+#include <iostream>
 
 using namespace JARVIS::Core;
 
-int __cdecl
-main(int argc, const char** argv)
+JARVIS_MAIN
 {    
     Ptr<Thread> thread = Thread::Create();
     Ptr<Function<void()>> threadProc = Function<void()>::Create([]()

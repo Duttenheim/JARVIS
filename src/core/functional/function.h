@@ -15,7 +15,7 @@
 	
 	Instantiate this class by using the std::function syntax, and using Create to feed it a lambda function.
 	Example:
-		Function<void()> func = Function<void()>::Create([]() { printf("Reference counted lambda function!"); });
+		Ptr<Function<void()>> func = Function<void()>::Create([]() { printf("Reference counted lambda function!"); });
 		func->Call();
 	
 	(C) 2015 See the LICENSE file.
@@ -33,10 +33,17 @@ class Function<RET(PARAMS...)> : public Ref
 {
 	__ClassDecl(Function);
 public:
+    /// default constructor
+    Function();
 	/// constructor from function
-	template <class FUNC> Function(FUNC&& func);
+	template <class FUNC> Function(FUNC rhs);
 	/// destructor
 	virtual ~Function();
+    
+    /// assignment operator from function
+    template <class FUNC> void operator=(FUNC rhs);
+    /// move operator from function
+    template <class FUNC> void operator=(FUNC&& rhs);
 
 	/// call function
 	template <class... ARGS> void Call(ARGS&&... args) const;
@@ -49,10 +56,19 @@ private:
 /**
 */
 template<class RET, class... PARAMS>
-template<class FUNC>
-Function<RET(PARAMS...)>::Function(FUNC&& func)
+Function<RET(PARAMS...)>::Function()
 {
-	this->func = std::function<RET(PARAMS...)>(func);
+    // empty
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template<class RET, class... PARAMS>
+template<class FUNC>
+Function<RET(PARAMS...)>::Function(FUNC rhs)
+{
+    this->func = rhs;
 }
 
 //------------------------------------------------------------------------------
@@ -62,6 +78,29 @@ template<class RET, class... PARAMS>
 Function<RET(PARAMS...)>::~Function()
 {
     // empty
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template<class RET, class... PARAMS>
+template<class FUNC>
+void
+Function<RET(PARAMS...)>::operator=(FUNC rhs)
+{
+    this->func = rhs;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template<class RET, class... PARAMS>
+template<class FUNC>
+void
+Function<RET(PARAMS...)>::operator=(FUNC&& rhs)
+{
+    this->func = rhs;
+    rhs = nullptr;
 }
 
 //------------------------------------------------------------------------------

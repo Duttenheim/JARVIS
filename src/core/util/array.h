@@ -63,7 +63,7 @@ public:
 	/// remove from array using an iterator
 	void Remove(Iter iterator);
 	/// remove from array using index
-	void RemoveIndex(uint32 index);
+	void RemoveIndex(const uint32 index);
 	/// clear array
 	void Clear();
 
@@ -91,7 +91,7 @@ public:
     /// thread safe remove function
     void RemoveThreadSafe(const TYPE& key);
     /// thread safe remove index function
-    void RemoveIndexThreadSafe(uint32 index);
+    void RemoveIndexThreadSafe(const uint32 index);
 	
 private:
 
@@ -138,6 +138,8 @@ Array<TYPE>::~Array()
 
 //------------------------------------------------------------------------------
 /**
+    Move constructor.
+    @param rhs  Array to move into this array.
 */
 template <class TYPE>
 inline
@@ -154,6 +156,8 @@ Array<TYPE>::Array(const Array<TYPE>&& rhs)
 
 //------------------------------------------------------------------------------
 /**
+    Assignment operator.
+    @param rhs  Array to copy from.
 */
 template <class TYPE>
 inline void
@@ -171,6 +175,8 @@ Array<TYPE>::operator=(const Array<TYPE>& rhs)
 
 //------------------------------------------------------------------------------
 /**
+    Move operator.
+    @param rhs  Array to move from.
 */
 template <class TYPE>
 inline void
@@ -187,6 +193,8 @@ Array<TYPE>::operator=(const Array<TYPE>&& rhs)
 
 //------------------------------------------------------------------------------
 /**
+    Read-write access operator.
+    @param index    Index into the list.
 */
 template <class TYPE>
 inline TYPE&
@@ -198,6 +206,8 @@ Array<TYPE>::operator[](const uint32 index)
 
 //------------------------------------------------------------------------------
 /**
+    Read-only access operator
+    @param index    Index into the list.
 */
 template <class TYPE>
 inline const TYPE&
@@ -209,6 +219,9 @@ Array<TYPE>::operator[](const uint32 index) const
 
 //------------------------------------------------------------------------------
 /**
+    Resize array to given size. If the size to resize is bigger than the array, the data is just copied.
+    Otherwise, the array gets shrunk and only the data that fits will be copied.
+    @param size     Number of elements to resize to.
 */
 template <class TYPE>
 inline void
@@ -223,7 +236,7 @@ Array<TYPE>::Resize(const uint32 size)
         this->size = j_min(this->size, this->capacity);
         
         // run constructor on newly created elements
-		for (uint32 i = 0; i < this->size; i++)
+		for (uint32 i = 0; i < this->size && i < this->capacity; i++)
 		{
 			new (buf + i) TYPE(std::move(this->data[i]));
 			(&this->data[i])->~TYPE();
@@ -238,6 +251,8 @@ Array<TYPE>::Resize(const uint32 size)
 
 //------------------------------------------------------------------------------
 /**
+    Set how many elements the array should use to increase it's size if empty.
+    @param grow     Number of elements to initiate the array to.
 */
 template <class TYPE>
 inline void
@@ -249,19 +264,26 @@ Array<TYPE>::SetGrow(const uint32 grow)
 
 //------------------------------------------------------------------------------
 /**
+    Append element to end of array
+    @param val      Element to add.
 */
 template <class TYPE>
 inline void
-Array<TYPE>::Append(const TYPE& key)
+Array<TYPE>::Append(const TYPE& val)
 {	
 	// if we don't have any room, then we make room!
 	if (this->size == this->capacity) this->Grow();
-	new (this->data + this->size) TYPE(std::move(key));
+    
+    // allocate new element here
+	new (this->data + this->size) TYPE(std::move(val));
 	this->size++;
 }
 
 //------------------------------------------------------------------------------
 /**
+    Insert element into array at given index.
+    @param val      Element to insert.
+    @param index    Location in array to which this value gets inserted.
 */
 template <class TYPE>
 void
@@ -285,6 +307,8 @@ Array<TYPE>::Insert(const TYPE& val, uint32 index)
 
 //------------------------------------------------------------------------------
 /**
+    Insert element but retain the ordered state of the array. Only viable if array is sorted.
+    @param val      Element to insert.
 */
 template <class TYPE>
 void
@@ -324,6 +348,8 @@ Array<TYPE>::InsertOrdered(const TYPE& val)
 
 //------------------------------------------------------------------------------
 /**
+    Merge two arrays, the other array will be retained.
+    @param arr      Array to merge into this array.
 */
 template <class TYPE>
 void
@@ -342,6 +368,8 @@ Array<TYPE>::Merge(const Array<TYPE>& arr)
 
 //------------------------------------------------------------------------------
 /**
+    Rmmove element, assumes element actually exists in array.
+    @param key      Element to search for, and if found, remove.
 */
 template <class TYPE>
 inline void
@@ -354,6 +382,8 @@ Array<TYPE>::Remove(const TYPE& key)
 
 //------------------------------------------------------------------------------
 /**
+    Remove an index in the array using an iterator. Does no searching.
+    @param iterator     Iterator into the array.
 */
 template <class TYPE>
 inline void
@@ -365,10 +395,12 @@ Array<TYPE>::Remove(Iter iterator)
 
 //------------------------------------------------------------------------------
 /**
+    Remove an index in the array using an index.
+    @param index        Index in the array to remove.
 */
 template <class TYPE>
 void
-Array<TYPE>::RemoveIndex(uint32 index)
+Array<TYPE>::RemoveIndex(const uint32 index)
 {
 	j_assert(index >= 0 && index < this->size);
 
@@ -383,9 +415,6 @@ Array<TYPE>::RemoveIndex(uint32 index)
 	{
 		// move data
 		Memory::Move<TYPE>(this->data + index + 1, this->data + index, dist);
-
-		// run constructor on freed element
-		//new (&this->data[this->size-1]) TYPE;
 	}
 
 	// decrease size
@@ -615,10 +644,12 @@ Array<TYPE>::RemoveThreadSafe(const TYPE &key)
 
 //------------------------------------------------------------------------------
 /**
+    Thread-safe method for indexed removal
+    @param index        Index to remove from the list.
 */
 template <class TYPE>
 inline void
-Array<TYPE>::RemoveIndexThreadSafe(uint32 index)
+Array<TYPE>::RemoveIndexThreadSafe(const uint32 index)
 {
     std::lock_guard<std::mutex> lock(this->mutex);
     this->RemoveIndex(index);
