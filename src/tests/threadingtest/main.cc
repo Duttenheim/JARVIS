@@ -18,6 +18,7 @@
 
 using namespace JARVIS::Core;
 
+
 JARVIS_MAIN
 {    
     Ptr<Thread> thread = Thread::Create();
@@ -38,9 +39,8 @@ JARVIS_MAIN
         printf("Hej från specialfunktion!\n");
     });
     
+    // create a persistent thread which will be a lightweight workhorse
     auto ctx = Threading::ThreadJobContext{inputs, outputs, uniforms};
-	thread->Start(specialThreadProc, inputs, outputs, uniforms);
-    
     Ptr<PersistentThread> pthread = PersistentThread::Create();
     pthread->Start();
     pthread->Enqueue(specialThreadProc, ctx);
@@ -49,6 +49,8 @@ JARVIS_MAIN
     pthread->Enqueue(specialThreadProc, ctx);
     while (pthread->Working());
 
+    // create a pool of 16 threads which can all be enqueued.
+    // threads will quit when the job is done.
 	Ptr<ThreadPool> pool = ThreadPool::Create(16);
 	uint32 i;
 	for (i = 0; i < 16; i++)

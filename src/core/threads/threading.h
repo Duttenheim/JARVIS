@@ -12,6 +12,8 @@ namespace Threading
 {
 
 /// typedef a typical thread function
+//template<class INPUT, class OUTPUT, class UNIFORM>
+//using ThreadJobFunc = Function<void(INPUT*, OUTPUT*, UNIFORM*)>;
 typedef Function<void(byte*, byte*, byte*)> ThreadJobFunc;
 
 /// define struct for common case use of thread jobs
@@ -21,6 +23,13 @@ struct ThreadJobContext
     byte* outputs;
     byte* uniforms;
 };
+
+/// create job context from template
+template<class INPUT, class OUTPUT, class UNIFORM>
+static ThreadJobContext CreateContext(INPUT inputs, OUTPUT outputs, UNIFORM uniforms)
+{
+    return ThreadJobContext{(byte*)inputs, (byte*)outputs, (byte*)uniforms};
+}
     
 //------------------------------------------------------------------------------
 /**

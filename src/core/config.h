@@ -14,9 +14,11 @@
 #include "posix/pch.h"
 #endif
 
+#include <stdlib.h>
 #include <stdint.h>
 #include <atomic>
 #include <xmmintrin.h>
+#include <smmintrin.h>
 
 typedef uint32_t	uint32;
 typedef int32_t		int32;
@@ -40,15 +42,24 @@ typedef __m128		vec4;
 typedef __m128i		ivec4;
 typedef __m128d		dvec4;
 
+#if __WIN32__
+#define align_16
+#elif __APPLE__ || __UNIX__
+#define align_16 __attribute__((aligned(16)))
+#else
+#endif
+
 // hmm, maybe move this to each platforms pch.h
 #if __WIN32__
-#define JARVIS_MAIN int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd)
+    #define JARVIS_MAIN int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd)
 #else
-#define JARVIS_MAIN int main(int argc, const char** argv)
+    #define JARVIS_MAIN int main(int argc, const char** argv)
 #endif
 
 #define j_min(x, y) x < y ? x : y
 #define j_max(x, y) x > y ? x : y
+//#define j_assert(exp) { printf("JARVIS assertion failed: %s", #exp); exit(EXIT_FAILURE); }
+//#define j_assert_msg(exp, msg) { printf("JARVIS assertion failed: %s. Message: %s", #exp, msg); exit(EXIT_FAILURE); }
 
 #ifdef NULL
 #undef NULL

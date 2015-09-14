@@ -6,6 +6,6 @@ SET(containertest_src
 	main.cc)
 	
 ADD_EXECUTABLE(containertest ${containertest_src})
-TARGET_LINK_LIBRARIES(containertest core)
+TARGET_LINK_LIBRARIES(containertest core headeronly)
 JARVIS_SETUP_TARGET(containertest)
 SET_TARGET_PROPERTIES(containertest PROPERTIES FOLDER "JARVIS/tests")
