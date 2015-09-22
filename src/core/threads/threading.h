@@ -6,6 +6,7 @@
 	(C) 2015 See the LICENSE file.
 */
 #include "functional/function.h"
+#include <thread>
 namespace JARVIS {
 namespace Core {
 namespace Threading
@@ -39,7 +40,7 @@ static ThreadJobContext CreateContext(INPUT inputs, OUTPUT outputs, UNIFORM unif
 static inline void
 Sleep(uint32 ms)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+    std::this_thread::sleep_for(std::chrono::seconds(ms));
 }
 
 //------------------------------------------------------------------------------

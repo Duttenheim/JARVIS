@@ -8,6 +8,7 @@ namespace JARVIS {
 namespace Core
 {
     
+__SingletonDef(Application);
 //------------------------------------------------------------------------------
 /**
 */
@@ -34,10 +35,7 @@ Application::Start()
 {
     this->Setup();
     this->state = Running;
-    while (this->state == Running)
-    {
-        this->Run();
-    }
+    this->Run();
     this->Exit();
 }
 
@@ -45,6 +43,12 @@ Application::Start()
 /**
     Setup the initial state of your application here.
     Override this function to setup the application yourself.
+    
+    This setup proceduce could include stuff as:
+        Path resolution and path assignments.
+        User profile loading.
+        Application window title and window setup.
+ 
 */
 void
 Application::Setup()
@@ -54,7 +58,7 @@ Application::Setup()
 
 //------------------------------------------------------------------------------
 /**
-    This is your applications main loop.
+    This is your applications core code.
 */
 void
 Application::Run()

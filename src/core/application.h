@@ -32,24 +32,25 @@ public:
     
     /// start application
     void Start();
-    /// setup the application context
-    virtual void Setup();
-    /// main loop function
-    virtual void Run();
-    /// exit function
-    virtual void Exit();
-    
     /// tell the application to quit
     void Quit();
     
 protected:
+
+    /// setup the application context
+    virtual void Setup();
+    /// run the application code
+    virtual void Run();
+    /// exit function
+    virtual void Exit();
+    
     State state;
 };
 
 //------------------------------------------------------------------------------
 /**
 */
-void
+inline void
 Application::Quit()
 {
     this->state = Exiting;

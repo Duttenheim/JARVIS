@@ -162,7 +162,7 @@ String::Set(const char* str)
 //------------------------------------------------------------------------------
 /**
 */
-void
+inline void
 String::Set(const char* str, uint32 length)
 {
 	if (nullptr == str)
@@ -306,7 +306,7 @@ String::Append(const char* str)
 //------------------------------------------------------------------------------
 /**
 */
-void
+inline void
 String::Append(const char* str, uint32 length)
 {
 	uint32 len = this->length + length;
@@ -368,7 +368,7 @@ String::CharPtr() const
 //------------------------------------------------------------------------------
 /**
 */
-void
+inline void
 String::Delete()
 {
 	if (nullptr != this->heapBuffer)

@@ -13,6 +13,8 @@
 	(C) 2015 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
+namespace JARVIS {
+namespace Core {
 template <class TYPE>
 class Ptr
 {
@@ -60,10 +62,6 @@ public:
 	void operator=(std::nullptr_t);
 	/// assignment operator for c pointer
 	void operator=(TYPE* rhs);
-	/// test if invalid (against nullptr)
-	bool operator==(std::nullptr_t) const;
-	/// test if valid (against nullptr)
-	bool operator!=(std::nullptr_t) const;
 
 	/// standard equality operator
 	bool operator==(const Ptr<TYPE>& rhs);
@@ -228,26 +226,6 @@ Ptr<TYPE>::operator=(TYPE* rhs)
 /**
 */
 template <class TYPE>
-inline bool
-Ptr<TYPE>::operator==(std::nullptr_t) const
-{
-	return this->ptr == nullptr;
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-template <class TYPE>
-inline bool
-Ptr<TYPE>::operator!=(std::nullptr_t) const
-{
-	return this->ptr != nullptr;
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-template <class TYPE>
 bool
 Ptr<TYPE>::operator==(const Ptr<TYPE>& rhs)
 {
@@ -315,3 +293,5 @@ Ptr<TYPE>::operator bool() const
 {
 	return nullptr != this->ptr;
 }
+
+}} // namespace JARVIS::Core

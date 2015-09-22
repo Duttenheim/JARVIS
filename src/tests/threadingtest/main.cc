@@ -22,7 +22,7 @@ using namespace JARVIS::Core;
 JARVIS_MAIN
 {    
     Ptr<Thread> thread = Thread::Create();
-    Ptr<Function<void()>> threadProc = Function<void()>::Create([]()
+    auto threadProc = Functional::Lambda([]()
     {
         printf("Hej!\n");
     });
@@ -33,8 +33,16 @@ JARVIS_MAIN
 	byte* outputs = (byte*)String("Outputs").CharPtr();
 	byte* uniforms = (byte*)String("Uniforms").CharPtr();
    
+    /*
     Ptr<Threading::ThreadJobFunc> specialThreadProc =
 	Threading::ThreadJobFunc::Create([](byte* input, byte* output, byte* uniform) -> void
+	{
+        printf("Hej från specialfunktion!\n");
+    });
+    */
+    auto f = Function<void(byte* input, byte* output, byte* uniform)>::Create([](byte* input, byte* output, byte* uniform){});
+
+    auto specialThreadProc = Functional::Lambda([](byte* input, byte* output, byte* uniform) -> void
 	{
         printf("Hej från specialfunktion!\n");
     });

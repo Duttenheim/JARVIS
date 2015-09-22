@@ -17,15 +17,19 @@
 	Example:
 		Ptr<Function<void()>> func = Function<void()>::Create([]() { printf("Reference counted lambda function!"); });
 		func->Call();
+        
+    One can also create a pointer to a function lambda using the Lambda constructor function.
 	
 	(C) 2015 See the LICENSE file.
  */
 //------------------------------------------------------------------------------
 #include <functional>
+
 namespace JARVIS {
 namespace Core
 {
-template <class>
+
+template <class LAMBDA>
 class Function;
 
 template<class RET, class... PARAMS> 
@@ -36,26 +40,93 @@ public:
     /// default constructor
     Function();
 	/// constructor from function
-	template <class FUNC> Function(FUNC rhs);
+	Function(const Function<RET(PARAMS...)>& rhs);
+    /// constructor from std function
+    Function(const std::function<RET(PARAMS...)>& rhs);
 	/// destructor
 	virtual ~Function();
     
     /// assignment operator from function
-    template <class FUNC> void operator=(FUNC rhs);
+    template void operator=(const Function<RET(PARAMS...)>& rhs);
     /// move operator from function
-    template <class FUNC> void operator=(FUNC&& rhs);
+    template void operator=(Function<RET(PARAMS...)>&& rhs);
+    
+    /// compare if function is null pointer
+    const bool operator==(std::nullptr_t ptr) const;
+    /// compare if function is not null pointer
+    const bool operator!=(std::nullptr_t ptr) const;
 
 	/// call function
 	template <class... ARGS> void Call(ARGS&&... args) const;
+    /// call operator
+    template <class... ARGS> void operator()(ARGS&&... args) const;
 
 private:
 	std::function<RET(PARAMS...)> func;
 };
 
+
+namespace Functional
+{
+
+// use templates to extract lambda signature
+template<typename T>
+struct __function_traits : __function_traits<decltype(&T::operator())>
+{
+};
+
+// used if we create lambdas from existing functions
+template<class RET, class... ARGS>
+struct __function_traits<RET(*)(ARGS...)>
+{
+    typedef Core::Function<RET(ARGS...)> type;
+};
+
+// this one for lambdas who are members of classes with constant members
+template<class CLASS, class RET, class... ARGS>
+struct __function_traits<RET(CLASS::*)(ARGS...) const>
+{
+    typedef Core::Function<RET(ARGS...)> type;
+};
+
+// this one for lambdas who are members of classes with non-constant members
+template<class CLASS, class RET, class... ARGS>
+struct __function_traits<RET(CLASS::*)(ARGS...)>
+{
+    typedef Core::Function<RET(ARGS...)> type;
+};
+
+//------------------------------------------------------------------------------
+/**
+    Create a lambda function using our refcounted Function object 
+    by using an alias to save the type and use it to run the constructor.
+    
+    This allows us to create a smart pointer to a function object by just calling this
+    static constructor. For example:
+    
+    auto func = Core::Functional::Lambda([]()
+    {
+ 
+    });
+
+    func is now a Ptr<Core::Function<void()>>.
+    
+    Booyah.
+*/
+template<class LAMBDA>
+Core::Ptr<typename __function_traits<LAMBDA>::type> Lambda(LAMBDA func)
+{
+    using ty = typename __function_traits<LAMBDA>::type;
+    return ty::Create(func);
+}
+
+} // namespace Functional
+
 //------------------------------------------------------------------------------
 /**
 */
 template<class RET, class... PARAMS>
+inline
 Function<RET(PARAMS...)>::Function()
 {
     // empty
@@ -65,8 +136,18 @@ Function<RET(PARAMS...)>::Function()
 /**
 */
 template<class RET, class... PARAMS>
-template<class FUNC>
-Function<RET(PARAMS...)>::Function(FUNC rhs)
+inline
+Function<RET(PARAMS...)>::Function(const Function<RET(PARAMS...)>& rhs)
+{
+    this->func = rhs.func;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template<class RET, class... PARAMS>
+inline
+Function<RET(PARAMS...)>::Function(const std::function<RET(PARAMS...)>& rhs)
 {
     this->func = rhs;
 }
@@ -75,6 +156,7 @@ Function<RET(PARAMS...)>::Function(FUNC rhs)
 /**
 */
 template<class RET, class... PARAMS>
+inline
 Function<RET(PARAMS...)>::~Function()
 {
     // empty
@@ -84,9 +166,8 @@ Function<RET(PARAMS...)>::~Function()
 /**
 */
 template<class RET, class... PARAMS>
-template<class FUNC>
-void
-Function<RET(PARAMS...)>::operator=(FUNC rhs)
+inline void
+Function<RET(PARAMS...)>::operator=(const Function<RET(PARAMS...)>& rhs)
 {
     this->func = rhs;
 }
@@ -95,9 +176,8 @@ Function<RET(PARAMS...)>::operator=(FUNC rhs)
 /**
 */
 template<class RET, class... PARAMS>
-template<class FUNC>
-void
-Function<RET(PARAMS...)>::operator=(FUNC&& rhs)
+inline void
+Function<RET(PARAMS...)>::operator=(Function<RET(PARAMS...)>&& rhs)
 {
     this->func = rhs;
     rhs = nullptr;
@@ -107,9 +187,41 @@ Function<RET(PARAMS...)>::operator=(FUNC&& rhs)
 /**
 */
 template<class RET, class... PARAMS>
+inline const bool
+Function<RET(PARAMS...)>::operator==(std::nullptr_t ptr) const
+{
+    return this->func == nullptr;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template<class RET, class... PARAMS>
+inline const bool
+Function<RET(PARAMS...)>::operator!=(std::nullptr_t ptr) const
+{
+    return this->func != nullptr;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template<class RET, class... PARAMS>
 template <class... ARGS>
-void
+inline void
 Function<RET(PARAMS...)>::Call(ARGS&&... args) const
+{
+	this->func(args...);
+}
+
+
+//------------------------------------------------------------------------------
+/**
+*/
+template<class RET, class... PARAMS>
+template <class... ARGS>
+inline void
+Function<RET(PARAMS...)>::operator()(ARGS&&... args) const
 {
 	this->func(args...);
 }

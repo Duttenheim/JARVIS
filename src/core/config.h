@@ -14,6 +14,7 @@
 #include "posix/pch.h"
 #endif
 
+#ifdef __cplusplus
 #include <stdlib.h>
 #include <stdint.h>
 #include <atomic>
@@ -56,6 +57,13 @@ typedef __m128d		dvec4;
     #define JARVIS_MAIN int main(int argc, const char** argv)
 #endif
 
+// check for maximum opengl version, only restricted on OS X
+#if __APPLE__
+#define OPENGL_VERSION_MAX 41
+#else
+#define OPENGL_VERSION_MAX INT_MAX
+#endif
+
 #define j_min(x, y) x < y ? x : y
 #define j_max(x, y) x > y ? x : y
 //#define j_assert(exp) { printf("JARVIS assertion failed: %s", #exp); exit(EXIT_FAILURE); }
@@ -73,3 +81,4 @@ typedef __m128d		dvec4;
 #include "ptr.h"
 #include "mem.h"
 #include "enum.h"
+#endif

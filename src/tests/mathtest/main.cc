@@ -45,7 +45,7 @@ JARVIS_MAIN
     auto ctx = Threading::CreateContext(inputs, outputs, uniforms);
     
     auto specialThreadProc =
-	Threading::ThreadJobFunc::Create([](byte* input, byte* output, byte* uniform) -> void
+	Functional::Lambda([](byte* input, byte* output, byte* uniform) -> void
 	{
         Vec4* in = (Vec4*)input;
         Vec4* out = (Vec4*)output;

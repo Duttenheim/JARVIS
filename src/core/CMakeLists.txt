@@ -19,7 +19,7 @@ SET(core
 	singleton.h	
 )
 
-SOURCE_GROUP("core" FILES ${core})
+SOURCE_GROUP("" FILES ${core})
 
 SET(core_util
 	util/allocator.h
@@ -28,7 +28,7 @@ SET(core_util
 	util/string.h
 	util/timer.h
 )
-SOURCE_GROUP("core\\util" FILES ${core_util})
+SOURCE_GROUP("util" FILES ${core_util})
 
 SET(core_threads
 	threads/thread.h
@@ -39,18 +39,18 @@ SET(core_threads
 	threads/persistentthread.h
 	threads/persistentthread.cc
 )
-SOURCE_GROUP("core\\threads" FILES ${core_threads})
+SOURCE_GROUP("threads" FILES ${core_threads})
 
 SET(core_functional
 	functional/function.h
 )
-SOURCE_GROUP("core\\functional" FILES ${core_functional})
+SOURCE_GROUP("functional" FILES ${core_functional})
 
 SET(core_network
 	network/socket.h
 	network/socket.cc
 )
-SOURCE_GROUP("core\\network" FILES ${core_network})
+SOURCE_GROUP("network" FILES ${core_network})
 
 SET(core_math
 	math/vec4.h
@@ -61,7 +61,7 @@ SET(core_math
 	math/vector.h
 	math/point.h
 )
-SOURCE_GROUP("core\\math" FILES ${core_math})
+SOURCE_GROUP("math" FILES ${core_math})
 
 IF(WIN32)
 	SET(core_os
@@ -69,24 +69,23 @@ IF(WIN32)
 		win32/win32socket.h
 		win32/win32socket.cc
 	)
-	SOURCE_GROUP("core\\os" FILES ${core_os})
+	SOURCE_GROUP("os" FILES ${core_os})
 ELSEIF(APPLE)	
 	SET(core_os
 		apple/pch.h
 		apple/applesocket.h
 		apple/applesocket.cc
 	)
-	SOURCE_GROUP("core\\os" FILES ${core_os})
+	SOURCE_GROUP("os" FILES ${core_os})
 ELSE()
 	SET(core_os
 		posix/pch.h
 		posix/posixsocket.h
 		posix/posixsocket.cc
 	)
-	SOURCE_GROUP("core\\os" FILES ${core_os})
+	SOURCE_GROUP("os" FILES ${core_os})
 ENDIF()
 
 ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_threads} ${core_functional} ${core_math} ${core_os} ${core_network})
 JARVIS_SETUP_TARGET(core)
 TARGET_INCLUDE_DIRECTORIES(core PUBLIC ${JARVIS_SOURCE_DIR}/src/core)
-SET_TARGET_PROPERTIES(core PROPERTIES FOLDER "JARVIS")
