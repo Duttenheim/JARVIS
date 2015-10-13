@@ -7,14 +7,18 @@
 #if J_RENDERER_GL4
 #include "gl4/window.h"
 namespace JARVIS {
-namespace Render {
-using Window = JARVIS::GL4::Window;
+namespace Render
+{
+class Window : public JARVIS::GL4::Window
+{};
 }}
 #elif J_RENDERER_METAL
 #include "metal/window.h"
 namespace JARVIS {
-namespace Render {
-using Window = JARVIS::Metal::Window;
+namespace Render
+{
+class Window : public JARVIS::Metal::Window
+{};
 }}
 #else
 #error "Window is not implemented using this renderer!"

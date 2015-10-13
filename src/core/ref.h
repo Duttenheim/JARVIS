@@ -22,8 +22,13 @@ public:
 	void Retain();
 	/// decrease ref count
 	void Release();
+    
 protected:
+    /// destructor
 	virtual ~Ref();
+    
+    /// destroy reference
+    virtual void Destroy();
 private:
 	std::atomic<uint32> ref{0};
 };
@@ -61,8 +66,17 @@ Ref::Retain()
 inline void
 Ref::Release()
 {
-	if (1 == this->ref.fetch_sub(1, std::memory_order_relaxed)) delete this;
+	if (1 == this->ref.fetch_sub(1, std::memory_order_relaxed)) this->Destroy();
 }
 
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+Ref::Destroy()
+{
+    this->~Ref();
+    Core::Memory::Free(this);
 }
-} // namespace JARVIS::Core
+
+}} // namespace JARVIS::Core

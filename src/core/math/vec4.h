@@ -14,7 +14,7 @@
 /**
     Fast vector select
 */
-__m128
+inline __m128
 _mm_sel_ps_xor(const __m128& a, const __m128& b, const __m128& mask)
 {
     // (((b ^ a) & mask)^a)
@@ -137,8 +137,8 @@ public:
     static Vec4 normalize_fast(const Vec4& vec);
     
     /// public convenience vectors
-    static const Vec4 zero;
-    static const Vec4 one;
+    static CONST_EXPR __m128_vec zero   = {{0,0,0,0}};
+    static CONST_EXPR __m128_vec one    = {{1,1,1,1}};
     
 private:
     friend class Vec3;
@@ -150,6 +150,7 @@ private:
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec4::Vec4()
 {
     this->v.sse = _mm_setr_ps(0, 0, 0, 0);
@@ -158,6 +159,7 @@ Vec4::Vec4()
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec4::~Vec4()
 {
     // empty
@@ -166,6 +168,7 @@ Vec4::~Vec4()
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec4::Vec4(const float32& v)
 {
     this->v.sse = _mm_set1_ps(v);
@@ -174,6 +177,7 @@ Vec4::Vec4(const float32& v)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec4::Vec4(const float32& x, const float32& y, const float32& z, const float32& w)
 {
     this->v.sse = _mm_setr_ps(x, y, z, w);
@@ -182,6 +186,7 @@ Vec4::Vec4(const float32& x, const float32& y, const float32& z, const float32& 
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec4::Vec4(const __m128& vec)
 {
     this->v.sse = vec;
@@ -190,6 +195,7 @@ Vec4::Vec4(const __m128& vec)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec4::Vec4(const __m128_vec& vec)
 {
     this->v.sse = vec.sse;
@@ -198,6 +204,7 @@ Vec4::Vec4(const __m128_vec& vec)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec4::Vec4(const Vec4& rhs)
 {
     this->v.sse = rhs.v.sse;
@@ -207,8 +214,8 @@ Vec4::Vec4(const Vec4& rhs)
 /**
     Setup static vector types which might be useful
 */
-const Vec4 Vec4::zero = Vec4(0.0f);
-const Vec4 Vec4::one = Vec4(1.0f);
+//const Vec4 Vec4::zero = Vec4(0.0f);
+//const Vec4 Vec4::one = Vec4(1.0f);
 
 //------------------------------------------------------------------------------
 /**
@@ -380,7 +387,7 @@ Vec4::store(float* buf)
 inline float32
 Vec4::dot(const Vec4& lhs, const Vec4& rhs)
 {
-    // 22 will mean all 4 components get dotted, 0
+    // 22 will mean all 4 components get dotted
     return _mm_cvtss_f32(_mm_dp_ps(lhs.v.sse, rhs.v.sse, 0xF1));
 }
 
@@ -543,7 +550,7 @@ Vec4::equal_any(const Math::Vec4& lhs, const Math::Vec4& rhs)
 inline Vec4
 Vec4::less(const Math::Vec4& lhs, const Math::Vec4& rhs)
 {
-    return _mm_min_ps(_mm_cmplt_ps(lhs.v.sse, rhs.v.sse), Vec4::one.v.sse);
+    return _mm_min_ps(_mm_cmplt_ps(lhs.v.sse, rhs.v.sse), Vec4::one.sse);
 }
 
 //------------------------------------------------------------------------------
@@ -552,7 +559,7 @@ Vec4::less(const Math::Vec4& lhs, const Math::Vec4& rhs)
 inline Vec4
 Vec4::greater(const Math::Vec4& lhs, const Math::Vec4& rhs)
 {
-    return _mm_min_ps(_mm_cmpgt_ps(lhs.v.sse, rhs.v.sse), Vec4::one.v.sse);
+    return _mm_min_ps(_mm_cmpgt_ps(lhs.v.sse, rhs.v.sse), Vec4::one.sse);
 }
 
 //------------------------------------------------------------------------------
@@ -561,7 +568,7 @@ Vec4::greater(const Math::Vec4& lhs, const Math::Vec4& rhs)
 inline Vec4
 Vec4::equal(const Math::Vec4& lhs, const Math::Vec4& rhs)
 {
-    return _mm_min_ps(_mm_cmpeq_ps(lhs.v.sse, rhs.v.sse), Vec4::one.v.sse);
+    return _mm_min_ps(_mm_cmpeq_ps(lhs.v.sse, rhs.v.sse), Vec4::one.sse);
 }
 
 //------------------------------------------------------------------------------

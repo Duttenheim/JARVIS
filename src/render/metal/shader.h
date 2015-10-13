@@ -3,25 +3,33 @@
 /**
 	@class JARVIS::Render::Shader
 	
-    Interface level shader object.
- 
-    A shader object is more than just a single pipeline stage, but encompasses an entire shader pipeline.
+    Metal implementation of a shader.
 	
 	(C) 2015 See the LICENSE file.
  */
 //------------------------------------------------------------------------------
+#include "shading/shader.h"
 namespace JARVIS {
-namespace Render
+namespace Metal
 {
-class Shader
+class PipelineState;
+class Context;
+class Shader : public Base::Shader
 {
+    __ClassDecl(Shader);
 public:
     /// constructor
     Shader();
     /// destructor
     virtual ~Shader();
     
+    /// load shader
+    void Load(const Core::String& name);
+    
 private:
+    friend class Metal::Context;
+    friend class Metal::PipelineState;
+    OBJC_ID_POINTER(MTLFunction) shader;
 };
 
-}} // namespace JARVIS::Render
+}} // namespace JARVIS::Metal

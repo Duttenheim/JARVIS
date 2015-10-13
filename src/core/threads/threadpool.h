@@ -24,21 +24,20 @@ class ThreadPool : public Ref
 {
     __ClassDecl(ThreadPool);
 public:
-
     /// constructor
     ThreadPool(uint32 threads);
     /// destructor
     virtual ~ThreadPool();
     
     /// enqueue thread function and its execution context
-	void Enqueue(const Core::Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadJobContext& ctx);
+	void Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadJobContext& ctx);
     /// update thread pool, this causes the threads to update their status, and finished threads to attain new tasks
     void Update();
 private:
 
-    Array<Core::Ptr<Thread>> activeThreads;
-    Array<Core::Ptr<Thread>> freeThreads;
-	Array<Core::Ptr<Threading::ThreadJobFunc>> funcs;
+    Array<Ptr<Thread>> activeThreads;
+    Array<Ptr<Thread>> freeThreads;
+	Array<Ptr<Threading::ThreadJobFunc>> funcs;
     Array<Threading::ThreadJobContext> contexts;
 };
 

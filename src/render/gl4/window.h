@@ -9,14 +9,14 @@
  */
 //------------------------------------------------------------------------------
 #include "display/window.h"
-#include "glew.h"
-#include "glfw3.h"
 
+struct GLFWwindow;
 namespace JARVIS {
 namespace GL4
 {
 class Window : public Base::Window
 {
+    __ClassDecl(Window);
 public:
     /// constructor
     Window();

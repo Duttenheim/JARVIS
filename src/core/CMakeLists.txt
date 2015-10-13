@@ -8,15 +8,19 @@ SET(core
 	class.h
 	config.h
 	config.cc
+	constness.h
 	debug.h
 	enum.h
 	mem.h
+	poolalloc.h
 	ptr.h
 	pqueue.h
 	queue.h
 	rand.h
 	ref.h
 	singleton.h	
+	typeinfo.h
+	typeinfo.cc
 )
 
 SOURCE_GROUP("" FILES ${core})
@@ -27,6 +31,7 @@ SET(core_util
 	util/map.h
 	util/string.h
 	util/timer.h
+    util/tuple.h
 )
 SOURCE_GROUP("util" FILES ${core_util})
 
@@ -75,6 +80,8 @@ ELSEIF(APPLE)
 		apple/pch.h
 		apple/applesocket.h
 		apple/applesocket.cc
+		apple/sysfunc.h
+		apple/sysfunc.mm
 	)
 	SOURCE_GROUP("os" FILES ${core_os})
 ELSE()
@@ -89,3 +96,4 @@ ENDIF()
 ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_threads} ${core_functional} ${core_math} ${core_os} ${core_network})
 JARVIS_SETUP_TARGET(core)
 TARGET_INCLUDE_DIRECTORIES(core PUBLIC ${JARVIS_SOURCE_DIR}/src/core)
+TARGET_LINK_LIBRARIES(core ext)

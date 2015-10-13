@@ -5,7 +5,7 @@
 */
 #include "indexbuffer.h"
 namespace JARVIS {
-namespace Render
+namespace Base
 {
     
 //------------------------------------------------------------------------------
@@ -22,6 +22,15 @@ IndexBuffer::IndexBuffer()
 IndexBuffer::~IndexBuffer()
 {
     // empty
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+void
+IndexBuffer::Bind()
+{
+    // override in subclass
 }
 
 }}

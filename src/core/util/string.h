@@ -64,6 +64,8 @@ public:
 	const uint32 Length() const;
 	/// get c pointer
 	const char* CharPtr() const;
+    /// generate hash for string
+    const uint32 Hash() const;
 private:
 
 	/// delete heap buffer if valid
@@ -363,6 +365,28 @@ String::CharPtr() const
 {
 	if (nullptr != this->heapBuffer) return this->heapBuffer;
 	else							 return this->stackBuffer;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline const uint32
+String::Hash() const
+{
+    uint32 hash = 0;
+    const char* ptr = this->CharPtr();
+    uint32 len = this->length;
+    uint32 i;
+    for (i = 0; i < len; i++)
+    {
+        hash += ptr[i];
+        hash += hash << 10;
+        hash ^= hash >>  6;
+    }
+    hash += hash << 3;
+    hash ^= hash >> 11;
+    hash += hash << 15;
+    return hash;
 }
 
 //------------------------------------------------------------------------------

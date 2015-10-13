@@ -39,7 +39,9 @@ public:
 	/// assignment operator
 	void operator=(const Array<TYPE>& rhs);
 	/// move operator
-	void operator=(const Array<TYPE>&& rhs);
+	void operator=(Array<TYPE>&& rhs);
+    /// copy constructor from an initializer list
+    void operator=(const InitList<TYPE>& rhs);
 	/// read-write access operator
 	TYPE& operator[](const uint32 index);
 	/// read-only access operator
@@ -94,7 +96,6 @@ public:
     void RemoveIndexThreadSafe(const uint32 index);
 	
 private:
-
 	/// grow array using the grow parameter
 	void Grow();
 	/// shrinks array by allocating a new array which only contains size, so basically capacity becomes size
@@ -180,8 +181,11 @@ Array<TYPE>::operator=(const Array<TYPE>& rhs)
 */
 template <class TYPE>
 inline void
-Array<TYPE>::operator=(const Array<TYPE>&& rhs)
+Array<TYPE>::operator=(Array<TYPE>&& rhs)
 {
+    // first, clear our data since we are stealing the rhs pointer
+    this->Clear();
+    
 	this->capacity = rhs.capacity;
 	this->grow = rhs.grow;
 	this->size = rhs.size;
@@ -189,6 +193,20 @@ Array<TYPE>::operator=(const Array<TYPE>&& rhs)
 
 	rhs.capacity = rhs.grow = rhs.size = 0;
 	rhs.data = nullptr;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Move operator from std::vector, lets us do Array<TYPE> foo = {...}.
+    @param rhs  Array to move from.
+*/
+template <class TYPE>
+inline void
+Array<TYPE>::operator=(const InitList<TYPE>& rhs)
+{
+    this->Clear();
+    this->Resize(rhs.size());
+    Memory::Copy<TYPE>(rhs.begin(), this->data, this->size);
 }
 
 //------------------------------------------------------------------------------
@@ -514,6 +532,7 @@ Array<TYPE>::SearchBinary(const TYPE& key)
 #if JARVIS_CACHED_ELEMENT
 	if (this->cachedElement != nullptr && *this->cachedElement == key) return int32(this->cachedElement - this->data);
 #endif
+    if (this->size == 0) return -1;
     
     int32 min = 0;
     int32 max = this->size;

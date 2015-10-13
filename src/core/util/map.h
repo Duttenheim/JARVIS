@@ -19,6 +19,7 @@
 	(C) 2015 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
+#include "util/array.h"
 namespace JARVIS { 
 namespace Core
 {
@@ -166,7 +167,7 @@ template <class KEY, class VALUE>
 inline const std::tuple<KEY, VALUE>&
 Map<KEY, VALUE>::Pair(const uint32 index) const
 {
-	j_assert(index < this->data.size);
+	j_assert(index < this->data.Size());
 	return this->data[index];
 }
 
@@ -177,7 +178,7 @@ template <class KEY, class VALUE>
 inline const KEY&
 Map<KEY, VALUE>::Key(const uint32 index) const
 {
-	j_assert(index < this->data.size);
+	j_assert(index < this->data.Size());
 	return std::get<0>(this->data[index]);
 }
 
@@ -188,7 +189,7 @@ template <class KEY, class VALUE>
 inline const VALUE&
 Map<KEY, VALUE>::Value(const uint32 index) const
 {
-	j_assert(index < this->data.size);
+	j_assert(index < this->data.Size());
 	return std::get<1>(this->data[index]);
 }
 

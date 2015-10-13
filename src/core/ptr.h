@@ -3,12 +3,12 @@
 /**
 	@class JARVIS::Core::Ptr
 	
-	Implements a smart pointer which decrease and increase its internal reference count.
-	The smart pointer internally keeps track of the total ref count, and if it reaches 0 performs an automatic delete.
-
-	Classes used as a template to Ptr must inherit from Ref in order for it to compile.
-
-	This class is outside the namespace because it will look annyoing 
+	Implements a smart pointer which keeps track of how many times it's referenced.
+        Assigning a smart pointer to an object will bump the reference count.
+        Assigning a valid smart pointer to nullptr will diminish the reference count.
+ 
+	If at any point the reference count reaches 0, the object is automatically deleted.
+	Classes used as a template to Ptr must inherit from Ref in order to be a Ptr valid type.
 	
 	(C) 2015 See the LICENSE file.
 */
@@ -295,3 +295,12 @@ Ptr<TYPE>::operator bool() const
 }
 
 }} // namespace JARVIS::Core
+
+//------------------------------------------------------------------------------
+/**
+    Use name alias in order to avoid writing Core::Ptr everywhere...
+*/
+namespace JARVIS {
+template <class TYPE>
+using Ptr = Core::Ptr<TYPE>;
+}

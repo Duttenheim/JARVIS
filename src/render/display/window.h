@@ -11,6 +11,9 @@
 //------------------------------------------------------------------------------
 #include "util/string.h"
 #include "functional/function.h"
+#include "../context.h"
+#include "../rendertarget.h"
+
 namespace JARVIS {
 namespace Base
 {
@@ -31,15 +34,15 @@ public:
     void SetTitle(const Core::String& title);
     
     /// set key press function callback
-	void SetKeyPressFunction(const Core::Ptr<Core::Function<void(int32, int32, int32, int32)>>& func);
+	void SetKeyPressFunction(const Ptr<Core::Function<void(int32, int32, int32, int32)>>& func);
 	/// set mouse press function callback
-	void SetMousePressFunction(const Core::Ptr<Core::Function<void(int32, int32, int32)>>& func);
+	void SetMousePressFunction(const Ptr<Core::Function<void(int32, int32, int32)>>& func);
 	/// set mouse move function callback
-	void SetMouseMoveFunction(const Core::Ptr<Core::Function<void(float64, float64)>>& func);
+	void SetMouseMoveFunction(const Ptr<Core::Function<void(float64, float64)>>& func);
 	/// set mouse enter leave function callback
-	void SetMouseEnterLeaveFunction(const Core::Ptr<Core::Function<void(bool)>>& func);
+	void SetMouseEnterLeaveFunction(const Ptr<Core::Function<void(bool)>>& func);
 	/// set mouse scroll function callback
-	void SetMouseScrollFunction(const Core::Ptr<Core::Function<void(float64, float64)>>& func);
+	void SetMouseScrollFunction(const Ptr<Core::Function<void(float64, float64)>>& func);
     
     /// open window
     bool Open();
@@ -60,18 +63,19 @@ public:
     Core::String title;
 protected:
 
-
     /// function for key press callbacks
-	Core::Ptr<Core::Function<void(int32, int32, int32, int32)>> keyPressCallback;
+	Ptr<Core::Function<void(int32, int32, int32, int32)>> keyPressCallback;
 	/// function for mouse press callbacks
-	Core::Ptr<Core::Function<void(int32, int32, int32)>> mousePressCallback;
+	Ptr<Core::Function<void(int32, int32, int32)>> mousePressCallback;
 	/// function for mouse move callbacks
-	Core::Ptr<Core::Function<void(float64, float64)>> mouseMoveCallback;
+	Ptr<Core::Function<void(float64, float64)>> mouseMoveCallback;
 	/// function for mouse enter/leave callbacks
-	Core::Ptr<Core::Function<void(bool)>> mouseLeaveEnterCallback;
+	Ptr<Core::Function<void(bool)>> mouseLeaveEnterCallback;
 	/// function for mose scroll callbacks
-	Core::Ptr<Core::Function<void(float64, float64)>> mouseScrollCallback;
+	Ptr<Core::Function<void(float64, float64)>> mouseScrollCallback;
     
+    Ptr<Render::Context> context;
+    Ptr<Render::RenderTarget> renderTarget;
     static uint32 GlobalWindowCounter;
 };
 
@@ -97,7 +101,7 @@ Window::SetHeight(const uint32 height)
 /**
 */
 inline void
-Window::SetKeyPressFunction(const Core::Ptr<Core::Function<void(int32, int32, int32, int32)>>& func)
+Window::SetKeyPressFunction(const Ptr<Core::Function<void(int32, int32, int32, int32)>>& func)
 {
 	this->keyPressCallback = func;
 }
@@ -106,7 +110,7 @@ Window::SetKeyPressFunction(const Core::Ptr<Core::Function<void(int32, int32, in
 /**
 */
 inline void
-Window::SetMousePressFunction(const Core::Ptr<Core::Function<void(int32, int32, int32)>>& func)
+Window::SetMousePressFunction(const Ptr<Core::Function<void(int32, int32, int32)>>& func)
 {
 	this->mousePressCallback = func;
 }
@@ -115,7 +119,7 @@ Window::SetMousePressFunction(const Core::Ptr<Core::Function<void(int32, int32, 
 /**
 */
 inline void
-Window::SetMouseMoveFunction(const Core::Ptr<Core::Function<void(float64, float64)>>& func)
+Window::SetMouseMoveFunction(const Ptr<Core::Function<void(float64, float64)>>& func)
 {
 	this->mouseMoveCallback = func;
 }
@@ -124,7 +128,7 @@ Window::SetMouseMoveFunction(const Core::Ptr<Core::Function<void(float64, float6
 /**
 */
 inline void
-Window::SetMouseEnterLeaveFunction(const Core::Ptr<Core::Function<void(bool)>>& func)
+Window::SetMouseEnterLeaveFunction(const Ptr<Core::Function<void(bool)>>& func)
 {
 	this->mouseLeaveEnterCallback = func;
 }
@@ -133,7 +137,7 @@ Window::SetMouseEnterLeaveFunction(const Core::Ptr<Core::Function<void(bool)>>& 
 /**
 */
 inline void
-Window::SetMouseScrollFunction(const Core::Ptr<Core::Function<void(float64, float64)>>& func)
+Window::SetMouseScrollFunction(const Ptr<Core::Function<void(float64, float64)>>& func)
 {
 	this->mouseScrollCallback = func;
 }

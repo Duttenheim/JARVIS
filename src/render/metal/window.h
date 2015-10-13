@@ -8,13 +8,15 @@
 	(C) 2015 See the LICENSE file.
  */
 //------------------------------------------------------------------------------
-#include "types.h"
 #include "display/window.h"
+#include "types.h"
 namespace JARVIS {
 namespace Metal
 {
+class RenderTarget;
 class Window : public Base::Window
 {
+    __ClassDecl(Window);
 public:
     /// constructor
     Window();
@@ -35,7 +37,10 @@ public:
     static void Update();
     
 private:
+    friend class Metal::RenderTarget;
     OBJC_POINTER(NSWindow) nsWindow;
+    OBJC_ID viewDelegate;
+    OBJC_POINTER(MTKView) view;
     OBJC_POINTER(CAMetalLayer) defaultRenderTarget;
 };
 

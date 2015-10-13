@@ -34,8 +34,15 @@ void
 Application::Start()
 {
     this->Setup();
+#if J_RENDERER_METAL
+    this->sysfunc.StartOSX();
+#else
     this->state = Running;
-    this->Run();
+    while (this->state == Application::Running)
+    {
+        this->OnFrame();
+    }
+#endif
     this->Exit();
 }
 
@@ -61,7 +68,7 @@ Application::Setup()
     This is your applications core code.
 */
 void
-Application::Run()
+Application::OnFrame()
 {
     // empty
 }

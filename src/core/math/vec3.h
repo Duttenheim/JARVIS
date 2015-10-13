@@ -13,6 +13,7 @@
 namespace JARVIS {
 namespace Math
 {
+class Vec3;
 class align_16 Vec3 : public Vec4
 {
 public:
@@ -56,6 +57,7 @@ private:
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec3::Vec3()
 {
     this->v.sse = _mm_setr_ps(0, 0, 0, 0);
@@ -64,6 +66,7 @@ Vec3::Vec3()
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec3::~Vec3()
 {
     // empty
@@ -72,6 +75,7 @@ Vec3::~Vec3()
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec3::Vec3(const float32& v)
 {
     this->v.sse = _mm_set1_ps(v);
@@ -80,6 +84,7 @@ Vec3::Vec3(const float32& v)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec3::Vec3(const float32& x, const float32& y, const float32& z)
 {
     this->v.sse = _mm_setr_ps(x, y, z, 0);
@@ -88,6 +93,7 @@ Vec3::Vec3(const float32& x, const float32& y, const float32& z)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec3::Vec3(const __m128& vec)
 {
     this->v.sse = vec;
@@ -96,6 +102,7 @@ Vec3::Vec3(const __m128& vec)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec3::Vec3(const __m128_vec& vec)
 {
     this->v.sse = vec.sse;
@@ -104,6 +111,7 @@ Vec3::Vec3(const __m128_vec& vec)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec3::Vec3(const Vec3& rhs)
 {
     this->v.sse = rhs.v.sse;
@@ -112,6 +120,7 @@ Vec3::Vec3(const Vec3& rhs)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec3::Vec3(const Vec4& rhs)
 {
     this->v.sse = rhs.v.sse;
@@ -120,6 +129,7 @@ Vec3::Vec3(const Vec4& rhs)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vec4::Vec4(const Vec3& rhs)
 {
     this->v.sse = rhs.v.sse;

@@ -16,8 +16,6 @@ namespace Base
 #define APICALLTYPE
 #endif
 
-
-    
 uint32 Window::GlobalWindowCounter = 0;
 
 //------------------------------------------------------------------------------
@@ -64,7 +62,7 @@ Window::Close()
 void
 Window::MakeCurrent()
 {
-    // empty, override in subclass
+    Base::Context::Current = this->context.Pointer();
 }
 
 //------------------------------------------------------------------------------

@@ -16,6 +16,13 @@
 
 #define j_assert(exp) { if (!(exp)) JARVIS::Core::Debug::Error(#exp, __FILE__, __LINE__); }
 #define j_assert_msg(exp, msg) { if (!(exp)) JARVIS::Core::Debug::ErrorWithMsg(#exp, msg, __FILE__, __LINE__); }
+#define j_error(msg) { JARVIS::Core::Debug::ErrorWithMsg("Programmer invoked error", msg, __FILE__, __LINE__); }
+
+#ifdef __CONST_EXPR_SUPPORTED__
+#define j_static_assert(exp, msg) static_assert(exp, msg)
+#else
+#define j_static_assert(exp, msg) j_assert_msg(exp, msg)
+#endif
 
 namespace JARVIS {
 namespace Core {

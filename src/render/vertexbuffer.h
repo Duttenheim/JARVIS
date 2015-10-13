@@ -7,14 +7,18 @@
 #if J_RENDERER_GL4
 #include "gl4/vertexbuffer.h"
 namespace JARVIS {
-namespace Render {
-using VertexBuffer = JARVIS::GL4::VertexBuffer;
+namespace Render
+{
+class VertexBuffer : public JARVIS::GL4::VertexBuffer
+{};
 }}
 #elif J_RENDERER_METAL
 #include "metal/vertexbuffer.h"
 namespace JARVIS {
-namespace Render {
-using VertexBuffer = JARVIS::Metal::VertexBuffer;
+namespace Render
+{
+class VertexBuffer : public JARVIS::Metal::VertexBuffer
+{};
 }}
 #else
 #error "VertexBuffer is not implemented using this renderer!"

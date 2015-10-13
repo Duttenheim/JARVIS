@@ -1,18 +1,20 @@
 #pragma once
 //------------------------------------------------------------------------------
 /**
-	@class JARVIS::Render::UniformBuffer
+	@class JARVIS::Metal::UniformBuffer
 	
-    Interface level uniform buffer (for uniform shader data)
+    Metal implementation of a uniform buffer
 	
 	(C) 2015 See the LICENSE file.
  */
 //------------------------------------------------------------------------------
+#include "shading/uniformbuffer.h"
 namespace JARVIS {
-namespace Render
+namespace Metal
 {
-class UniformBuffer
+class UniformBuffer : public Base::UniformBuffer
 {
+    __ClassDecl(UniformBuffer);
 public:
     /// constructor
     UniformBuffer();
@@ -22,4 +24,4 @@ public:
 private:
 };
 
-}} // namespace JARVIS::Render
+}} // namespace JARVIS::Metal

@@ -5,7 +5,7 @@
 */
 #include "vertexbuffer.h"
 namespace JARVIS {
-namespace Render
+namespace Base
 {
     
 //------------------------------------------------------------------------------
@@ -24,4 +24,13 @@ VertexBuffer::~VertexBuffer()
     // empty
 }
 
-}}
+//------------------------------------------------------------------------------
+/**
+*/
+void
+VertexBuffer::Bind(uint32& componentIndex)
+{
+    // empty, override in subclass
+}
+
+}} // namespace JARVIS::Base

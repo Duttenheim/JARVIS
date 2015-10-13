@@ -36,11 +36,8 @@ JARVIS_MAIN
             cv::cvtColor(frame, edges, CV_BGR2GRAY);
             
             cv::Canny(edges, edges, 100, 200);
-            //cv::Sobel(edges, edges, CV_8U, 1, 0, 3);
-            //cv::threshold(edges, edges, 128, 255, CV_THRESH_TRIANGLE);
             cv::findContours(edges, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-            //cv::findContours(edges, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, cv::Point(0,0));
-            lines = cv::Mat::zeros( edges.size(), CV_8UC3 );
+            lines = cv::Mat::zeros(edges.size(), CV_8UC3);
             for (int i = 0; i < contours.size(); i++)
             {
                 std::vector<cv::Point> shape;
@@ -66,7 +63,6 @@ JARVIS_MAIN
             }
         }
     }
-    //cv::imshow("Display Image", image);
 
     cv::waitKey(0);
    	return 0;

@@ -5,7 +5,7 @@
 */
 #include "shader.h"
 namespace JARVIS {
-namespace Render
+namespace Base
 {
     
 //------------------------------------------------------------------------------
@@ -24,4 +24,4 @@ Shader::~Shader()
     // empty
 }
 
-}}
+}} // namespace JARVIS::Base

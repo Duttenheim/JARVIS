@@ -1,21 +1,25 @@
 #pragma once
 //------------------------------------------------------------------------------
-//  @file render/shaderinstance.h
+//  @file render/shaderstate.h
 //	(C) 2015 See the LICENSE file.
 //------------------------------------------------------------------------------
 
 #if J_RENDERER_GL4
-#include "gl4/shaderinstance.h"
+#include "gl4/shaderstate.h"
 namespace JARVIS {
-namespace Render {
-using ShaderInstance = JARVIS::GL4::ShaderInstance;
+namespace Render
+{
+class ShaderState : public JARVIS::GL4::ShaderState
+{};
 }}
 #elif J_RENDERER_METAL
-#include "metal/shaderinstance.h"
+#include "metal/shaderstate.h"
 namespace JARVIS {
-namespace Render {
-using ShaderInstance = JARVIS::Metal::ShaderInstance;
+namespace Render
+{
+class ShaderState : public JARVIS::Metal::ShaderState
+{};
 }}
 #else
-#error "ShaderInstance is not implemented using this renderer!"
+#error "ShaderState is not implemented using this renderer!"
 #endif

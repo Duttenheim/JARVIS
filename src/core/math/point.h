@@ -46,6 +46,7 @@ private:
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Point::Point()
 {
     this->v.sse = _mm_setr_ps(0, 0, 0, 1);
@@ -54,6 +55,7 @@ Point::Point()
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Point::~Point()
 {
     // empty
@@ -62,6 +64,7 @@ Point::~Point()
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Point::Point(const float32& v)
 {
     this->v.sse = _mm_set1_ps(v);
@@ -70,6 +73,7 @@ Point::Point(const float32& v)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Point::Point(const float32& x, const float32& y, const float32& z)
 {
     this->v.sse = _mm_setr_ps(x, y, z, 1);
@@ -78,6 +82,7 @@ Point::Point(const float32& x, const float32& y, const float32& z)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Point::Point(const Point& rhs)
 {
     this->v.sse = rhs.v.sse;
@@ -86,25 +91,27 @@ Point::Point(const Point& rhs)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Point::Point(const Vec4& rhs)
 {
     const __m128i control = _mm_setr_epi32(0, 0, 0, 0xFFFFFFFF);
-    this->v.sse = _mm_sel_ps_xor(rhs.v.sse, Vec4::one.v.sse, control);
+    this->v.sse = _mm_sel_ps_xor(rhs.v.sse, Vec4::one.sse, control);
 }
 
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Point::Point(const Vec3& rhs)
 {
     const __m128i control = _mm_setr_epi32(0, 0, 0, 0xFFFFFFFF);
-    this->v.sse = _mm_sel_ps_xor(rhs.v.sse, Vec4::one.v.sse, control);
+    this->v.sse = _mm_sel_ps_xor(rhs.v.sse, Vec4::one.sse, control);
 }
 
 //------------------------------------------------------------------------------
 /**
 */
-float32
+inline float32
 Point::distance(const Point& lhs, const Point& rhs)
 {
     __m128 temp = _mm_sub_ps(lhs.v.sse, rhs.v.sse);

@@ -3,16 +3,17 @@
 /**
 	@class JARVIS::Render::UniformBuffer
 	
-    Interface level uniform buffer (for uniform shader data)
+    Interface level uniform buffer (for uniform shader data).
 	
 	(C) 2015 See the LICENSE file.
  */
 //------------------------------------------------------------------------------
 namespace JARVIS {
-namespace Render
+namespace Base
 {
-class UniformBuffer
+class UniformBuffer : public Core::Ref
 {
+    __ClassDecl(UniformBuffer);
 public:
     /// constructor
     UniformBuffer();

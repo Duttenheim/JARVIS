@@ -1,11 +1,11 @@
 //------------------------------------------------------------------------------
 /**
-    @class JARVIS::Render::IndexBuffer
+    @class JARVIS::Metal::IndexBuffer
  	(C) 2015 See the LICENSE file.
 */
 #include "indexbuffer.h"
 namespace JARVIS {
-namespace Render
+namespace Metal
 {
     
 //------------------------------------------------------------------------------
@@ -24,4 +24,4 @@ IndexBuffer::~IndexBuffer()
     // empty
 }
 
-}}
+}} // namespace JARVIS::Metal

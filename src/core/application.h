@@ -9,6 +9,9 @@
 	(C) 2015 See the LICENSE file.
  */
 //------------------------------------------------------------------------------
+#if __APPLE__
+#include "apple/sysfunc.h"
+#endif
 namespace JARVIS {
 namespace Core
 {
@@ -32,17 +35,23 @@ public:
     
     /// start application
     void Start();
-    /// tell the application to quit
-    void Quit();
+    /// stop application
+    void Stop();
     
-protected:
-
     /// setup the application context
     virtual void Setup();
     /// run the application code
-    virtual void Run();
+    virtual void OnFrame();
     /// exit function
     virtual void Exit();
+    
+protected:
+    friend class JARVISAppDelegate;
+    friend class JARVISViewDelegate;
+    
+#if __APPLE__
+    Apple::SysFunc sysfunc;
+#endif
     
     State state;
 };
@@ -51,7 +60,7 @@ protected:
 /**
 */
 inline void
-Application::Quit()
+Application::Stop()
 {
     this->state = Exiting;
 }

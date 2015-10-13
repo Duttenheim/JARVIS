@@ -1,11 +1,11 @@
 //------------------------------------------------------------------------------
 /**
-    @class JARVIS::Render::UniformBuffer
+    @class JARVIS::Metal::UniformBuffer
  	(C) 2015 See the LICENSE file.
 */
 #include "uniformbuffer.h"
 namespace JARVIS {
-namespace Render
+namespace Metal
 {
     
 //------------------------------------------------------------------------------
@@ -24,4 +24,4 @@ UniformBuffer::~UniformBuffer()
     // empty
 }
 
-}}
+}} // namespace JARVIS::Metal

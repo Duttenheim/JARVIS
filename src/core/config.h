@@ -18,8 +18,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <atomic>
+#include <utility>
 #include <xmmintrin.h>
 #include <smmintrin.h>
+#include <initializer_list>
 
 typedef uint32_t	uint32;
 typedef int32_t		int32;
@@ -43,8 +45,16 @@ typedef __m128		vec4;
 typedef __m128i		ivec4;
 typedef __m128d		dvec4;
 
+// typedef away ugly std:::initializer_list syntax
+template <class T>
+using InitList = std::initializer_list<T>;
+
+// typedef away ugly std::array<T, N>
+template <class TYPE, uint32 N>
+using ConstArr = std::array<TYPE, N>;
+
 #if __WIN32__
-#define align_16
+#define align_16 __declspec(align(16))
 #elif __APPLE__ || __UNIX__
 #define align_16 __attribute__((aligned(16)))
 #else
@@ -74,11 +84,17 @@ typedef __m128d		dvec4;
 #define NULL nullptr
 #endif
 
-#include "class.h"
-#include "singleton.h"
+#if J_RENDERER_GL4
+#include <glew.h>
+#endif
+
 #include "debug.h"
+#include "mem.h"
+#include "constness.h"
+#include "singleton.h"
 #include "ref.h"
 #include "ptr.h"
-#include "mem.h"
 #include "enum.h"
+#include "poolalloc.h"
+#include "class.h"
 #endif

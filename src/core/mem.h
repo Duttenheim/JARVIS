@@ -195,4 +195,4 @@ Fill(void* buf, uint32 size, uint8 val)
 	std::memset(buf, val, size);
 }
 
-}}}
+}}} // namespace JARVIS::Core::Memory

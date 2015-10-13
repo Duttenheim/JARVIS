@@ -1,18 +1,21 @@
 #pragma once
 //------------------------------------------------------------------------------
 /**
-	@class JARVIS::Render::IndexBuffer
+	@class JARVIS::Metal::IndexBuffer
 	
-    Interface level implementation of an index buffer. 
+    Metal implementation of an index buffer
 	
 	(C) 2015 See the LICENSE file.
  */
 //------------------------------------------------------------------------------
+#include "resources/indexbuffer.h"
 namespace JARVIS {
-namespace Render
+namespace Metal
 {
-class IndexBuffer
+class Context;
+class IndexBuffer : public Base::IndexBuffer
 {
+    __ClassDecl(IndexBuffer);
 public:
     /// constructor
     IndexBuffer();
@@ -20,6 +23,8 @@ public:
     virtual ~IndexBuffer();
     
 private:
+    friend class Context;
+    OBJC_ID_POINTER(MTLBuffer) buffer;
 };
 
-}} // namespace JARVIS::Render
+}} // namespace JARVIS::Metal

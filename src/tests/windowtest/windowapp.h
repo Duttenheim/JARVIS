@@ -24,10 +24,12 @@ public:
     /// setup context
     void Setup();
     /// implement main loop
-    void Run();
+    void OnFrame();
+    /// exit app
+    void Exit();
     
 private:
-    Core::Ptr<Render::Window> window;
+    Ptr<Render::Window> window;
 };
 
 }} // namespace JARVIS::WindowTest

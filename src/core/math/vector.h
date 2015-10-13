@@ -40,6 +40,7 @@ private:
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vector::Vector()
 {
     this->v.sse = _mm_setr_ps(0, 0, 0, 0);
@@ -48,6 +49,7 @@ Vector::Vector()
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vector::~Vector()
 {
     // empty
@@ -56,6 +58,7 @@ Vector::~Vector()
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vector::Vector(const float32& v)
 {
     this->v.sse = _mm_set1_ps(v);
@@ -64,6 +67,7 @@ Vector::Vector(const float32& v)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vector::Vector(const float32& x, const float32& y, const float32& z)
 {
     this->v.sse = _mm_setr_ps(x, y, z, 0);
@@ -72,6 +76,7 @@ Vector::Vector(const float32& x, const float32& y, const float32& z)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vector::Vector(const Vector& rhs)
 {
     this->v.sse = rhs.v.sse;
@@ -80,25 +85,27 @@ Vector::Vector(const Vector& rhs)
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vector::Vector(const Vec4& rhs)
 {
     const __m128i control = _mm_setr_epi32(0, 0, 0, 0xFFFFFFFF);
-    this->v.sse = _mm_sel_ps_xor(rhs.v.sse, Vec4::zero.v.sse, control);
+    this->v.sse = _mm_sel_ps_xor(rhs.v.sse, Vec4::zero.sse, control);
 }
 
 //------------------------------------------------------------------------------
 /**
 */
+inline
 Vector::Vector(const Vec3& rhs)
 {
     const __m128i control = _mm_setr_epi32(0, 0, 0, 0xFFFFFFFF);
-    this->v.sse = _mm_sel_ps_xor(rhs.v.sse, Vec4::zero.v.sse, control);
+    this->v.sse = _mm_sel_ps_xor(rhs.v.sse, Vec4::zero.sse, control);
 }
 
 //------------------------------------------------------------------------------
 /**
 */
-float32
+inline float32
 Vector::length(const Vector& rhs)
 {
     return _mm_cvtss_f32(_mm_sqrt_ps(_mm_dp_ps(rhs.v.sse, rhs.v.sse, 0xFF)));

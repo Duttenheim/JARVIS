@@ -114,7 +114,7 @@ struct __function_traits<RET(CLASS::*)(ARGS...)>
     Booyah.
 */
 template<class LAMBDA>
-Core::Ptr<typename __function_traits<LAMBDA>::type> Lambda(LAMBDA func)
+Ptr<typename __function_traits<LAMBDA>::type> Lambda(LAMBDA func)
 {
     using ty = typename __function_traits<LAMBDA>::type;
     return ty::Create(func);

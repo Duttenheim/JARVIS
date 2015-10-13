@@ -5,7 +5,7 @@
 */
 #include "uniformbuffer.h"
 namespace JARVIS {
-namespace Render
+namespace Base
 {
     
 //------------------------------------------------------------------------------

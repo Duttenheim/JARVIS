@@ -4,6 +4,11 @@
  	(C) 2015 See the LICENSE file.
 */
 #include "window.h"
+#include "glfw3.h"
+#include "context.h"
+#include "../context.h"
+#include "../rendertarget.h"
+#include "../window.h"
 namespace JARVIS {
 namespace GL4
 {
@@ -75,7 +80,7 @@ Window::~Window()
 bool
 Window::Open()
 {
- if (GlobalWindowCounter == 0)
+    if (GlobalWindowCounter == 0)
     {
         if (!glfwInit()) return false;
     }
@@ -99,34 +104,16 @@ Window::Open()
     
     // create window and make current directly
     this->window = glfwCreateWindow(this->width, this->height, this->title.CharPtr(), nullptr, nullptr);
-    glfwMakeContextCurrent(this->window);
     
     if (nullptr != this->window && Window::GlobalWindowCounter == 0)
     {
-        GLenum res = glewInit();
-		assert(res == GLEW_OK);
-		if (!(GLEW_VERSION_4_1))
-		{
-			printf("[WARNING]: OpenGL 4.1+ is not supported on this hardware!\n");
-            printf("Current GL version: %s", glewGetString(GLEW_VERSION));
-		}
-    
-#if OPENGL_VERSION_MAX >= 43
-        // setup debug callback
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageCallback(GLDebugCallback, NULL);
-		GLuint unusedIds;
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
-#endif
-
-		// setup stuff
-		glEnable(GL_FRAMEBUFFER_SRGB);
-		glEnable(GL_LINE_SMOOTH);
-		glEnable(GL_POLYGON_SMOOTH);
-		glEnable(GL_MULTISAMPLE);
-		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+        // explicitly setup a GL4 context using this window as it's context source
+        this->context = GL4::Context::Create(this->window);
+        this->context->Setup();
+        
+        // setup default render target
+        this->renderTarget = GL4::RenderTarget::Create();
+        this->renderTarget->Setup(this);
         
         // setup callbacks
         glfwSetWindowUserPointer(this->window, this);
@@ -136,6 +123,8 @@ Window::Open()
         glfwSetCursorEnterCallback(this->window, Window::StaticMouseEnterLeaveCallback);
         glfwSetScrollCallback(this->window, Window::StaticMouseScrollCallback);
         glfwSetWindowCloseCallback(this->window, Window::StaticWindowCloseCallback);
+        
+        glDrawPixels(1, 1, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         
         // call base class
         Base::Window::Open();
@@ -151,8 +140,17 @@ Window::Open()
 void
 Window::Close()
 {
+    j_assert(this->window != nullptr);
+    j_assert(this->context != nullptr);
+    
+    // discard the context
+    this->context->Discard();
+    this->context = nullptr;
+    
+    // discard the window
     glfwDestroyWindow(this->window);
     this->window = nullptr;
+    
     Base::Window::Close();
 }
 
@@ -163,7 +161,8 @@ void
 Window::MakeCurrent()
 {
     j_assert(this->window != nullptr);
-    glfwMakeContextCurrent(this->window);
+    j_assert(this->context != nullptr);
+    this->context->MakeCurrent();
 }
 
 //------------------------------------------------------------------------------
@@ -174,6 +173,7 @@ Window::SwapBuffers()
 {
     j_assert(this->window != nullptr);
     glfwSwapBuffers(this->window);
+    Base::Window::SwapBuffers();
 }
 
 //------------------------------------------------------------------------------
@@ -183,6 +183,7 @@ void
 Window::Update()
 {
     glfwPollEvents();
+    Base::Window::Update();
 }
 
 //------------------------------------------------------------------------------
