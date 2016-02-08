@@ -117,12 +117,13 @@ template <class TYPE>
 inline static void
 Move(TYPE* from, TYPE* to, uint32 elements)
 {
-	TYPE* end = from + elements;
-	while (from != end)
-	{
-		*to = std::move(*from);
-		++from; ++to;
-	}
+    uint32 i;
+    for (i = 0; i < elements; i++)
+    {
+        TYPE* toPtr = to + i;
+        TYPE* fromPtr = from + i;
+        *toPtr = std::move(*fromPtr);
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 */
 #include "context.h"
 #include "types.h"
+#include "window.h"
 namespace JARVIS {
 namespace Metal
 {
@@ -13,7 +14,11 @@ namespace Metal
 /**
 */
 Context::Context() :
-    encoder(nullptr)
+    device(nil),
+    library(nil),
+    cmdQueue(nil),
+    cmdBuffer(nil),
+    encoder(nil)
 {
     // empty
 }
@@ -38,9 +43,8 @@ Context::Setup()
 {
     Base::Context::Setup();
     this->device = MTLCreateSystemDefaultDevice();
-    this->library = [this->device newDefaultLibrary];
+    this->library = [this->device newLibraryWithFile:METAL_DEFAULT_LIB error:nil];
     this->cmdQueue = [this->device newCommandQueue];
-    this->cmdBuffer = [this->cmdQueue commandBuffer];
     this->MakeCurrent();
     return true;
 }
@@ -59,14 +63,15 @@ Context::Discard()
 /**
 */
 void
-Context::BindVertexBuffers(const InitList<Ptr<Render::VertexBuffer>>& vbos)
+Context::BindVertexBuffers(InitList<Ptr<Render::VertexBuffer>> vbos)
 {
-    j_assert(this->encoder != nullptr);
-    Base::Context::BindVertexBuffers(Core::Forward(vbos));
+    if (this->encoder == nil) return;
+    Base::Context::BindVertexBuffers(Fw(vbos));
     
     int32 i;
     for (i = 0; i < this->vbos.Size(); i++)
     {
+        j_assert(this->vbos[i]->buffer != nullptr);
         [this->encoder setVertexBuffer:this->vbos[i]->buffer offset:0 atIndex:i];
     }
 }
@@ -77,8 +82,8 @@ Context::BindVertexBuffers(const InitList<Ptr<Render::VertexBuffer>>& vbos)
 void
 Context::BindIndexBuffer(const Ptr<Render::IndexBuffer>& ibo)
 {
-    j_assert(this->encoder != nullptr);
-    Base::Context::BindIndexBuffer(Core::Forward(ibo));
+    if (this->encoder == nil) return;
+    Base::Context::BindIndexBuffer(Fw(ibo));
 }
 
 //------------------------------------------------------------------------------
@@ -87,8 +92,14 @@ Context::BindIndexBuffer(const Ptr<Render::IndexBuffer>& ibo)
 void
 Context::BindPipelineState(const Ptr<Render::PipelineState>& pipelineState)
 {
-    Base::Context::BindPipelineState(Core::Forward(pipelineState));
-    this->encoder = [this->cmdBuffer renderCommandEncoderWithDescriptor:pipelineState->rt->pass];
+    Base::Context::BindPipelineState(Fw(pipelineState));
+    if (this->encoder != nil)
+    {
+        [this->encoder endEncoding];
+        this->encoder = nil;
+    }
+    if (this->cmdBuffer == nil) return;
+    this->encoder = [this->cmdBuffer renderCommandEncoderWithDescriptor:pipelineState->rt->GetPass()];
     [this->encoder setRenderPipelineState:pipelineState->renderPipeline];
     [this->encoder setViewport:*pipelineState->rt->viewport];
 }
@@ -100,10 +111,6 @@ void
 Context::UnbindPipelineState()
 {
     Base::Context::UnbindPipelineState();
-    
-    // end encoding and deref encoder (might not work as expected xD)
-    [this->encoder endEncoding];
-    this->encoder = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -113,15 +120,58 @@ Context::UnbindPipelineState()
 void
 Context::BindRenderState(const Ptr<Render::RenderState>& renderState)
 {
-    j_assert(this->encoder != nullptr);
-    Base::Context::BindRenderState(Core::Forward(renderState));
-    [this->encoder setCullMode:renderState->mtlCullMode];
-    [this->encoder setDepthClipMode:renderState->mtlDepthClipMode];
-    [this->encoder setFrontFacingWinding:renderState->mtlWinding];
-    [this->encoder setScissorRect:renderState->mtlScissorRect];
+    if (this->encoder == nil) return;
+    Base::Context::BindRenderState(Fw(renderState));
+    
+    MTLCullMode cullMode;
+    // set cull mode
+    switch (renderState->cullMode)
+    {
+        case Render::CullMode::Front:   cullMode = MTLCullModeFront;
+        break;
+        case Render::CullMode::Back:    cullMode = MTLCullModeBack;
+        break;
+        case Render::CullMode::None:    cullMode = MTLCullModeNone;
+        break;
+    }
+    
+    MTLWinding winding;
+    // set winding mode
+    switch (renderState->winding)
+    {
+        case Render::Winding::Clockwise:            winding = MTLWindingClockwise;
+        break;
+        case Render::Winding::CounterClockwise:     winding = MTLWindingCounterClockwise;
+        break;
+    }
+    
+    MTLDepthClipMode clipMode;
+    // set depth mode
+    switch (renderState->depthMode)
+    {
+        case Render::DepthMode::Clamp:          clipMode = MTLDepthClipModeClamp;
+        break;
+        case Render::DepthMode::Clip:           clipMode = MTLDepthClipModeClip;
+        break;
+    }
+    
+    MTLTriangleFillMode triangleFillMode;
+    // set fill mode
+    switch (renderState->fillMode)
+    {
+        case Render::FillMode::Fill:            triangleFillMode = MTLTriangleFillModeFill;
+        break;
+        case Render::FillMode::Lines:           triangleFillMode = MTLTriangleFillModeLines;
+        break;
+    }
+    
+    [this->encoder setCullMode:cullMode];
+    [this->encoder setDepthClipMode:clipMode];
+    [this->encoder setFrontFacingWinding:winding];
+    [this->encoder setTriangleFillMode:triangleFillMode];
+    [this->encoder setScissorRect:*renderState->mtlScissorRect];
     const auto stencilRef = renderState->stencilRef;
     [this->encoder setStencilFrontReferenceValue:stencilRef.frontRef backReferenceValue:stencilRef.backRef];
-    [this->encoder setTriangleFillMode:renderState->mtlFillMode];
     const auto depthBias = renderState->depthBias;
     [this->encoder setDepthBias:depthBias.bias slopeScale:depthBias.slopeScale clamp:depthBias.clamp];
     [this->encoder setDepthStencilState:Base::Context::renderState->mtlDepthStencilState];
@@ -133,17 +183,16 @@ Context::BindRenderState(const Ptr<Render::RenderState>& renderState)
 void
 Context::Draw()
 {
-    j_assert(this->encoder != nullptr);
+    if (this->encoder == nil) return;
     Base::Context::Draw();
     if (this->ibo != nullptr)
     {
-        [this->encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:this->primitive.indexCount indexType:this->ibo->indexType == IndexBuffer::IndexType::UShort ? MTLIndexTypeUInt16 : MTLIndexTypeUInt32 indexBuffer:this->ibo->buffer indexBufferOffset:this->primitive.baseIndex];
+        [this->encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle indexCount:this->primitive.indexCount indexType:this->ibo->indexType == IndexBuffer::IndexType::UShort ? MTLIndexTypeUInt16 : MTLIndexTypeUInt32 indexBuffer:this->ibo->buffer indexBufferOffset:this->primitive.baseIndex instanceCount:1];
     }
     else
     {
-        [this->encoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:this->primitive.baseVertex vertexCount:this->primitive.vertexCount];
+        [this->encoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:this->primitive.baseVertex vertexCount:this->primitive.vertexCount instanceCount:1];
     }
-    
 }
 
 //------------------------------------------------------------------------------
@@ -152,7 +201,7 @@ Context::Draw()
 void
 Context::Draw(uint32 numInstances)
 {
-    j_assert(this->encoder != nullptr);
+    if (this->encoder == nil) return;
     Base::Context::Draw(numInstances);
     if (this->ibo != nullptr)
     {
@@ -164,4 +213,28 @@ Context::Draw(uint32 numInstances)
     }
 }
 
+//------------------------------------------------------------------------------
+/**
+*/
+void
+Context::NewFrame()
+{
+    this->cmdBuffer = nil;
+    this->cmdBuffer = [this->cmdQueue commandBuffer];
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+void
+Context::Present(const Ptr<Metal::Window>& window)
+{
+    if (this->cmdBuffer != nil && this->encoder != nil)
+    {
+        [this->encoder endEncoding];
+        [this->cmdBuffer presentDrawable:window->view.currentDrawable];
+        [this->cmdBuffer commit];
+    }
+    this->encoder = nil;
+}
 }} // namespace JARVIS::Metal

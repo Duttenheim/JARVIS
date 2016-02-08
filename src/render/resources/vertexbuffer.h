@@ -34,11 +34,11 @@ public:
     /// bind to render pipeline
     void Bind(uint32& componentIndex);
     
-protected:
     /// initialize an index buffer which can be resized
-    void InitMutable(const InitList<VertexComponent>& comps, const uint32 size, const byte* data, Render::AccessPattern access, Render::UsagePattern usage, Render::FrequencyPattern frequency);
+    void InitMutable(InitList<VertexComponent> comps, const uint32 size, const byte* data, Render::AccessPattern access = Render::AccessPattern::None, Render::UsagePattern usage = Render::UsagePattern::CPUWriteGPURead, Render::FrequencyPattern frequency = Render::FrequencyPattern::ChangeOnceUseMany);
     /// initialize an index buffer which is immutable
-    void InitImmutable(const InitList<VertexComponent>& comps, const uint32 size, const byte* data, Render::AccessPattern access, Render::UsagePattern usage, Render::FrequencyPattern frequency, Render::ImmutableFlags flags);
+    void InitImmutable(InitList<VertexComponent> comps, const uint32 size, const byte* data, Render::AccessPattern access = Render::AccessPattern::None, Render::UsagePattern usage = Render::UsagePattern::CPUWriteGPURead, Render::FrequencyPattern frequency = Render::FrequencyPattern::ChangeOnceUseMany, Render::ImmutableFlags flags = Render::ImmutableFlags::None);
+protected:
     
     Core::Array<VertexComponent> components;
     uint32 vertexByteSize;
@@ -48,7 +48,7 @@ protected:
 /**
 */
 inline void
-VertexBuffer::InitMutable(const InitList<JARVIS::Base::VertexBuffer::VertexComponent>& comps, const uint32 size, const byte* data, Render::AccessPattern access, Render::UsagePattern usage, Render::FrequencyPattern frequency)
+VertexBuffer::InitMutable(InitList<JARVIS::Base::VertexBuffer::VertexComponent> comps, const uint32 size, const byte* data, Render::AccessPattern access, Render::UsagePattern usage, Render::FrequencyPattern frequency)
 {
     Buffer::InitMutable(Render::BufferType::VertexBufferType, size, data, access, usage, frequency);
     this->components = comps;
@@ -65,7 +65,7 @@ VertexBuffer::InitMutable(const InitList<JARVIS::Base::VertexBuffer::VertexCompo
 /**
 */
 inline void
-VertexBuffer::InitImmutable(const InitList<JARVIS::Base::VertexBuffer::VertexComponent>& comps, const uint32 size, const byte* data, Render::AccessPattern access, Render::UsagePattern usage, Render::FrequencyPattern frequency, Render::ImmutableFlags flags)
+VertexBuffer::InitImmutable(InitList<JARVIS::Base::VertexBuffer::VertexComponent> comps, const uint32 size, const byte* data, Render::AccessPattern access, Render::UsagePattern usage, Render::FrequencyPattern frequency, Render::ImmutableFlags flags)
 {
     Buffer::InitImmutable(Render::BufferType::VertexBufferType, size, data, access, usage, frequency, flags);
     this->components = comps;

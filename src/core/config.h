@@ -2,7 +2,7 @@
 /**
     @file core/config.h
     
-	Main configure file for types and OS-specific stuff.
+	Main configure file for types and generic OS-specific stuff.
 	
 	(C) 2015 See the LICENSE file.
 */
@@ -22,7 +22,11 @@
 #include <xmmintrin.h>
 #include <smmintrin.h>
 #include <initializer_list>
+#include <limits.h>
+#include <float.h>
 
+typedef uint64_t    uint64;
+typedef int64_t     int64;
 typedef uint32_t	uint32;
 typedef int32_t		int32;
 typedef uint16_t	uint16;
@@ -33,7 +37,7 @@ typedef uint8_t		uchar;
 
 // eh, windows already defines byte, so don't redefine byte if we are running windows
 #ifndef __WIN32__
-typedef uint8_t      byte;
+typedef int8_t      byte;
 #endif
 
 typedef uint8_t		ubyte;
@@ -46,10 +50,11 @@ typedef __m128i		ivec4;
 typedef __m128d		dvec4;
 
 // typedef away ugly std:::initializer_list syntax
+// danger: using in clang as const ref causes corruption
 template <class T>
 using InitList = std::initializer_list<T>;
 
-// typedef away ugly std::array<T, N>
+// typedef std::array<T, N> so it becomes clear it's a constant array
 template <class TYPE, uint32 N>
 using ConstArr = std::array<TYPE, N>;
 
@@ -62,9 +67,11 @@ using ConstArr = std::array<TYPE, N>;
 
 // hmm, maybe move this to each platforms pch.h
 #if __WIN32__
-    #define JARVIS_MAIN int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd)
+    #define JARVIS_MAIN  using namespace JARVIS; \
+    int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd)
 #else
-    #define JARVIS_MAIN int main(int argc, const char** argv)
+    #define JARVIS_MAIN using namespace JARVIS; \
+    int main(int argc, const char** argv)
 #endif
 
 // check for maximum opengl version, only restricted on OS X

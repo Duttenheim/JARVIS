@@ -8,12 +8,12 @@
 	(C) 2015 See the LICENSE file.
  */
 //------------------------------------------------------------------------------
-#include "application.h"
+#include "renderapplication.h"
 #include "window.h"
 namespace JARVIS {
 namespace WindowTest
 {
-class WindowApp : public Core::Application
+class WindowApp : public Core::RenderApplication
 {
 public:
     /// constructor
@@ -29,7 +29,13 @@ public:
     void Exit();
     
 private:
-    Ptr<Render::Window> window;
+    Render::WindowPtr window;
+    Render::RenderTargetPtr rt;
+    Render::PipelineStatePtr pipeline;
+    Render::RenderStatePtr renderState;
+    Render::VertexBufferPtr vbo;
+    Render::Primitive prim;
+    
 };
 
 }} // namespace JARVIS::WindowTest

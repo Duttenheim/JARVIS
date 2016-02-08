@@ -55,7 +55,7 @@ public:
     void SwapBuffers();
     
     /// updates all windows including events and such
-    static void Update();
+    void Update();
     
     /// public members, setting them as is will do nothing
     uint32 width;

@@ -11,6 +11,7 @@ namespace Render
 {
 class Window : public JARVIS::GL4::Window
 {};
+__Ptr(Window)
 }}
 #elif J_RENDERER_METAL
 #include "metal/window.h"
@@ -19,6 +20,7 @@ namespace Render
 {
 class Window : public JARVIS::Metal::Window
 {};
+__Ptr(Window)
 }}
 #else
 #error "Window is not implemented using this renderer!"

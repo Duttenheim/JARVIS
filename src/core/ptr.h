@@ -78,7 +78,7 @@ public:
 			this->ptr = p;
 			if (0 != this->ptr) this->ptr->Retain();
 		}
-}
+    }
 
 	/// assignment operator for smart pointer of other type
 	template<class OTHERTYPE> void operator=(Ptr<OTHERTYPE>&& rhs)

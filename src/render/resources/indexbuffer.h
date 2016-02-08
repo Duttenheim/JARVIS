@@ -31,11 +31,11 @@ public:
     /// bind to be rendered
     void Bind();
 
-protected:
     /// initialize an index buffer which can be resized
     void InitMutable(IndexType type, int32 numIndices, byte* data);
     /// initialize an index buffer which is immutable
     void InitImmutable(IndexType type, int32 numIndices, byte* data);
+protected:
     
     int32 numIndices;
     IndexType indexType;

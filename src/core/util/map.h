@@ -43,8 +43,10 @@ public:
 	const Kvp& Pair(const uint32 index) const;
 	/// index-lookup for key
 	const KEY& Key(const uint32 index) const;
-	/// index-lookup for value
+	/// index-lookup for const value
 	const VALUE& Value(const uint32 index) const;
+    /// index-lookup for read-write access
+    VALUE& Value(const uint32 index);
 
 	/// add key-value pair by using key and value separately
 	void Insert(const KEY& key, const VALUE& value);
@@ -52,6 +54,10 @@ public:
 	void Insert(const Kvp& kvp);
 	/// returns true if dictionary contains the key
 	bool Contains(const KEY& key);
+    /// get index of key into array, or -1 if it can't be found
+    uint32 Index(const KEY& key);
+    /// removes element on key
+    void Remove(const KEY& key);
 
 	/// resize internal storage before hand
 	void Resize(const uint32 size);
@@ -197,6 +203,17 @@ Map<KEY, VALUE>::Value(const uint32 index) const
 /**
 */
 template <class KEY, class VALUE>
+inline VALUE&
+Map<KEY, VALUE>::Value(const uint32 index)
+{
+	j_assert(index < this->data.Size());
+	return std::get<1>(this->data[index]);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class KEY, class VALUE>
 inline void
 Map<KEY, VALUE>::Insert(const KEY& key, const VALUE& value)
 {
@@ -221,6 +238,28 @@ inline bool
 Map<KEY, VALUE>::Contains(const KEY& key)
 {
 	return this->data.SearchBinary(std::forward_as_tuple(key, VALUE())) != -1;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class KEY, class VALUE>
+inline uint32
+Map<KEY, VALUE>::Index(const KEY& key)
+{
+    return this->data.SearchBinary(std::forward_as_tuple(key, VALUE()));
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class KEY, class VALUE>
+inline void
+Map<KEY, VALUE>::Remove(const KEY& key)
+{
+    uint32 index = this->data.SearchBinary(std::forward_as_tuple(key, VALUE()));
+    j_assert(index != -1);
+    this->data.RemoveIndex(index);
 }
 
 //------------------------------------------------------------------------------

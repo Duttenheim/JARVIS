@@ -33,47 +33,73 @@ PipelineState::~PipelineState()
 /**
 */
 void
-PipelineState::InitRender(const InitList<Ptr<Render::Shader>>& shaders, const Ptr<Render::RenderTarget>& rt, const InitList<Render::BlendState>& blendStates)
+PipelineState::InitRender(const Render::RenderShaderBundle& shaders, const Ptr<Render::RenderTarget>& rt, InitList<Render::BlendState> blendStates, const uint8 samples)
 {
-    Base::PipelineState::InitRender(Core::Forward(shaders), Core::Forward(rt), Core::Forward(blendStates));
+    Base::PipelineState::InitRender(shaders, rt, blendStates, samples);
     
     // setup descriptor
     MTLRenderPipelineDescriptor* desc = [[MTLRenderPipelineDescriptor alloc] init];
+    desc.sampleCount = this->samples;
     desc.vertexFunction = this->vs->shader;
-    desc.vertexFunction = this->fs->shader;
+    desc.fragmentFunction = this->ps->shader;
     
     // assign attachments
-    int32 i;
-    for(i = 0; i < rt->textures.Size(); i++)
+    if (rt->isWindowTarget)
     {
-        MTLRenderPipelineColorAttachmentDescriptor* attachment = [desc.colorAttachments objectAtIndexedSubscript:i];
-        attachment.pixelFormat = (MTLPixelFormat)Types::PixelFormatFlag(rt->textures[i]->pixelFormat);
+        MTLRenderPipelineColorAttachmentDescriptor* colorAttachment = desc.colorAttachments[0];
+        colorAttachment.pixelFormat = rt->view.colorPixelFormat;
         
-        // setup blend state if we have a descriptor for it
-        if (this->blendStates.Size() > i)
+        // set blend state if available
+        if (this->blendStates.Size() > 0)
         {
-            attachment.blendingEnabled = this->blendStates[i].blendEnabled;
-            attachment.alphaBlendOperation = Types::BlendOpFlag(this->blendStates[i].alphaBlendOp);
-            attachment.rgbBlendOperation = Types::BlendOpFlag(this->blendStates[i].colorBlendOp);
-            attachment.sourceRGBBlendFactor = Types::BlendModeFlag(this->blendStates[i].srcColorBlendMode);
-            attachment.sourceAlphaBlendFactor = Types::BlendModeFlag(this->blendStates[i].srcAlphaBlendMode);
-            attachment.destinationRGBBlendFactor = Types::BlendModeFlag(this->blendStates[i].dstColorBlendMode);
-            attachment.destinationAlphaBlendFactor = Types::BlendModeFlag(this->blendStates[i].dstAlphaBlendMode);
+            colorAttachment.blendingEnabled = this->blendStates[0].blendEnabled;
+            colorAttachment.alphaBlendOperation = Types::BlendOpFlag(this->blendStates[0].alphaBlendOp);
+            colorAttachment.rgbBlendOperation = Types::BlendOpFlag(this->blendStates[0].colorBlendOp);
+            colorAttachment.sourceRGBBlendFactor = Types::BlendModeFlag(this->blendStates[0].srcColorBlendMode);
+            colorAttachment.sourceAlphaBlendFactor = Types::BlendModeFlag(this->blendStates[0].srcAlphaBlendMode);
+            colorAttachment.destinationRGBBlendFactor = Types::BlendModeFlag(this->blendStates[0].dstColorBlendMode);
+            colorAttachment.destinationAlphaBlendFactor = Types::BlendModeFlag(this->blendStates[0].dstAlphaBlendMode);
         }
-        else
-        {
-            // create default placeholder state and assign, this avoids random attachment behaviour
-            const Render::BlendState placeholder(nullptr);
-            attachment.blendingEnabled = placeholder.blendEnabled;
-            attachment.alphaBlendOperation = Types::BlendOpFlag(placeholder.alphaBlendOp);
-            attachment.rgbBlendOperation = Types::BlendOpFlag(placeholder.colorBlendOp);
-            attachment.sourceRGBBlendFactor = Types::BlendModeFlag(placeholder.srcColorBlendMode);
-            attachment.sourceAlphaBlendFactor = Types::BlendModeFlag(placeholder.srcAlphaBlendMode);
-            attachment.destinationRGBBlendFactor = Types::BlendModeFlag(placeholder.dstColorBlendMode);
-            attachment.destinationAlphaBlendFactor = Types::BlendModeFlag(placeholder.dstAlphaBlendMode);
-        }
+        
+        desc.depthAttachmentPixelFormat = rt->view.depthStencilPixelFormat;
+        desc.stencilAttachmentPixelFormat = Types::AsValidStencilFormat(rt->view.depthStencilPixelFormat);
     }
-    
+    else
+    {
+        for(uint32 i = 0; i < rt->textures.Size(); i++)
+        {
+            MTLRenderPipelineColorAttachmentDescriptor* attachment = desc.colorAttachments[i];
+            attachment.pixelFormat = (MTLPixelFormat)Types::PixelFormatFlag(rt->textures[i]->pixelFormat);
+            
+            // setup blend state if we have a descriptor for it
+            if (this->blendStates.Size() > i)
+            {
+                attachment.blendingEnabled = this->blendStates[i].blendEnabled;
+                attachment.alphaBlendOperation = Types::BlendOpFlag(this->blendStates[i].alphaBlendOp);
+                attachment.rgbBlendOperation = Types::BlendOpFlag(this->blendStates[i].colorBlendOp);
+                attachment.sourceRGBBlendFactor = Types::BlendModeFlag(this->blendStates[i].srcColorBlendMode);
+                attachment.sourceAlphaBlendFactor = Types::BlendModeFlag(this->blendStates[i].srcAlphaBlendMode);
+                attachment.destinationRGBBlendFactor = Types::BlendModeFlag(this->blendStates[i].dstColorBlendMode);
+                attachment.destinationAlphaBlendFactor = Types::BlendModeFlag(this->blendStates[i].dstAlphaBlendMode);
+            }
+            else
+            {
+                // create default placeholder state and assign, this avoids random attachment behaviour
+                const Render::BlendState placeholder(nullptr);
+                attachment.blendingEnabled = placeholder.blendEnabled;
+                attachment.alphaBlendOperation = Types::BlendOpFlag(placeholder.alphaBlendOp);
+                attachment.rgbBlendOperation = Types::BlendOpFlag(placeholder.colorBlendOp);
+                attachment.sourceRGBBlendFactor = Types::BlendModeFlag(placeholder.srcColorBlendMode);
+                attachment.sourceAlphaBlendFactor = Types::BlendModeFlag(placeholder.srcAlphaBlendMode);
+                attachment.destinationRGBBlendFactor = Types::BlendModeFlag(placeholder.dstColorBlendMode);
+                attachment.destinationAlphaBlendFactor = Types::BlendModeFlag(placeholder.dstAlphaBlendMode);
+            }
+        }
+        
+        //desc.depthAttachmentPixelFormat = rt->depthStencilTarget.depthStencilPixelFormat;
+        //desc.stencilAttachmentPixelFormat = rt->depthStencilTarget.depthStencilPixelFormat;
+    }
+
     // create pipeline
     NSError* err;
     this->renderPipeline = [Context::Current->device newRenderPipelineStateWithDescriptor:desc error:&err];
@@ -87,13 +113,13 @@ PipelineState::InitRender(const InitList<Ptr<Render::Shader>>& shaders, const Pt
 /**
 */
 void
-PipelineState::InitCompute(const Ptr<Render::Shader>& shader)
+PipelineState::InitCompute(const Render::ComputeShaderBundle& shader)
 {
-    Base::PipelineState::InitCompute(Core::Forward(shader));
+    Base::PipelineState::InitCompute(shader);
     
     // create pipeline
     NSError* err;
-    this->computePipeline = [Context::Current->device newComputePipelineStateWithFunction:shader->shader error:&err];
+    this->computePipeline = [Context::Current->device newComputePipelineStateWithFunction:this->cs->shader error:&err];
     if (err != nil)
     {
         j_error([[err localizedDescription] cStringUsingEncoding:NSUTF8StringEncoding]);

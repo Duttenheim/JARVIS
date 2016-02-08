@@ -11,6 +11,7 @@ namespace Render
 {
 class PipelineState : public JARVIS::GL4::PipelineState
 {};
+__Ptr(PipelineState)
 }}
 #elif J_RENDERER_METAL
 #include "metal/pipelinestate.h"
@@ -19,6 +20,7 @@ namespace Render
 {
 class PipelineState : public JARVIS::Metal::PipelineState
 {};
+__Ptr(PipelineState)
 }}
 #else
 #error "PipelineState is not implemented using this renderer!"

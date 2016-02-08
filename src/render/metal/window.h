@@ -10,6 +10,12 @@
 //------------------------------------------------------------------------------
 #include "display/window.h"
 #include "types.h"
+
+#if __OBJC__
+@interface JARVISMTKView: MTKView
+@end
+#endif
+
 namespace JARVIS {
 namespace Metal
 {
@@ -34,13 +40,14 @@ public:
     void SwapBuffers();
     
     /// updates all windows including events and such
-    static void Update();
+    void Update();
     
 private:
     friend class Metal::RenderTarget;
+    friend class Metal::Context;
     OBJC_POINTER(NSWindow) nsWindow;
     OBJC_ID viewDelegate;
-    OBJC_POINTER(MTKView) view;
+    OBJC_POINTER(JARVISMTKView) view;
     OBJC_POINTER(CAMetalLayer) defaultRenderTarget;
 };
 

@@ -26,4 +26,21 @@ template <class T>
 inline CONST_EXPR T&&
 Forward(T f) { return std::forward<T>(f); };
 
-}} // namespace JARVIS::Core
+template <class T>
+inline CONST_EXPR T&&
+Move(T f) { return std::move(f); }
+
+} // namespace JARVIS
+
+// convenience functions which are to be used when one doesn't want verbose calls
+template <class T>
+inline CONST_EXPR T&&
+Fw(T f) { return std::forward<T>(f); }
+
+// same as above but for moves
+template <class T>
+inline CONST_EXPR T&&
+Mv(T f) { return std::move(f); }
+
+} // namespace Core
+

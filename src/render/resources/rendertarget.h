@@ -31,12 +31,12 @@ public:
     virtual ~RenderTarget();
     
     /// setup render target from list of textures and optional depth-stencil target
-    void InitWithTargets(const InitList<Ptr<Render::Texture>>& textures, const Ptr<Render::DepthStencilTarget>& depthStencil);
+    void InitWithTargets(InitList<Ptr<Render::Texture>> textures, const Ptr<Render::DepthStencilTarget>& depthStencil);
     /// setup render target from window
     void InitWithWindow(const Ptr<Render::Window>& window);
 
     /// set clear color, will also make color clearing active
-    void SetClearColor(const Math::Vec4& color);
+    void SetClearColor(const uint8 texture, const Math::Vec4& color);
     /// set clear depth, will also make depth clearing active
     void SetClearDepth(const uint32 depth);
     /// set clear stencil, will also make depth clearing active
@@ -59,8 +59,9 @@ protected:
     Ptr<Render::DepthStencilTarget> depthStencilTarget;
     
     ClearFlags clearFlags;
-    Math::Vec4 clearColor;
+    Core::Array<Math::Vec4> clearColors;
     Math::Vec4 rect;
+    int samples;
     bool isWindowTarget;
 };
 
@@ -68,9 +69,10 @@ protected:
 /**
 */
 inline void
-RenderTarget::SetClearColor(const Math::Vec4 &color)
+RenderTarget::SetClearColor(const uint8 texture, const Math::Vec4& color)
 {
     this->clearFlags = ClearFlags(this->clearFlags | ClearFlags::Color);
+    this->clearColors[texture] = color;
 }
 
 //------------------------------------------------------------------------------

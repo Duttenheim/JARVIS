@@ -9,9 +9,11 @@
  */
 //------------------------------------------------------------------------------
 #include "display/context.h"
+#include "types.h"
 namespace JARVIS {
 namespace Metal
 {
+class Texture;
 class Window;
 class Context : public Base::Context
 {
@@ -32,7 +34,7 @@ public:
     /// unbind pipeline, which denotes the end of a frame
     void UnbindPipelineState();
     /// bind vertex buffers to be used
-    void BindVertexBuffers(const InitList<Ptr<Render::VertexBuffer>>& vbos);
+    void BindVertexBuffers(InitList<Ptr<Render::VertexBuffer>> vbos);
     /// bind index buffer to be used
     void BindIndexBuffer(const Ptr<Render::IndexBuffer>& ibo);
     /// bind render state to be used
@@ -43,6 +45,11 @@ public:
     /// draw instanced
     void Draw(uint32 numInstances);
     
+    /// get a new frame
+    void NewFrame();
+    /// present frame
+    void Present(const Ptr<Metal::Window>& window);
+    
 private:
     friend class Metal::Window;
     friend class Metal::VertexBuffer;
@@ -50,6 +57,8 @@ private:
     friend class Metal::RenderState;
     friend class Metal::PipelineState;
     friend class Metal::Shader;
+    friend class Metal::Texture;
+    
     OBJC_ID_POINTER(MTLDevice) device;
     OBJC_ID_POINTER(MTLLibrary) library;
     OBJC_ID_POINTER(MTLCommandQueue) cmdQueue;

@@ -11,6 +11,7 @@ namespace Render
 {
 class DepthStencilTarget : public JARVIS::GL4::DepthStencilTarget
 {};
+__Ptr(DepthStencilTarget)
 }}
 #elif J_RENDERER_METAL
 #include "metal/depthstenciltarget.h"
@@ -19,6 +20,7 @@ namespace Render
 {
 class DepthStencilTarget : public JARVIS::Metal::DepthStencilTarget
 {};
+__Ptr(DepthStencilTarget)
 }}
 #else
 #error "DepthStencilTarget is not implemented using this renderer!"

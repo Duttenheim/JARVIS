@@ -31,8 +31,9 @@ Shader::~Shader()
 void
 Shader::Load(const Core::String& name)
 {
-    Base::Shader::Load(Core::Forward(name));
-    this->shader = [Context::Current->library newFunctionWithName:[[NSString alloc] initWithCString: name.CharPtr() encoding:NSUnicodeStringEncoding]];
+    Base::Shader::Load(Fw(name));
+    NSString* shaderName = [[NSString alloc] initWithCString: name.CharPtr() encoding:NSUTF8StringEncoding];
+    this->shader = [Context::Current->library newFunctionWithName:shaderName];
 }
 
 }} // namespace JARVIS::Metal

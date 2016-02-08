@@ -162,7 +162,7 @@ Vec3::normalize(const Math::Vec3& vec)
 {
     if (Vec4::equal_all(vec, Vec4::zero)) return vec;
     __m128 temp = _mm_sqrt_ps(_mm_dp_ps(vec.v.sse, vec.v.sse, 0x77));
-    return _mm_insert_ps(_mm_div_ps(vec.v.sse, temp), Vec4::zero.v.sse, 0xF8);
+    return _mm_insert_ps(_mm_div_ps(vec.v.sse, temp), Vec4::zero.sse, 0xF7);
 }
 
 //------------------------------------------------------------------------------
@@ -173,7 +173,7 @@ Vec3::normalize_fast(const Math::Vec3& vec)
 {
     if (Vec4::equal_all(vec, Vec4::zero)) return vec;
     __m128 temp = _mm_rsqrt_ps(_mm_dp_ps(vec.v.sse, vec.v.sse, 0x77));
-    return _mm_mul_ps(vec.v.sse, _mm_insert_ps(temp, Vec4::zero.v.sse, 0xF8));
+    return _mm_mul_ps(vec.v.sse, _mm_insert_ps(temp, Vec4::zero.sse, 0xF7));
 }
 
 }} // namespace JARVIS::Math

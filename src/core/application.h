@@ -12,6 +12,7 @@
 #if __APPLE__
 #include "apple/sysfunc.h"
 #endif
+#include "appargs.h"
 namespace JARVIS {
 namespace Core
 {
@@ -33,17 +34,20 @@ public:
     /// destructor
     virtual ~Application();
     
+    /// setup application arguments
+    void SetAppArgs(const char** argv, const uint32 argc);
+    
     /// start application
     void Start();
     /// stop application
     void Stop();
     
     /// setup the application context
-    virtual void Setup();
+    virtual void OnSetup();
     /// run the application code
     virtual void OnFrame();
     /// exit function
-    virtual void Exit();
+    virtual void OnExit();
     
 protected:
     friend class JARVISAppDelegate;
@@ -51,8 +55,13 @@ protected:
     
 #if __APPLE__
     Apple::SysFunc sysfunc;
+#elif __WIN32__
+    Win32::SysFunc sysfunc;
+#elif __LINUX__
+    Posix::SysFunc sysfunc;
 #endif
     
+    AppArgs args;
     State state;
 };
 

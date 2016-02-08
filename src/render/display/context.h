@@ -54,7 +54,7 @@ public:
     /// unbind pipeline, which denotes the end of a frame
     void UnbindPipelineState();
     /// bind vertex buffers to be used
-    void BindVertexBuffers(const InitList<Ptr<Render::VertexBuffer>>& vbos);
+    void BindVertexBuffers(InitList<Ptr<Render::VertexBuffer>> vbos);
     /// bind index buffer to be used
     void BindIndexBuffer(const Ptr<Render::IndexBuffer>& ibo);
     /// bind render state to be used
@@ -67,7 +67,7 @@ public:
     /// draw instanced
     void Draw(uint32 numInstances);
     
-    static Render::Context* Current;
+    static Ptr<Render::Context> Current;
 protected:
     Render::Primitive primitive;
     Core::Array<Ptr<Render::VertexBuffer>> vbos;
@@ -99,7 +99,7 @@ Context::UnbindPipelineState()
 /**
 */
 inline void
-Context::BindVertexBuffers(const InitList<Ptr<Render::VertexBuffer>>& vbos)
+Context::BindVertexBuffers(InitList<Ptr<Render::VertexBuffer>> vbos)
 {
     this->vbos = vbos;
 }

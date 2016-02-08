@@ -12,9 +12,16 @@
 #ifndef __OBJC__
 typedef void* MTLDevice;
 typedef void* MTLCommandQueue;
+typedef void* MTLCommandBuffer;
+typedef void* MTLRenderCommandEncoder;
+typedef void* MTLLibrary;
+typedef void* MTLFunction;
 typedef void* MTLTexture;
 typedef void* MTLBuffer;
 typedef void* CAMetalLayer;
+typedef void* MTLComputePipelineState;
+typedef void* MTLRenderPipelineState;
+typedef void* MTLDepthStencilState;
 #endif
 
 #ifdef __OBJC__
@@ -38,6 +45,7 @@ namespace JARVIS {
 namespace Metal {
 namespace Types
 {
+
 //------------------------------------------------------------------------------
 /**
 */
@@ -131,8 +139,6 @@ BufferUsageFlag(const Render::UsagePattern usage, const Render::ImmutableFlags f
     switch (usage)
     {
         case UsagePattern::CPUReadGPUWrite:
-            opts |= MTLResourceCPUCacheModeWriteCombined;
-        break;
         case UsagePattern::CPUWriteGPURead:
             opts |= MTLResourceCPUCacheModeWriteCombined;
         break;
@@ -244,6 +250,20 @@ StencilOpFlag(const Render::StencilOp op)
         case StencilOp::Invert:         return MTLStencilOperationInvert;
         case StencilOp::IncrementWrap:  return MTLStencilOperationIncrementWrap;
         case StencilOp::DecrementWrap:  return MTLStencilOperationDecrementWrap;
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline MTLPixelFormat
+AsValidStencilFormat(const MTLPixelFormat rhs)
+{
+    switch (rhs)
+    {
+        case MTLPixelFormatDepth24Unorm_Stencil8: return rhs;
+        case MTLPixelFormatDepth32Float_Stencil8: return rhs;
+        default: return MTLPixelFormatInvalid;
     }
 }
 

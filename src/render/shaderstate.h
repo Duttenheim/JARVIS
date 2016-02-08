@@ -11,6 +11,7 @@ namespace Render
 {
 class ShaderState : public JARVIS::GL4::ShaderState
 {};
+__Ptr(ShaderState)
 }}
 #elif J_RENDERER_METAL
 #include "metal/shaderstate.h"
@@ -19,6 +20,7 @@ namespace Render
 {
 class ShaderState : public JARVIS::Metal::ShaderState
 {};
+__Ptr(ShaderState)
 }}
 #else
 #error "ShaderState is not implemented using this renderer!"

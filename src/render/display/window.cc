@@ -23,7 +23,8 @@ uint32 Window::GlobalWindowCounter = 0;
 */
 Window::Window() :
     width(1024),
-    height(768)
+    height(768),
+    context(nullptr)
 {
     // empty
 }

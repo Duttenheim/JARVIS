@@ -7,7 +7,6 @@
 	Can be resized so that appends doesn't modify its size.
 
 	Supports sorting using std::sort, and also with a custom comparison function lambda.
-	Uses element caching to save the last searched for index, which makes searching for the same value instant.
 	
 	(C) 2015 See the LICENSE file.
 */
@@ -15,8 +14,6 @@
 #include <functional>
 #include <algorithm>
 #include <mutex>
-
-#define JARVIS_CACHED_ELEMENT 1
 
 namespace JARVIS { 
 namespace Core
@@ -31,17 +28,21 @@ public:
 
 	/// constructor
 	Array();
+    /// copy constructor form other array
+    Array(const Array<TYPE>& rhs);
+	/// move constructor
+	Array(Array<TYPE>&& rhs);
+    /// construct from init list
+    Array(InitList<TYPE> rhs);
 	/// destructor
 	virtual ~Array();
-	/// move constructor
-	Array(const Array<TYPE>&& rhs);
-
+    
 	/// assignment operator
 	void operator=(const Array<TYPE>& rhs);
 	/// move operator
 	void operator=(Array<TYPE>&& rhs);
     /// copy constructor from an initializer list
-    void operator=(const InitList<TYPE>& rhs);
+    void operator=(InitList<TYPE> rhs);
 	/// read-write access operator
 	TYPE& operator[](const uint32 index);
 	/// read-only access operator
@@ -51,6 +52,8 @@ public:
 	void Resize(const uint32 size);
 	/// set grow size, this will cause the array to allocate 'grow' new elements each time the array needs to increase its size
 	void SetGrow(const uint32 grow);
+    /// fill array with value
+    void Fill(const TYPE& val);
 
 	/// add to array
 	void Append(const TYPE& val);
@@ -77,6 +80,15 @@ public:
 	const uint32 Size() const;
     /// get internal buffer
     const TYPE* Buffer() const;
+    
+    /// used for range based const iteration
+    const TYPE* begin() const;
+    /// used for range based const iteration
+    const TYPE* end() const;
+    /// used for range based non-const iteration
+    TYPE* begin();
+    /// used for range based non-const iteration
+    TYPE* end();
 
 	/// search for key, return index in array, or -1 if not found
 	int32 Search(const TYPE& key);
@@ -105,9 +117,6 @@ private:
 	uint32 capacity;
 	uint32 size;
 	TYPE* data;
-#if JARVIS_CACHED_ELEMENT
-	TYPE* cachedElement;
-#endif
     std::mutex mutex;
 };
 
@@ -119,12 +128,66 @@ inline
 Array<TYPE>::Array() :
 	grow(8),
     capacity(0),
-    size(0)
-#if JARVIS_CACHED_ELEMENT
-	,cachedElement(nullptr)
-#endif
+    size(0),
+    data(nullptr)
 {
 	this->data = nullptr;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Move constructor.
+    @param rhs  Array to move into this array.
+*/
+template <class TYPE>
+inline
+Array<TYPE>::Array(Array<TYPE>&& rhs)
+{
+	this->capacity = rhs.capacity;
+	this->grow = rhs.grow;
+	this->size = rhs.size;
+	this->data = rhs.data;
+
+	rhs.size = rhs.capacity = rhs.grow = 0;
+	rhs.data = nullptr;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+inline
+Array<TYPE>::Array(const Array<TYPE>& rhs) :
+	grow(8),
+    capacity(0),
+    size(0),
+    data(nullptr)
+{
+    this->Resize(rhs.size);
+    this->capacity = rhs.capacity;
+	this->grow = rhs.grow;
+	this->size = rhs.size;
+    for (uint32 i = 0; i < this->size; i++) new (this->data + i) TYPE(Fw(rhs.data[i]));
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+inline
+Array<TYPE>::Array(InitList<TYPE> rhs) :
+	grow(8),
+    capacity(0),
+    size(0),
+    data(nullptr)
+{
+    size_t listSize = rhs.size();
+    if (listSize > 0)
+    {
+        this->Resize(listSize);
+        this->size = listSize;
+        for (uint32 i = 0; i < listSize; i++) new (this->data + i) TYPE(Mv(rhs.begin()[i]));
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -135,24 +198,6 @@ inline
 Array<TYPE>::~Array()
 {
     this->Clear();
-}
-
-//------------------------------------------------------------------------------
-/**
-    Move constructor.
-    @param rhs  Array to move into this array.
-*/
-template <class TYPE>
-inline
-Array<TYPE>::Array(const Array<TYPE>&& rhs)
-{
-	this->capacity = rhs.capacity;
-	this->grow = rhs.grow;
-	this->size = rhs.size;
-	this->data = rhs.data;
-
-	rhs.size = rhs.capacity = rhs.grow = 0;
-	rhs.data = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -202,11 +247,16 @@ Array<TYPE>::operator=(Array<TYPE>&& rhs)
 */
 template <class TYPE>
 inline void
-Array<TYPE>::operator=(const InitList<TYPE>& rhs)
+Array<TYPE>::operator=(InitList<TYPE> rhs)
 {
     this->Clear();
-    this->Resize(rhs.size());
-    Memory::Copy<TYPE>(rhs.begin(), this->data, this->size);
+    size_t listSize = rhs.size();
+    if (listSize > 0)
+    {
+        this->Resize(listSize);
+        this->size = listSize;
+        for (uint32 i = 0; i < listSize; i++) new (this->data + i) TYPE(Mv(rhs.begin()[i]));
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -262,7 +312,7 @@ Array<TYPE>::Resize(const uint32 size)
         //for (uint32 i = this->size; i < this->capacity; i++) new (buf + i) TYPE;
 		//Memory::Copy<TYPE>(this->data, buf, this->size);
 		Memory::Fill(buf + this->size, (this->capacity - this->size) * sizeof(TYPE), 0);
-        Memory::Free(this->data);
+        if (nullptr != this->data) Memory::Free(this->data);
 		this->data = buf;
 	}	
 }
@@ -282,6 +332,27 @@ Array<TYPE>::SetGrow(const uint32 grow)
 
 //------------------------------------------------------------------------------
 /**
+    Fill array with elements so that size ise equal to capacity
+    @param val      Value to fill array with.
+*/
+template <class TYPE>
+inline void
+Array<TYPE>::Fill(const TYPE& val)
+{
+    // destroy elements already in the array
+    for (uint32 i = 0; i < this->size; i++)
+    {
+        (&this->data[i])->~TYPE();
+    }
+    for (uint32 i = 0; i < this->capacity; i++)
+    {
+        new (&this->data[i]) TYPE(Fw(val));
+    }
+    this->size = this->capacity;
+}
+
+//------------------------------------------------------------------------------
+/**
     Append element to end of array
     @param val      Element to add.
 */
@@ -293,7 +364,7 @@ Array<TYPE>::Append(const TYPE& val)
 	if (this->size == this->capacity) this->Grow();
     
     // allocate new element here
-	new (this->data + this->size) TYPE(std::move(val));
+	new (this->data + this->size) TYPE(val);
 	this->size++;
 }
 
@@ -338,7 +409,7 @@ Array<TYPE>::InsertOrdered(const TYPE& val)
     int32 min = 0;
     int32 max = this->size;
     int32 result;
-    int32 mid;
+    int32 mid = min;
     while (max > min)
     {
         mid = min + ((max - min) >> 1);
@@ -348,17 +419,11 @@ Array<TYPE>::InsertOrdered(const TYPE& val)
     }
     
     // get the max value which should either be equal to min if found, or LESS than min if not
-    const TYPE& cur = data[max];
+    const TYPE& cur = data[mid];
     
-    // if we found the value, simply return it
-    if ((max == min) && (data[max] == val)) result = min;
-    else
-    {
-        // get the max value, which was the previous upper limit.
-        // since we stopped, our value must be either at max, or beyond max
-        if (cur < val)			result = max;
-        else					result = max + 1;
-    }
+    // if value at midpoint is bigger, select min, otherwise max
+    if (cur < val) result = min;
+    else           result = max;
 
 	// insert, result must be a valid result here
 	this->Insert(val, result);
@@ -502,20 +567,53 @@ Array<TYPE>::Buffer() const
 /**
 */
 template <class TYPE>
+const TYPE*
+Array<TYPE>::begin() const
+{
+    return &this->data[0];
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+const TYPE*
+Array<TYPE>::end() const
+{
+    return &this->data[this->size];
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+TYPE*
+Array<TYPE>::begin()
+{
+    return &this->data[0];
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
+TYPE*
+Array<TYPE>::end()
+{
+    return &this->data[this->size];
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+template <class TYPE>
 int32
 Array<TYPE>::Search(const TYPE& key)
 {
-#if JARVIS_CACHED_ELEMENT
-	if (this->cachedElement != nullptr && *this->cachedElement == key) return int32(this->cachedElement - this->data);
-#endif
-
 	for (uint32 i = 0; i < this->size; i++)
 	{
 		if (this->data[i] == key)
 		{
-#if JARVIS_CACHED_ELEMENT
-			this->cachedElement = &this->data[i];
-#endif
 			return i;
 		}
 	}
@@ -529,13 +627,10 @@ template <class TYPE>
 int32
 Array<TYPE>::SearchBinary(const TYPE& key)
 {
-#if JARVIS_CACHED_ELEMENT
-	if (this->cachedElement != nullptr && *this->cachedElement == key) return int32(this->cachedElement - this->data);
-#endif
     if (this->size == 0) return -1;
     
     int32 min = 0;
-    int32 max = this->size;
+    int32 max = this->size-1;
     int32 mid;
     int32 result = -1;
     while (max > min)
@@ -546,14 +641,6 @@ Array<TYPE>::SearchBinary(const TYPE& key)
         else				max = mid;
     }
     if ((max == min) && (data[min] == key)) result = min;
-
-	//int32 index = bin(this->data, 0, this->size);
-#if JARVIS_CACHED_ELEMENT
-	if (result != -1)
-	{
-		this->cachedElement = &this->data[result];
-	}
-#endif
 	return result;
 }
 
@@ -597,11 +684,6 @@ Array<TYPE>::Grow()
 
 	uint32 newCapacity = this->capacity + growSize;
 	TYPE* buf = Memory::Alloc<TYPE>(newCapacity);
-
-	// run constructor on newly created elements
-	//for (uint32 i = this->size; i < newCapacity; i++) new (buf + i) TYPE;
-
-	//for (uint32 i = this->size; i < newCapacity; i++) new (buf + i) TYPE;
 	Memory::Fill(buf + this->size, (newCapacity - this->size) * sizeof(TYPE), 0);
 
 	if (this->data != nullptr)
@@ -611,8 +693,6 @@ Array<TYPE>::Grow()
 			new (buf + i) TYPE(std::move(this->data[i]));
 			(&this->data[i])->~TYPE();
 		}
-		//Memory::Move<TYPE>(this->data, buf, this->size);
-		//Memory::Copy<TYPE>(this->data, buf, this->size);
 		Memory::Free(this->data);
 	}	
 

@@ -4,11 +4,12 @@
  	(C) 2015 See the LICENSE file.
 */
 #include "context.h"
+#include "../context.h"
 namespace JARVIS {
 namespace Base
 {
     
-Render::Context* Context::Current = nullptr;
+Ptr<Render::Context> Context::Current = nullptr;
 //------------------------------------------------------------------------------
 /**
 */
@@ -49,7 +50,7 @@ Context::Discard()
 void
 Context::MakeCurrent()
 {
-    Context::Current = (Render::Context*)this;
+    Context::Current = this;
 }
 
 //------------------------------------------------------------------------------

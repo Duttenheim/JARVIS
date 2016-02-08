@@ -9,6 +9,7 @@
 */
 //------------------------------------------------------------------------------
 #include "resources/renderstate.h"
+#include "types.h"
 namespace JARVIS {
 namespace Metal
 {
@@ -43,14 +44,7 @@ public:
 private:
     friend class Context;
     OBJC_ID_POINTER(MTLDepthStencilState) mtlDepthStencilState;
-    OBJC_ENUM_TYPE(MTLCullMode) mtlCullMode;
-    OBJC_ENUM_TYPE(MTLDepthClipMode) mtlDepthClipMode;
-    OBJC_ENUM_TYPE(MTLScissorRect) mtlScissorRect;
-    OBJC_ENUM_TYPE(MTLBlendFactor) mtlBlendFactor;
-    OBJC_ENUM_TYPE(MTLBlendOperation) mtlBlendOp;
-    OBJC_ENUM_TYPE(MTLStencilOperation) mtlStencilOp;
-    OBJC_ENUM_TYPE(MTLWinding) mtlWinding;
-    OBJC_ENUM_TYPE(MTLTriangleFillMode) mtlFillMode;
+    OBJC_POINTER(MTLScissorRect) mtlScissorRect;
 };
 
 }} // namespace JARVIS::Metal

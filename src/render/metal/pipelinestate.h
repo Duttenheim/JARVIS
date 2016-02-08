@@ -11,6 +11,7 @@
 */
 //------------------------------------------------------------------------------
 #include "resources/pipelinestate.h"
+#include "types.h"
 namespace JARVIS {
 namespace Metal
 {
@@ -25,9 +26,9 @@ public:
     
     /// setup from graphics pipeline
     /// 1: vertex, 2: geometry, 3: hull, 4: domain, 5: fragment
-    void InitRender(const InitList<Ptr<Render::Shader>>& shaders, const Ptr<Render::RenderTarget>& rt, const InitList<Render::BlendState>& blendStates);
+    void InitRender(const Render::RenderShaderBundle& shaders, const Ptr<Render::RenderTarget>& rt, InitList<Render::BlendState> blendStates, const uint8 samples = 1);
     /// setup from compute pipeline
-    void InitCompute(const Ptr<Render::Shader>& shader);
+    void InitCompute(const Render::ComputeShaderBundle& shader);
     
 private:
     friend class Metal::Context;

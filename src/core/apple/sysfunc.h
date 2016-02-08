@@ -24,6 +24,9 @@ public:
     /// start as an iOS app
     void StartIOS();
     
+    /// get location of exe
+    Core::String BinDir();
+    
 private:
     OBJC_POINTER(NSApplication) app;
     OBJC_ID appDelegate;

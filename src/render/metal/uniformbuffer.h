@@ -9,6 +9,7 @@
  */
 //------------------------------------------------------------------------------
 #include "shading/uniformbuffer.h"
+#include "types.h"
 namespace JARVIS {
 namespace Metal
 {

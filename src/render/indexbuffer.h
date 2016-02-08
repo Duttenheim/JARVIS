@@ -11,6 +11,7 @@ namespace Render
 {
 class IndexBuffer : public JARVIS::GL4::IndexBuffer
 {};
+__Ptr(IndexBuffer)
 }}
 #elif J_RENDERER_METAL
 #include "metal/indexbuffer.h"
@@ -19,6 +20,7 @@ namespace Render
 {
 class IndexBuffer : public JARVIS::Metal::IndexBuffer
 {};
+__Ptr(IndexBuffer)
 }}
 #else
 #error "IndexBuffer is not implemented using this renderer!"

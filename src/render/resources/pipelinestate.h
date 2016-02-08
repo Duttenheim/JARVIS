@@ -16,6 +16,21 @@
 namespace JARVIS {
 namespace Render
 {
+
+struct RenderShaderBundle
+{
+    Ptr<Render::Shader> vs;
+    Ptr<Render::Shader> gs;
+    Ptr<Render::Shader> hs;
+    Ptr<Render::Shader> ds;
+    Ptr<Render::Shader> ps;
+};
+
+struct ComputeShaderBundle
+{
+    Ptr<Render::Shader> cs;
+};
+    
 class Shader;
 class RenderTarget;
 }}
@@ -34,18 +49,19 @@ public:
     
     /// setup from graphics pipeline, shaders are sent as an array corresponding to:
     /// 1: vertex, 2: geometry, 3: hull, 4: domain, 5: fragment
-    void InitRender(const InitList<Ptr<Render::Shader>>& shaders, const Ptr<Render::RenderTarget>& rt, const InitList<Render::BlendState>& blendStates);
+    void InitRender(const Render::RenderShaderBundle& shaders, const Ptr<Render::RenderTarget>& rt, InitList<Render::BlendState> blendStates, const uint8 samples = 1);
     /// setup from compute pipeline
-    void InitCompute(const Ptr<Render::Shader>& shader);
+    void InitCompute(const Render::ComputeShaderBundle& shader);
     
 protected:
     Ptr<Render::Shader> vs;
     Ptr<Render::Shader> gs;
     Ptr<Render::Shader> hs;
     Ptr<Render::Shader> ds;
-    Ptr<Render::Shader> fs;
+    Ptr<Render::Shader> ps;
     Ptr<Render::Shader> cs;
     Ptr<Render::RenderTarget> rt;
+    uint8 samples;
     Core::Array<Render::BlendState> blendStates;
 };
 
@@ -54,34 +70,16 @@ protected:
 /**
 */
 inline void
-PipelineState::InitRender(const InitList<Ptr<Render::Shader>>& shaders, const Ptr<Render::RenderTarget>& rt, const InitList<Render::BlendState>& blendStates)
+PipelineState::InitRender(const Render::RenderShaderBundle& shaders, const Ptr<Render::RenderTarget>& rt, InitList<Render::BlendState> blendStates, const uint8 samples)
 {
-    this->vs = nullptr;
-    this->gs = nullptr;
-    this->hs = nullptr;
-    this->ds = nullptr;
-    this->fs = nullptr;
+    this->vs = shaders.vs;
+    this->gs = shaders.gs;
+    this->hs = shaders.hs;
+    this->ds = shaders.ds;
+    this->ps = shaders.ps;
     this->cs = nullptr;
     this->rt = rt;
-    uint32 i;
-    for (i = 0; i < shaders.size(); i++)
-    {
-        switch (i)
-        {
-            case 0: this->vs = *(shaders.begin() + i);
-                break;
-            case 1: this->gs = *(shaders.begin() + i);
-                break;
-            case 2: this->hs = *(shaders.begin() + i);
-                break;
-            case 3: this->ds = *(shaders.begin() + i);
-                break;
-            case 4: this->fs = *(shaders.begin() + i);
-                break;
-            default:
-                return;
-        }
-    }
+    this->samples = samples;
     this->blendStates = blendStates;
 }
 
@@ -89,14 +87,14 @@ PipelineState::InitRender(const InitList<Ptr<Render::Shader>>& shaders, const Pt
 /**
 */
 inline void
-PipelineState::InitCompute(const Ptr<Render::Shader>& shader)
+PipelineState::InitCompute(const Render::ComputeShaderBundle& shader)
 {
     this->vs = nullptr;
     this->gs = nullptr;
     this->hs = nullptr;
     this->ds = nullptr;
-    this->fs = nullptr;
-    this->cs = shader;
+    this->ps = nullptr;
+    this->cs = shader.cs;
     this->rt = nullptr;
 }
 

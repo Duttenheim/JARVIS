@@ -11,6 +11,7 @@ namespace Render
 {
 class RenderTarget : public JARVIS::GL4::RenderTarget
 {};
+__Ptr(RenderTarget);
 }}
 #elif J_RENDERER_METAL
 #include "metal/rendertarget.h"
@@ -19,6 +20,7 @@ namespace Render
 {
 class RenderTarget : public JARVIS::Metal::RenderTarget
 {};
+__Ptr(RenderTarget);
 }}
 #else
 #error "RenderTarget is not implemented using this renderer!"

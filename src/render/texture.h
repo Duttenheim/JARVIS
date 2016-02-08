@@ -11,6 +11,7 @@ namespace Render
 {
 class Texture : public JARVIS::GL4::Texture
 {};
+__Ptr(Texture)
 }}
 #elif J_RENDERER_METAL
 #include "metal/texture.h"
@@ -19,6 +20,7 @@ namespace Render
 {
 class Texture : public JARVIS::Metal::Texture
 {};
+__Ptr(Texture)
 }}
 #else
 #error "Texture is not implemented using this renderer!"

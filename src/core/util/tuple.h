@@ -22,22 +22,22 @@ struct tuple_concat<std::tuple<T1...>, std::tuple<T2...>>
 };
 
 template <typename T, int32 N>
-struct ArrayTuple;
+struct _array_tuple;
 
 template <typename T>
-struct ArrayTuple<T, 0>
+struct _array_tuple<T, 0>
 {
     using type = std::tuple<>;
 };
 
 template <typename T, int32 N>
-struct ArrayTuple
+struct _array_tuple
 {
-    using type = typename tuple_concat<typename ArrayTuple<T, N-1>::type,std::tuple<T>>::type;
+    using type = typename tuple_concat<typename _array_tuple<T, N-1>::type,std::tuple<T>>::type;
 };
 
 template <typename... T>
-struct Tuple
+struct _tuple
 {
     using type = typename std::tuple<T...>;
 };
@@ -49,7 +49,7 @@ struct Tuple
 template <typename S, typename... T>
 constexpr bool AllAreSame()
 {
-    return std::is_same<typename ArrayTuple<S, sizeof...(T)>::type, typename Tuple<T...>::type>::value;
+    return std::is_same<typename _array_tuple<S, sizeof...(T)>::type, typename _tuple<T...>::type>::value;
 }
 
 }} // namespace JARVIS::Core

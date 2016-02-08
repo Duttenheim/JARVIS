@@ -11,6 +11,7 @@ namespace Render
 {
 class Shader : public JARVIS::GL4::Shader
 {};
+__Ptr(Shader)
 }}
 #elif J_RENDERER_METAL
 #include "metal/shader.h"
@@ -19,6 +20,7 @@ namespace Render
 {
 class Shader : public JARVIS::Metal::Shader
 {};
+__Ptr(Shader)
 }}
 #else
 #error "Shader is not implemented using this renderer!"

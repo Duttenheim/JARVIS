@@ -32,6 +32,8 @@ union __m128_vec
 };
 
 class Vec3;
+class Mat4;
+class Mat3;
 class align_16 Vec4
 {
 public:
@@ -86,6 +88,8 @@ public:
     Vec4 operator/(const Vec4& rhs) const;
     /// performs a division using a single float vlaue
     Vec4 operator/(const float32& scalar) const;
+    /// unary - operator
+    Vec4 operator-() const;
     
     /// load from a float pointer
     void load(float* buf);
@@ -144,6 +148,8 @@ private:
     friend class Vec3;
     friend class Vector;
     friend class Point;
+    friend class Mat4;
+    friend class Mat3;
     __m128_vec v;
 };
 
@@ -361,6 +367,15 @@ inline Vec4
 Vec4::operator/(const float32& v) const
 {
     return _mm_div_ps(this->v.sse, _mm_set1_ps(v));
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline Vec4
+Vec4::operator-() const
+{
+    return _mm_mul_ps(this->v.sse, _mm_set1_ps(-1));
 }
 
 //------------------------------------------------------------------------------

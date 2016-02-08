@@ -9,6 +9,7 @@
 */
 //------------------------------------------------------------------------------
 #include "resources/texture.h"
+#include "types.h"
 namespace JARVIS {
 namespace Metal
 {
@@ -24,10 +25,16 @@ public:
     /// destructor
     virtual ~Texture();
     
+    /// initialize as drawable
+    void InitDrawable(TextureType type, Render::PixelFormat pixelFormat, uint32 width, uint32 height, uint8 mips = 1, uint8 samples = 1);
+    /// initialize with data
+    void InitWithData(TextureType type, Render::PixelFormat pixelFormat, uint32 width, uint32 height, byte* data, uint32 size, uint8 mips = 1);
+    
 private:
     friend class Metal::PipelineState;
     friend class Metal::RenderTarget;
     
+    OBJC_ID_POINTER(MTLBuffer) textureBuffer;
     OBJC_ID_POINTER(MTLTexture) texture;
 };
 

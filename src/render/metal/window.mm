@@ -26,6 +26,20 @@
 }
 @end
 
+@implementation JARVISMTKView
+- (BOOL)isOpaque {
+    return YES;
+}
+
+- (BOOL)canBecomeKeyView {
+    return YES;
+}
+
+- (BOOL)acceptsFirstResponder {
+    return YES;
+}
+@end
+
 namespace JARVIS {
 namespace Metal
 {
@@ -34,7 +48,8 @@ namespace Metal
 /**
 */
 Window::Window() :
-    nsWindow(nil)
+    nsWindow(nullptr),
+    view(nullptr)
 {
     // empty
 }
@@ -55,12 +70,9 @@ Window::Open()
 {
     j_assert(this->nsWindow == nil);
     
-    NSRect rect;
-    rect.origin = NSPoint{0, 0};
-    rect.size = NSSize{(float64)this->width, (float64)this->height};
-    this->nsWindow = [[[NSWindow alloc]initWithContentRect:rect styleMask:NSTitledWindowMask backing:NSBackingStoreBuffered defer:NO] autorelease];
-    [this->nsWindow setTitle: [[NSString alloc] initWithCString: this->title.CharPtr() encoding:NSUnicodeStringEncoding]];
-    [this->nsWindow makeKeyAndOrderFront:NSApp];
+    // create window
+    this->nsWindow = [[NSWindow alloc]initWithContentRect:NSMakeRect(0, 0, this->width, this->height) styleMask:NSTitledWindowMask backing:NSBackingStoreBuffered defer:NO];
+    [this->nsWindow setTitle: [[NSString alloc] initWithCString: this->title.CharPtr() encoding:NSUTF8StringEncoding]];
     
     if (this->nsWindow != nil)
     {
@@ -70,14 +82,15 @@ Window::Open()
         
         // setup view for Metal display
         this->viewDelegate = [[JARVISViewDelegate alloc] init];
-        this->view = [[MTKView alloc] init];
+        this->view = [[JARVISMTKView alloc] init];
         [this->view setDelegate:this->viewDelegate];
         [this->view setPreferredFramesPerSecond:60];
         [this->view setDevice:this->context->device];
-        [this->view setColorPixelFormat: (MTLPixelFormat)Types::PixelFormatFlag(Render::PixelFormat::BGRA8_UNorm_sRGB)];
-        [this->view setDepthStencilPixelFormat:MTLPixelFormatDepth32Float];
+        [this->view setSampleCount:8];
+        [this->view setColorPixelFormat:MTLPixelFormatBGRA8Unorm];
+        [this->view setDepthStencilPixelFormat:MTLPixelFormatDepth32Float_Stencil8];
         [this->nsWindow setContentView:this->view];
-        
+        [this->nsWindow makeKeyAndOrderFront:nil];
         Base::Window::Open();
     }
     return this->nsWindow != nil;
@@ -108,8 +121,7 @@ void
 Window::SwapBuffers()
 {
     Base::Window::SwapBuffers();
-    [this->context->cmdBuffer commit];
-    [this->context->cmdBuffer presentDrawable:this->view.currentDrawable];
+    this->context->Present(this);
 }
 
 //------------------------------------------------------------------------------
@@ -118,6 +130,7 @@ Window::SwapBuffers()
 void
 Window::Update()
 {
+    this->context->NewFrame();
 }
 
 }} // namespace JARVIS::Metal

@@ -3,6 +3,7 @@
 #-------------------------------------------------------------------------------
 
 SET(core
+    appargs.h
 	application.h
 	application.cc
 	class.h
@@ -18,6 +19,8 @@ SET(core
 	queue.h
 	rand.h
 	ref.h
+	renderapplication.h
+	renderapplication.cc
 	singleton.h	
 	typeinfo.h
 	typeinfo.cc
@@ -68,6 +71,14 @@ SET(core_math
 )
 SOURCE_GROUP("math" FILES ${core_math})
 
+SET(core_io
+	io/uri.h
+	io/uri.cc
+	io/assigns.h
+    io/assigns.cc
+)
+SOURCE_GROUP("io" FILES ${core_io})
+
 IF(WIN32)
 	SET(core_os
 		win32/pch.h
@@ -84,6 +95,10 @@ ELSEIF(APPLE)
 		apple/sysfunc.mm
 	)
 	SOURCE_GROUP("os" FILES ${core_os})
+
+    FIND_LIBRARY(COCOA_FRAMEWORK Cocoa)
+
+    SET(core_os_libs ${COCOA_FRAMEWORK})
 ELSE()
 	SET(core_os
 		posix/pch.h
@@ -93,7 +108,7 @@ ELSE()
 	SOURCE_GROUP("os" FILES ${core_os})
 ENDIF()
 
-ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_threads} ${core_functional} ${core_math} ${core_os} ${core_network})
+ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_threads} ${core_functional} ${core_math} ${core_os} ${core_io} ${core_network})
 JARVIS_SETUP_TARGET(core)
 TARGET_INCLUDE_DIRECTORIES(core PUBLIC ${JARVIS_SOURCE_DIR}/src/core)
-TARGET_LINK_LIBRARIES(core ext)
+TARGET_LINK_LIBRARIES(core ext ${core_os_libs})

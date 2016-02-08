@@ -4,6 +4,7 @@
  	(C) 2015 See the LICENSE file.
 */
 #include "application.h"
+#include "io/assigns.h"
 namespace JARVIS {
 namespace Core
 {
@@ -25,6 +26,14 @@ Application::~Application()
 {
     __SingletonDtor();
 }
+//------------------------------------------------------------------------------
+/**
+*/
+void
+Application::SetAppArgs(const char** argv, const uint32 argc)
+{
+    this->args.Set(argv, argc);
+}
 
 //------------------------------------------------------------------------------
 /**
@@ -33,23 +42,21 @@ Application::~Application()
 void
 Application::Start()
 {
-    this->Setup();
-#if J_RENDERER_METAL
-    this->sysfunc.StartOSX();
-#else
     this->state = Running;
+    this->OnSetup();
     while (this->state == Application::Running)
     {
         this->OnFrame();
     }
-#endif
-    this->Exit();
+    this->OnExit();
 }
 
 //------------------------------------------------------------------------------
 /**
     Setup the initial state of your application here.
     Override this function to setup the application yourself.
+    
+    Remember to run this yourself since it will retrieve the binary directory.
     
     This setup proceduce could include stuff as:
         Path resolution and path assignments.
@@ -58,9 +65,9 @@ Application::Start()
  
 */
 void
-Application::Setup()
+Application::OnSetup()
 {
-    // empty
+    Assigns::NewAssignment("root", this->sysfunc.BinDir());
 }
 
 //------------------------------------------------------------------------------
@@ -78,7 +85,7 @@ Application::OnFrame()
     Clean up application.
 */
 void
-Application::Exit()
+Application::OnExit()
 {
     // empty
 }

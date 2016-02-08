@@ -42,30 +42,30 @@ WindowApp::Setup()
     this->window->SetMousePressFunction(func);
     
     // setup render target, this will be our window
-    Ptr<Render::RenderTarget> rt = Render::RenderTarget::Create();
-    rt->InitWithWindow(this->window);
+    this->rt = Render::RenderTarget::Create();
+    this->rt->InitWithWindow(this->window);
+    this->rt->SetClearColor(0, Math::Vec4(0, 0, 1, 0));
     
     // setup pipeline state, which is shaders, render targets and blend states (which is empty, so we use default)
-    Ptr<Render::PipelineState> pipelineState = Render::PipelineState::Create();
-    Ptr<Render::Shader> vs = Render::Shader::Create(); vs->Load("vertex_shader");
-    Ptr<Render::Shader> ps = Render::Shader::Create(); ps->Load("pixel_shader");
-    pipelineState->InitRender({vs, ps}, rt, {});
+    this->pipeline = Render::PipelineState::Create();
+    Render::ShaderPtr vs = Render::Shader::Create(); vs->Load("basic_vertex");
+    Render::ShaderPtr ps = Render::Shader::Create(); ps->Load("basic_fragment");
+    Render::BlendState blend;
+    blend.blendEnabled = true;
+    blend.srcColorBlendMode = Render::BlendState::BlendMode::SourceAlpha;
+    blend.dstColorBlendMode = Render::BlendState::BlendMode::OneMinusSourceAlpha;
+    this->pipeline->InitRender(Render::RenderShaderBundle{vs, nullptr, nullptr, nullptr, ps}, rt, {blend}, 8);
     
-    // setup render state
-    Ptr<Render::RenderState> renderState = Render::RenderState::Create();
+    // setup render state, and commit it with default settings
+    this->renderState = Render::RenderState::Create();
+    this->renderState->scissorRect = Math::Vec4(0, 0, this->window->width, this->window->height);
+    this->renderState->Commit();
     
-    // setup draw call data
-    Ptr<Render::VertexBuffer> vbo0 = Render::VertexBuffer::Create();
-    Render::Primitive prim;
-    
-    // update context and draw
-    Ptr<Render::Context> context = Render::Context::Current;
-    context->BindPipelineState(pipelineState);
-    context->BindRenderState(renderState);
-    context->BindVertexBuffers({vbo0});
-    context->BindPrimitive(prim);
-    context->Draw();
-    context->UnbindPipelineState();
+    // setup draw data
+    this->vbo = Render::VertexBuffer::Create();
+    float vertices[] = {0, 1, 0, 1, -1, 0, -1, -1, 0};
+    this->vbo->InitImmutable({Render::VertexBuffer::VertexComponent{4, 0, Render::ComponentType::Float}}, sizeof(vertices), (byte*)vertices);
+    this->prim.vertexCount = 3;
 }
 
 //------------------------------------------------------------------------------
@@ -75,6 +75,14 @@ void
 WindowApp::OnFrame()
 {
     this->window->Update();
+    // update context and draw
+    Render::ContextPtr context = Render::Context::Current;
+    context->BindPipelineState(this->pipeline);
+    context->BindRenderState(this->renderState);
+    context->BindVertexBuffers({this->vbo});
+    context->BindPrimitive(this->prim);
+    context->Draw();
+    context->UnbindPipelineState();
     this->window->SwapBuffers();
 }
 
