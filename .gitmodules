@@ -4,3 +4,6 @@
 [submodule "ext/glfw_ext/glfw"]
 	path = ext/glfw_ext/glfw
 	url = git@github.com:glfw/glfw.git
+[submodule "ext/glew_ext/glew"]
+	path = ext/glew_ext/glew
+	url = https://github.com/gscept/glew.git
