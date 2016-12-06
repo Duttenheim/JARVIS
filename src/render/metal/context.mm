@@ -90,16 +90,44 @@ Context::BindIndexBuffer(const Ptr<Render::IndexBuffer>& ibo)
 /**
 */
 void
+Context::BindUniformBuffer(const Ptr<Render::UniformBuffer>& ubo, const Stage& stage, uint32 offset, uint32 index)
+{
+    if (this->encoder == nil) return;
+    Base::Context::BindUniformBuffer(ubo, stage, offset, index);
+    switch (stage)
+    {
+        case Base::Context::Vertex:
+        case Base::Context::Hull:
+        case Base::Context::Domain:
+        case Base::Context::Geometry:
+            [this->encoder setVertexBuffer:ubo->buffer offset:offset atIndex:index];
+            break;
+        case Base::Context::Fragment:
+            [this->encoder setFragmentBuffer:ubo->buffer offset:offset atIndex:index];
+            break;
+        case Base::Context::Compute:
+            // we currently only support render encoders
+            break;
+        default:
+            j_error("Unknown pipeline stage %d\n", stage);
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+void
 Context::BindPipelineState(const Ptr<Render::PipelineState>& pipelineState)
 {
+    j_assert(this->cmdBuffer != nil);
     Base::Context::BindPipelineState(Fw(pipelineState));
     if (this->encoder != nil)
     {
         [this->encoder endEncoding];
         this->encoder = nil;
     }
-    if (this->cmdBuffer == nil) return;
-    this->encoder = [this->cmdBuffer renderCommandEncoderWithDescriptor:pipelineState->rt->GetPass()];
+
+    this->encoder = [this->cmdBuffer renderCommandEncoderWithDescriptor:pipelineState->rt->Pass()];
     [this->encoder setRenderPipelineState:pipelineState->renderPipeline];
     [this->encoder setViewport:*pipelineState->rt->viewport];
 }
@@ -234,6 +262,7 @@ Context::Present(const Ptr<Metal::Window>& window)
         [this->encoder endEncoding];
         [this->cmdBuffer presentDrawable:window->view.currentDrawable];
         [this->cmdBuffer commit];
+        [this->cmdBuffer waitUntilCompleted];
     }
     this->encoder = nil;
 }

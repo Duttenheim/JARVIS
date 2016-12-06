@@ -22,11 +22,11 @@ public:
     virtual ~WindowApp();
     
     /// setup context
-    void Setup();
+    void OnSetup();
     /// implement main loop
     void OnFrame();
     /// exit app
-    void Exit();
+    void OnExit();
     
 private:
     Render::WindowPtr window;
@@ -34,7 +34,11 @@ private:
     Render::PipelineStatePtr pipeline;
     Render::RenderStatePtr renderState;
     Render::VertexBufferPtr vbo;
+    Render::UniformBufferPtr ubo;
     Render::Primitive prim;
+    
+    float rot;
+    Render::UniformBuffer::UniformMember member;
     
 };
 

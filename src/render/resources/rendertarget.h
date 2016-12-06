@@ -48,9 +48,10 @@ protected:
 
     enum class ClearFlags : uint8
     {
-        Color = 1 << 0,
-        Depth = 1 << 1,
-        Stencil = 1 << 2,
+        None = 1 << 0,
+        Color = 1 << 1,
+        Depth = 1 << 2,
+        Stencil = 1 << 3
     };
     
     __ENUM_OR_OPERATOR(ClearFlags)
@@ -60,6 +61,8 @@ protected:
     
     ClearFlags clearFlags;
     Core::Array<Math::Vec4> clearColors;
+    float clearDepth;
+    uint32 clearStencil;
     Math::Vec4 rect;
     int samples;
     bool isWindowTarget;
@@ -71,7 +74,7 @@ protected:
 inline void
 RenderTarget::SetClearColor(const uint8 texture, const Math::Vec4& color)
 {
-    this->clearFlags = ClearFlags(this->clearFlags | ClearFlags::Color);
+    this->clearFlags = this->clearFlags | ClearFlags::Color;
     this->clearColors[texture] = color;
 }
 
@@ -82,6 +85,7 @@ inline void
 RenderTarget::SetClearDepth(const uint32 depth)
 {
     this->clearFlags = this->clearFlags | ClearFlags::Depth;
+    this->clearDepth = depth;
 }
 
 //------------------------------------------------------------------------------
@@ -91,6 +95,7 @@ inline void
 RenderTarget::SetClearStencil(const uint32 stencil)
 {
     this->clearFlags = this->clearFlags | ClearFlags::Stencil;
+    this->clearStencil = stencil;
 }
 
 //------------------------------------------------------------------------------

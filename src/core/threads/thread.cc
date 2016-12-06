@@ -6,7 +6,7 @@
 #include "config.h"
 #include "thread.h"
 namespace JARVIS {
-namespace Core
+namespace Threading
 {
     
 //------------------------------------------------------------------------------
@@ -35,6 +35,7 @@ void
 Thread::Wait()
 {
     j_assert(nullptr != this->thread);
+    this->running.exchange(false);
     this->thread->join();
 	delete this->thread;
 	this->thread = nullptr;

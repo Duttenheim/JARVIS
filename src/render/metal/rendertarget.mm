@@ -55,6 +55,8 @@ RenderTarget::InitWithTargets(InitList<Ptr<Render::Texture>> textures, const Ptr
     this->viewport->originY = 0;
     this->viewport->width = this->textures[0]->width;
     this->viewport->height = this->textures[0]->height;
+    this->viewport->znear = 0.001f;
+    this->viewport->zfar = FLT_MAX;
 }
 
 //------------------------------------------------------------------------------
@@ -73,13 +75,16 @@ RenderTarget::InitWithWindow(const Ptr<Render::Window>& window)
     this->viewport->originY = 0;
     this->viewport->width = window->width;
     this->viewport->height = window->height;
+    this->viewport->znear = 0.001f;
+    this->viewport->zfar = FLT_MAX;
+
 }
 
 //------------------------------------------------------------------------------
 /**
 */
 OBJC_POINTER(MTLRenderPassDescriptor)
-RenderTarget::GetPass()
+RenderTarget::Pass()
 {
     // if we have a view, grab the current pass, and set it to clear...
     if (this->view != nil)
@@ -88,6 +93,7 @@ RenderTarget::GetPass()
         this->pass.colorAttachments[0].loadAction = MTLLoadActionClear;
         this->pass.colorAttachments[0].clearColor = MTLClearColorMake(this->clearColors[0].x(), this->clearColors[0].y(), this->clearColors[0].z(), this->clearColors[0].w());
     }
+
     return this->pass;
 }
 

@@ -11,7 +11,8 @@ namespace SmartSense
 //------------------------------------------------------------------------------
 /**
 */
-ImageStream::ImageStream()
+ImageStream::ImageStream() :
+    captureMode(Capture::Video)
 {
     // empty
 }
@@ -30,7 +31,7 @@ ImageStream::~ImageStream()
 bool
 ImageStream::SetupVideo(uint32 dev)
 {
-    this->mode = Capture::Video;
+    this->captureMode = Capture::Video;
     this->videoStream = new cv::VideoCapture;
     if (this->videoStream->open(dev))
     {
@@ -47,7 +48,7 @@ ImageStream::SetupVideo(uint32 dev)
 bool
 ImageStream::SetupImages(const Core::Array<Core::URI>& images)
 {
-    this->mode = Capture::Images;
+    this->captureMode = Capture::Images;
     this->currentImage = 0;
     this->imageStream.Clear();
     this->imageStream.Resize(images.Size());
@@ -70,7 +71,7 @@ cv::Mat
 ImageStream::NextFrame()
 {
     cv::Mat ret = this->lastFrame;
-    if (this->mode == Capture::Video)
+    if (this->captureMode == Capture::Video)
     {
         cv::Mat frame;
         if (this->videoStream->read(frame))
@@ -79,7 +80,7 @@ ImageStream::NextFrame()
             this->lastFrame = ret;
         }
     }
-    else if (this->mode == Capture::Images)
+    else if (this->captureMode == Capture::Images)
     {
         ret = this->imageStream[this->currentImage];
         this->lastFrame = ret;

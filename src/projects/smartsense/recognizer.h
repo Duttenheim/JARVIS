@@ -50,10 +50,6 @@ public:
     void Update(const cv::Mat& mat);
     /// get result back from recognizer upon completion
     const cv::Mat& Result() const;
-    /// render debug results if possible
-    void SetDebug(bool d);
-    /// get if recognizer is in debug mode
-    const bool Debug() const;
     
     /// add function to recognizer pipeline
     void AddToPipeline(const Core::String& name, const Ptr<Core::Function<void(const Ptr<Recognizer>& rec, cv::Mat input, cv::Mat& output)>>& func);
@@ -74,18 +70,15 @@ public:
     /// get buffer by name
     const IntermediateBuffer& Buffer(const Core::String& name);
     
-    /// trigger if this recognizer needs and update
-    void SetNeedsUpdate(bool b) { this->needsUpdate = b; }
-    /// get if recognizer needs an update
-    const bool NeedsUpdate() { return this->needsUpdate; }
+public:
+    bool debug;
+    bool isDirty;
     
 private:
     Core::Array<std::tuple<Core::String, Ptr<Core::Function<void(const Ptr<Recognizer>& rec, cv::Mat input, cv::Mat& output)>>>> functions;
-    bool debug;
     Core::Map<Core::String, cv::Mat*> intermediates;
     Core::Map<Core::String, IntermediateBuffer> buffers;
     cv::Mat result;
-    bool needsUpdate;
 };
 
 //------------------------------------------------------------------------------
@@ -95,24 +88,6 @@ inline const cv::Mat&
 Recognizer::Result() const
 {
     return this->result;
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-inline void
-Recognizer::SetDebug(bool d)
-{
-    this->debug = d;
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-inline const bool
-Recognizer::Debug() const
-{
-    return this->debug;
 }
 
 //------------------------------------------------------------------------------

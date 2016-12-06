@@ -9,12 +9,14 @@
  
 	If at any point the reference count reaches 0, the object is automatically deleted.
 	Classes used as a template to Ptr must inherit from Ref in order to be a Ptr valid type.
+    
+    Ptr is kept in the main namespace to avoid ambiguity when using the Core namespace, and to avoid
+    having to write Core::Ptr everywhere.
 	
 	(C) 2015 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
 namespace JARVIS {
-namespace Core {
 template <class TYPE>
 class Ptr
 {
@@ -294,13 +296,4 @@ Ptr<TYPE>::operator bool() const
 	return nullptr != this->ptr;
 }
 
-}} // namespace JARVIS::Core
-
-//------------------------------------------------------------------------------
-/**
-    Use name alias in order to avoid writing Core::Ptr everywhere...
-*/
-namespace JARVIS {
-template <class TYPE>
-using Ptr = Core::Ptr<TYPE>;
-}
+} // namespace JARVIS

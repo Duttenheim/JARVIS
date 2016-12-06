@@ -58,10 +58,13 @@ using InitList = std::initializer_list<T>;
 template <class TYPE, uint32 N>
 using ConstArr = std::array<TYPE, N>;
 
+template <class... TYPE>
+using Tuple = std::tuple<TYPE...>;
+
 #if __WIN32__
 #define align_16 __declspec(align(16))
 #elif __APPLE__ || __UNIX__
-#define align_16 __attribute__((aligned(16)))
+#define align_16 __attribute__((aligned(16))) __attribute((packed))
 #else
 #endif
 
@@ -104,4 +107,13 @@ using ConstArr = std::array<TYPE, N>;
 #include "enum.h"
 #include "poolalloc.h"
 #include "class.h"
+
+namespace JARVIS {
+
+template <class TYPE>
+using Array = Core::Array<TYPE>;
+
+using String = Core::String;
+using Ref = Core::Ref;
+}
 #endif

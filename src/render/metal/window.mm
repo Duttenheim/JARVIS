@@ -85,6 +85,7 @@ Window::Open()
         this->view = [[JARVISMTKView alloc] init];
         [this->view setDelegate:this->viewDelegate];
         [this->view setPreferredFramesPerSecond:60];
+        [this->view setWantsLayer:YES];
         [this->view setDevice:this->context->device];
         [this->view setSampleCount:8];
         [this->view setColorPixelFormat:MTLPixelFormatBGRA8Unorm];

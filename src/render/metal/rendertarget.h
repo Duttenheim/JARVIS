@@ -31,7 +31,7 @@ public:
     void InitWithWindow(const Ptr<Render::Window>& window);
     
     /// retrieve render pass for this frame
-    OBJC_POINTER(MTLRenderPassDescriptor) GetPass();
+    OBJC_POINTER(MTLRenderPassDescriptor) Pass();
     
 private:
     friend class Metal::Context;

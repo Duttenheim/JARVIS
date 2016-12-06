@@ -15,6 +15,7 @@
 #include "resources/primitive.h"
 #include "../vertexbuffer.h"
 #include "../indexbuffer.h"
+#include "../uniformbuffer.h"
 #include "../renderstate.h"
 #include "../pipelinestate.h"
 #include "../shader.h"
@@ -33,6 +34,19 @@ class Context : public Core::Ref
 {
     __ClassDecl(Context);
 public:
+
+    enum Stage : uint8
+    {
+        Vertex,
+        Hull,
+        Domain,
+        Geometry,
+        Fragment,
+        Compute,
+        
+        NumStages
+    };
+    
     /// constructor
     Context();
     /// destructor
@@ -57,6 +71,8 @@ public:
     void BindVertexBuffers(InitList<Ptr<Render::VertexBuffer>> vbos);
     /// bind index buffer to be used
     void BindIndexBuffer(const Ptr<Render::IndexBuffer>& ibo);
+    /// bind uniform buffer
+    void BindUniformBuffer(const Ptr<Render::UniformBuffer>& ubo, const Stage& stage, uint32 offset, uint32 index);
     /// bind render state to be used
     void BindRenderState(const Ptr<Render::RenderState>& renderState);
     /// bind primitive to be used by draw
@@ -75,6 +91,7 @@ protected:
     Ptr<Render::RenderState> renderState;
     Ptr<Render::PipelineState> pipelineState;
     Core::Map<uint32, Ptr<Render::Shader>> shaders;
+    Core::Map<uint32, Ptr<Render::UniformBuffer>> ubos[NumStages];
 };
 
 //------------------------------------------------------------------------------
@@ -111,6 +128,15 @@ inline void
 Context::BindIndexBuffer(const Ptr<Render::IndexBuffer>& ibo)
 {
     this->ibo = ibo;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
+Context::BindUniformBuffer(const Ptr<Render::UniformBuffer>& ubo, const Stage& stage, uint32 offset, uint32 index)
+{
+    this->ubos[stage].Insert(index, ubo);
 }
 
 //------------------------------------------------------------------------------

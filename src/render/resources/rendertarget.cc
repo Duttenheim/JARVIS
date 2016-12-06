@@ -15,7 +15,7 @@ namespace Base
 */
 RenderTarget::RenderTarget() :
     depthStencilTarget(nullptr),
-    clearFlags(ClearFlags::Color | ClearFlags::Depth | ClearFlags::Stencil),
+    clearFlags(ClearFlags::None),
     samples(1),
     isWindowTarget(false)
 {

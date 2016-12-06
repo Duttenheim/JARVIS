@@ -18,27 +18,69 @@
 #include "thread.h"
 #include "threading.h"
 namespace JARVIS {
-namespace Core
+namespace Threading
 {
 class ThreadPool : public Ref
 {
     __ClassDecl(ThreadPool);
 public:
+
+    struct ThreadPoolJob : public Ref
+    {
+        __ClassDecl(ThreadPoolJob);
+        Ptr<ThreadJobFunc> func;
+        ThreadJobContext ctx;
+        int32 idx;
+        
+        ThreadPoolJob() : func(nullptr), ctx({nullptr, nullptr, nullptr}), idx(-1) {};
+        ThreadPoolJob(const ThreadPoolJob& rhs) : func(rhs.func), ctx(rhs.ctx), idx(rhs.idx) {};
+        ~ThreadPoolJob() { this->func = nullptr; this->idx = -1; }
+        void operator=(ThreadPoolJob&& rhs)
+        {
+            this->func = rhs.func;
+            this->idx = rhs.idx;
+            this->ctx = rhs.ctx;
+            
+            rhs.func = nullptr;
+            rhs.idx = -1;
+            rhs.ctx = {nullptr, nullptr, nullptr};
+        }
+    };
+    
     /// constructor
     ThreadPool(uint32 threads);
     /// destructor
     virtual ~ThreadPool();
     
-    /// enqueue thread function and its execution context
-	void Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadJobContext& ctx);
+    /// enqueue thread function and its execution context and returns the job created
+	Ptr<ThreadPoolJob> Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const ThreadJobContext& ctx);
     /// update thread pool, this causes the threads to update their status, and finished threads to attain new tasks
     void Update();
+    /// waits for thread using index
+    void Wait(const Ptr<ThreadPoolJob>& job);
+    /// check if thread is running
+    bool Running(const Ptr<ThreadPoolJob>& job);
+
+    /// returns false if there are no pending jobs
+    const bool Working() const;
 private:
+
+    /// helper function to wait for a thread to finish and shuffles it to the free list, returns true if it's done
+    bool __Wait(const uint32 idx, bool kill = false);
 
     Array<Ptr<Thread>> activeThreads;
     Array<Ptr<Thread>> freeThreads;
-	Array<Ptr<Threading::ThreadJobFunc>> funcs;
-    Array<Threading::ThreadJobContext> contexts;
+    
+    Array<Ptr<ThreadPoolJob>> pendingJobs;
+    Array<Ptr<ThreadPoolJob>> activeJobs;
 };
 
+//------------------------------------------------------------------------------
+/**
+*/
+inline const bool
+ThreadPool::Working() const
+{
+    return this->activeThreads.Size() != 0;
+}
 }} // namespace JARVIS::Core

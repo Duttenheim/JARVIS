@@ -22,6 +22,11 @@ public:
     /// destructor
     virtual ~RenderApplication();
     
+    /// overload start
+    void Start();
+    /// overload stop
+    void Stop();
+    
     /// setup the application context
     virtual void OnSetup();
     /// run the application code

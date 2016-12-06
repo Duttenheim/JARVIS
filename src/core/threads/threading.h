@@ -8,14 +8,11 @@
 #include "functional/function.h"
 #include <thread>
 namespace JARVIS {
-namespace Core {
 namespace Threading
 {
 
 /// typedef a typical thread function
-//template<class INPUT, class OUTPUT, class UNIFORM>
-//using ThreadJobFunc = Function<void(INPUT*, OUTPUT*, UNIFORM*)>;
-typedef Function<void(byte*, byte*, byte*)> ThreadJobFunc;
+typedef Core::Function<void(byte*, byte*, byte*)> ThreadJobFunc;
 
 /// define struct for common case use of thread jobs
 struct ThreadJobContext
@@ -40,7 +37,7 @@ static ThreadJobContext CreateContext(INPUT inputs, OUTPUT outputs, UNIFORM unif
 static inline void
 Sleep(uint32 ms)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(ms));
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
 //------------------------------------------------------------------------------
@@ -53,4 +50,4 @@ Yield()
     std::this_thread::yield();
 }
 
-}}}
+}} // namespace JARVIS::Threading

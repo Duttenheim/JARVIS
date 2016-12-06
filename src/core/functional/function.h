@@ -159,7 +159,7 @@ template<class RET, class... PARAMS>
 inline
 Function<RET(PARAMS...)>::~Function()
 {
-    // empty
+    this->func = nullptr;
 }
 
 //------------------------------------------------------------------------------

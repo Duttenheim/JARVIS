@@ -11,6 +11,8 @@
 #include "application.h"
 #include "imagestream.h"
 #include "recognizer.h"
+#include "movementtracker.h"
+#include "objectrecognizer.h"
 namespace JARVIS {
 namespace SmartSense
 {
@@ -32,8 +34,9 @@ public:
 private:
     uint32 frameCounter;
     Ptr<ImageStream> stream;
-    Ptr<Recognizer> detector;
-    Ptr<Recognizer> tracker;
+    
+    Ptr<MovementTracker> movementTracker;
+    Ptr<ObjectRecognizer> objectRecognizer;
 };
 
 }} // namespace JARVIS::SmartSense

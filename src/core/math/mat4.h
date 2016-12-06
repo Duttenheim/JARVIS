@@ -29,7 +29,7 @@ union __m128_mat
     __m128 sse[4];
 };
 
-class Mat4
+class align_16 Mat4
 {
 public:
     /// constructor
@@ -43,11 +43,25 @@ public:
     static Mat4 RotationY(const float angle);
     /// create new matrix using global Z axis
     static Mat4 RotationZ(const float angle);
+    /// create a new matrix which is moved in world space
+    static Mat4 Translation(const float x, const float y, const float z);
+    /// create a new matrix which scales all axis uniformly
+    static Mat4 Scaling(const float x);
+    /// create a matrix which scaled each axis individually
+    static Mat4 Scaling(const float x, const float y, const float z);
+    /// create a new perspective matrix
+    static Mat4 Perspective(const float width, const float height, const float near, const float far, const float zrange = 1.0f, const float up = 1.0f);
+    /// create a new perspective matrix for off-center
+    static Mat4 PerspectiveOffCenter(const float left, const float right, const float top, const float bottom, const float near, const float far, const float zrange = 1.0f, const float up = 1.0f);
+
     
     /// multiply two matrices
     static Mat4 Multiply(const Mat4& lhs, const Mat4& rhs);
     /// transform vector with matrix
     static Vec4 Transform(const Vec4& vec, const Mat4& mat);
+    
+    /// get as float array
+    const float* Get() const;
     
 protected:
     __m128_mat m;
@@ -99,8 +113,8 @@ Mat4::RotationY(const float angle)
     Mat4 res;
     const float sine = sin(angle);
     const float cosine = cos(angle);
-    res.m.sse[0] = _mm_setr_ps(cosine, 0, sine, 0);
-    res.m.sse[2] = _mm_setr_ps(-sine, 0, cosine, 0);
+    res.m.sse[0] = _mm_setr_ps(cosine, 0, -sine, 0);
+    res.m.sse[2] = _mm_setr_ps(sine, 0, cosine, 0);
     return res;
 }
 
@@ -117,6 +131,45 @@ Mat4::RotationZ(const float angle)
     res.m.sse[0] = _mm_setr_ps(cosine, -sine, 0, 0);
     res.m.sse[1] = _mm_setr_ps(sine, cosine, 0, 0);
     return res;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline Mat4
+Math::Mat4::Translation(const float x, const float y, const float z)
+{
+    Math::Mat4 mat;
+    mat.m.fvv[3][0] = x;
+    mat.m.fvv[3][1] = y;
+    mat.m.fvv[3][2] = z;
+    return mat;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline Mat4
+Math::Mat4::Scaling(const float x)
+{
+    Math::Mat4 mat;
+    mat.m.fvv[0][0] = x;
+    mat.m.fvv[1][1] = x;
+    mat.m.fvv[2][2] = x;
+    return mat;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline Mat4
+Math::Mat4::Scaling(const float x, const float y, const float z)
+{
+    Math::Mat4 mat;
+    mat.m.fvv[0][0] = x;
+    mat.m.fvv[1][1] = y;
+    mat.m.fvv[2][2] = z;
+    return mat;
 }
 
 //------------------------------------------------------------------------------
@@ -156,6 +209,43 @@ Mat4::Transform(const Vec4& vec, const Mat4& mat)
     __m128 z = _mm_dp_ps(vec.v.sse, mat.m.sse[2], 0xF4);
     __m128 w = _mm_dp_ps(vec.v.sse, mat.m.sse[3], 0xF8);
     return _mm_add_ps(_mm_add_ps(x, y), _mm_add_ps(z, w));
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline
+Mat4
+Mat4::Perspective(const float width, const float height, const float near, const float far, const float zrange, const float up)
+{
+    Mat4 res;
+    const float dist = far / (near - far);
+    res.m.sse[0] = _mm_setr_ps(2.0f * near/width, 0, 0, 0);
+    res.m.sse[1] = _mm_setr_ps(0, 2.0f * near/height*up, 0, 0);
+    res.m.sse[2] = _mm_setr_ps(0, 0, dist * zrange, -1);
+    res.m.sse[3] = _mm_setr_ps(0, 0, dist * near * zrange, 0);
+    return res;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline
+Mat4
+Mat4::PerspectiveOffCenter(const float left, const float right, const float top, const float bottom, const float near, const float far, const float zrange, const float up)
+{
+    Mat4 res;
+    return res;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline
+const float*
+Mat4::Get() const
+{
+    return this->m.fv;
 }
 
 }} // namespace JARVIS::Math

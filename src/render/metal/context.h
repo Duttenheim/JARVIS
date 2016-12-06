@@ -37,6 +37,8 @@ public:
     void BindVertexBuffers(InitList<Ptr<Render::VertexBuffer>> vbos);
     /// bind index buffer to be used
     void BindIndexBuffer(const Ptr<Render::IndexBuffer>& ibo);
+    /// bind uniform buffer
+    void BindUniformBuffer(const Ptr<Render::UniformBuffer>& ubo, const Stage& stage, uint32 offset, uint32 index);
     /// bind render state to be used
     void BindRenderState(const Ptr<Render::RenderState>& renderState);
     
@@ -54,6 +56,7 @@ private:
     friend class Metal::Window;
     friend class Metal::VertexBuffer;
     friend class Metal::IndexBuffer;
+    friend class Metal::UniformBuffer;
     friend class Metal::RenderState;
     friend class Metal::PipelineState;
     friend class Metal::Shader;

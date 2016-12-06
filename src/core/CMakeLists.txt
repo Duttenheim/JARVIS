@@ -99,6 +99,13 @@ ELSEIF(APPLE)
     FIND_LIBRARY(COCOA_FRAMEWORK Cocoa)
 
     SET(core_os_libs ${COCOA_FRAMEWORK})
+ELSEIF(ANDROID)
+	SET(core_os
+		android/pch.h
+		android/sysfunc.h
+		android/sysfunc.cc
+	)
+	SOURCE_GROUP("os" files ${core_os})
 ELSE()
 	SET(core_os
 		posix/pch.h
