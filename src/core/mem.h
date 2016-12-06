@@ -26,6 +26,30 @@ template <class TYPE> static void FillDuffs(TYPE* buf, uint32 elements, const TY
 
 //------------------------------------------------------------------------------
 /**
+    Allocate new instance of type and run constructor.
+    @param args A list of constructor arguments.
+*/
+template <class TYPE, class ...ARGS>
+inline static TYPE*
+New(ARGS&&... args)
+{
+    return new TYPE(args...);
+}
+
+//------------------------------------------------------------------------------
+/**
+    Free pointer of type and run destructor.
+    @param ptr The pointer to destruct.
+*/
+template <class TYPE>
+inline static void
+Delete(void* ptr)
+{
+    ((TYPE*)ptr)->~TYPE();
+}
+
+//------------------------------------------------------------------------------
+/**
 	Allocate memory.
 	@param elements		Number of elements to allocate.
 */
@@ -55,17 +79,6 @@ Alloc(uint32 size)
 	Memory::Fill(buf, size, JARVIS_MEM_INIT);
 #endif
 	return buf;
-}
-
-//------------------------------------------------------------------------------
-/**
-    Allocate new instance of class.
-*/
-template <class TYPE, class ...ARGS>
-inline static TYPE*
-New(ARGS&&... args)
-{
-    return new TYPE(args...);
 }
 
 //------------------------------------------------------------------------------

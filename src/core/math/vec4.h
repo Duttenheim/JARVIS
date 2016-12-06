@@ -25,7 +25,7 @@ namespace JARVIS {
 namespace Math
 {
 
-union __m128_vec
+union align_16 __m128_vec
 {
     float fv[4];
     __m128 sse;
@@ -152,6 +152,9 @@ private:
     friend class Mat3;
     __m128_vec v;
 };
+
+//CONST_EXPR __m128_vec Vec4::zero;
+//CONST_EXPR __m128_vec Vec4::one;
 
 //------------------------------------------------------------------------------
 /**

@@ -17,7 +17,7 @@
 #include <iostream>
 
 using namespace JARVIS::Core;
-
+using namespace JARVIS::Threading;
 
 JARVIS_MAIN
 {    
@@ -64,7 +64,7 @@ JARVIS_MAIN
 	for (i = 0; i < 16; i++)
 	{
 		// create bogus job
-		auto poolProc1 = Threading::ThreadJobFunc::Create([=](byte* input, byte* output, byte* uniform)
+		auto poolProc1 = ThreadJobFunc::Create([=](byte* input, byte* output, byte* uniform)
 		{
 			printf("Pool job #%d\n", i);
 		});

@@ -54,7 +54,7 @@ enum class FrequencyPattern : uint8
 };
 
 // used for immutable buffers
-enum class ImmutableFlags : uint8
+enum ImmutableFlags : uint8
 {
     None = 0,
     Coherent = 1 << 0,          // allow the buffer to be coherent with driver memory

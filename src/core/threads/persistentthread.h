@@ -11,9 +11,9 @@
  */
 //------------------------------------------------------------------------------
 #include <thread>
-#include "threadpool.h"
+#include "thread.h"
 namespace JARVIS {
-namespace Core
+namespace Threading
 {
 class PersistentThread : public Ref
 {
@@ -25,7 +25,7 @@ public:
     virtual ~PersistentThread();
     
     /// enqueue function to run
-	void Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threading::ThreadJobContext& context);
+	void Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const ThreadJobContext& context);
     
     /// start the thread
     void Start();
@@ -40,9 +40,9 @@ public:
 private:
 	Array<Ptr<Threading::ThreadJobFunc>> funcs;
     Array<Threading::ThreadJobContext> contexts;
-    std::atomic<bool> running;
     std::atomic<bool> working;
-    std::thread* thread;
+    Ptr<Thread> thread;
+    //std::thread* thread;
 };
 
 //------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ private:
 inline const bool
 PersistentThread::Running() const
 {
-    return this->running.load();
+    return this->thread->Running();
 }
 
 //------------------------------------------------------------------------------

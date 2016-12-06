@@ -28,19 +28,22 @@ RenderApplication::~RenderApplication()
 /**
 */
 void
-RenderApplication::OnSetup()
+RenderApplication::Start()
 {
 #if J_RENDERER_METAL
     this->sysfunc.StartOSX();
 #else
-    this->OnSetup();
-    this->state = Running;
-    while (this->state == Application::Running)
-    {
-        this->OnFrame();
-    }
+    Application::Start();
 #endif
-    this->OnExit();
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+void
+RenderApplication::OnSetup()
+{
+    // empty
 }
 
 //------------------------------------------------------------------------------
@@ -49,7 +52,7 @@ RenderApplication::OnSetup()
 void
 RenderApplication::OnFrame()
 {
-
+    // empty
 }
 
 //------------------------------------------------------------------------------
@@ -58,7 +61,7 @@ RenderApplication::OnFrame()
 void
 RenderApplication::OnExit()
 {
-
+    // empty
 }
 
 }}

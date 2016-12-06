@@ -36,9 +36,9 @@ public:
     
     /// grab next image
     cv::Mat NextFrame();
-    
-    /// get type of stream
-    Capture CaptureMode() {return this->mode;}
+
+public:
+    Capture captureMode;
     
 private:
     cv::Mat lastFrame;
@@ -46,9 +46,6 @@ private:
     cv::Ptr<cv::VideoCapture> videoStream;
     Core::Array<cv::Mat> imageStream;
     uint32 currentImage;
-    
-    Capture mode;
-    
 };
 
 }} // namespace JARVIS::SmartSense

@@ -17,7 +17,7 @@
 
 #define j_assert(exp) { if (!(exp)) JARVIS::Core::Debug::Exception(#exp, __FILE__, __LINE__); }
 #define j_assert_msg(exp, msg) { if (!(exp)) JARVIS::Core::Debug::ExceptionWithMsg(#exp, msg, __FILE__, __LINE__); }
-#define j_error(msg, ...) { JARVIS::Core::Debug::Error(msg, __VA_ARGS__, __FILE__, __LINE__); }
+#define j_error(msg, ...) { JARVIS::Core::Debug::Error(msg, ##__VA_ARGS__); }
 
 #ifdef __CONST_EXPR_SUPPORTED__
 #define j_static_assert(exp, msg) static_assert(exp, msg)

@@ -10,10 +10,10 @@
 #include "threading.h"
 #include "functional/function.h"
 namespace JARVIS {
-namespace Core
+namespace Threading
 {
 
-class Thread : public Ref
+class Thread : public Core::Ref
 {
     __ClassDecl(Thread);
 public:
@@ -70,8 +70,8 @@ Thread::Start(const THREADPROC& func, PARAMS&& ...args)
         func->Call(args...);
 		this->running.exchange(false);
 	};
-	this->thread = Memory::New<std::thread>(threadProc);
-	this->running.exchange(true);
+    this->running.exchange(true);
+	this->thread = new std::thread(threadProc);
 }
 
 }} // namespace JARVIS::Core

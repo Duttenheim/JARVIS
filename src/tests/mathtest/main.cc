@@ -13,12 +13,21 @@
 #include "math/point.h"
 #include "util/timer.h"
 #include "threads/persistentthread.h"
+#include "threads/threadpool.h"
 
-using namespace JARVIS::Core;
+#include <vector>
+#include <iostream>
+
+#include <random>
+
 using namespace JARVIS::Math;
+using namespace JARVIS::Core;
+using namespace JARVIS::Threading;
+#define NUM_OPS 2000000
 
 JARVIS_MAIN
 {
+    
     Vec4 v1(1,2,3,4), v2(5,6,7,8);
     Vec4 v3 = v1 + v2;
     Vec4 v4(1);
@@ -36,13 +45,12 @@ JARVIS_MAIN
     dot = Vec3::dot(v7, v6);
     
     Vector vec(1, 1, 1);
-    //float32 len = Vector::length(vec);
     
-    Vec4* inputs = new Vec4[2000000];
-    Vec4* outputs = new Vec4[2000000];
+    Vec4* inputs = new Vec4[NUM_OPS];
+    Vec4* outputs = new Vec4[NUM_OPS];
     Vec4* uniforms = new Vec4(1);
     uniforms[0] = Vec4(1,1,1,1);
-    auto ctx = Threading::CreateContext(inputs, outputs, uniforms);
+    auto ctx = CreateContext(inputs, outputs, uniforms);
     
     auto specialThreadProc =
 	Functional::Lambda([](byte* input, byte* output, byte* uniform) -> void
@@ -51,7 +59,7 @@ JARVIS_MAIN
         Vec4* out = (Vec4*)output;
         Vec4* u = (Vec4*)uniform;
         int32 i;
-        for (i = 0; i < 2000000; i++)
+        for (i = 0; i < NUM_OPS; i++)
         {
             out[i] = Vec4::cross(in[i] + Vec4(1,2,3,4), u[0]);
         }
@@ -60,17 +68,50 @@ JARVIS_MAIN
     });
     
     Ptr<Timer> timer = Timer::Create();
+    
+    // run a persistent thread with 4 jobs in sequence
     timer->Start();
     Ptr<PersistentThread> pthread = PersistentThread::Create();
     pthread->Start();
     pthread->Enqueue(specialThreadProc, ctx);
-    //pthread->Enqueue(specialThreadProc, ctx);
-    //pthread->Enqueue(specialThreadProc, ctx);
-    //pthread->Enqueue(specialThreadProc, ctx);
+    pthread->Enqueue(specialThreadProc, ctx);
+    pthread->Enqueue(specialThreadProc, ctx);
+    pthread->Enqueue(specialThreadProc, ctx);
     while (pthread->Working());
     pthread->Stop();
     timer->Stop();
-    printf("Time taken to complete: %f\n", timer->Time());
+    printf("Time taken to complete sequental jobs: %fs\n", timer->Time());
+    
+    timer->Start();
+    Ptr<ThreadPool> pool = ThreadPool::Create(16);
+    for (uint32 i = 0; i < 16; i++)
+        pool->Enqueue(specialThreadProc, ctx);
+    
+    do { pool->Update(); } while(pool->Working());
+    timer->Stop();
+    printf("Time taken to complete cluster of jobs: %fs\n", timer->Time());
+    
+    uint32 threadIdx = 0;
+    while (true)
+    {
+        for (uint32 i = 0; i < 16; i++)
+        {
+            auto proc = Functional::Lambda([=](byte* input, byte* output, byte* uniform) -> void
+            {
+                std::random_device rd;
+                std::mt19937 mt(rd());
+                std::uniform_int_distribution<uint32> dist(100, 1000);
+                Threading::Sleep(dist(mt));
+                printf("Thread number %d\n", threadIdx);
+            });
+            pool->Enqueue(proc, ctx);
+            threadIdx++;
+        }
+        pool->Update();
+        
+        Threading::Sleep(10);
+    }
+    
     delete [] inputs;
     delete [] outputs;
     delete uniforms;

@@ -13,7 +13,7 @@ namespace SmartSense
 */
 Recognizer::Recognizer() :
     debug(false),
-    needsUpdate(true)
+    isDirty(true)
 {
     // empty
 }
@@ -48,7 +48,7 @@ Recognizer::Update(const cv::Mat& mat)
         }
     }
     
-    this->needsUpdate = false;
+    this->isDirty = false;
 }
 
 }} // JARVIS::SmartSense

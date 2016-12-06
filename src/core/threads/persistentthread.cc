@@ -6,14 +6,13 @@
 #include "config.h"
 #include "threads/persistentthread.h"
 namespace JARVIS {
-namespace Core
+namespace Threading
 {
 
 //------------------------------------------------------------------------------
 /**
 */
 PersistentThread::PersistentThread() :
-    running({false}),
     working({false}),
 	thread(nullptr)
 {
@@ -25,7 +24,7 @@ PersistentThread::PersistentThread() :
 */
 PersistentThread::~PersistentThread()
 {
-    if (nullptr != this->thread) this->Stop();
+    if (this->thread.Valid()) this->Stop();
     this->thread = nullptr;
 }
 
@@ -46,10 +45,12 @@ PersistentThread::Enqueue(const Ptr<Threading::ThreadJobFunc>& func, const Threa
 void
 PersistentThread::Start()
 {
-    j_assert(nullptr == this->thread);
-    auto proc = [this]()
+    j_assert(!this->thread.Valid());
+    this->thread = Thread::Create();
+    
+    auto proc = Core::Functional::Lambda([this]()
     {
-        while (this->running.load())
+        while (this->thread->Running())
         {
             while (this->funcs.Size() > 0)
             {
@@ -63,13 +64,10 @@ PersistentThread::Start()
             // sleep thread a little
             Threading::Sleep(1);
         }
-        
-        // flip running status
-        this->running.exchange(false);
-    };
+    });
     
-	this->running.exchange(true);
-    this->thread = Memory::New<std::thread>(proc);
+    // start thread
+    this->thread->Start(proc);
 }
 
 //------------------------------------------------------------------------------
@@ -78,11 +76,8 @@ PersistentThread::Start()
 void
 PersistentThread::Stop()
 {
-    j_assert(nullptr != this->thread);
-    this->running.exchange(false);
-    this->thread->join();
-    delete this->thread;
+    j_assert(this->thread.Valid());
     this->thread = nullptr;
 }
 
-}}
+}} // namespace JARVIS::Core

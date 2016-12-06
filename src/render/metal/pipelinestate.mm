@@ -31,6 +31,18 @@ PipelineState::~PipelineState()
 
 //------------------------------------------------------------------------------
 /**
+    Initialize with a list of shaders, a render target, a blend state per render target, and how many multisample levels to use.
+    @param shaders A list of shaders to provide, if set to nullptr, won't be used.
+        0: vertex
+        1: geometry
+        2: hull
+        3: domain
+        4: fragment
+        
+    @param rt A render target to render to when using this pipeline state.
+    @param blendStates A list of blend states to use when rendering to the render targets.
+    @param samples The amount of pixel subsamples. 
+ 
 */
 void
 PipelineState::InitRender(const Render::RenderShaderBundle& shaders, const Ptr<Render::RenderTarget>& rt, InitList<Render::BlendState> blendStates, const uint8 samples)
