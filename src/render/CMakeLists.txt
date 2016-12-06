@@ -1,0 +1,98 @@
+#-------------------------------------------------------------------------------
+# render
+#-------------------------------------------------------------------------------
+
+FILE(GLOB render_headers *.h)
+FILE(GLOB render_sources *.cc)
+SET(render_files ${render_headers} ${render_sources})
+SOURCE_GROUP("" FILES ${render_files})
+
+FILE(GLOB render_display_headers display/*.h)
+FILE(GLOB render_display_sources display/*.cc)
+SET(render_display_files ${render_display_headers} ${render_display_sources})
+SOURCE_GROUP("display" FILES ${render_display_files})
+
+FILE(GLOB render_util_headers util/*.h)
+FILE(GLOB render_util_sources util/*.cc)
+SET(render_util_files ${render_util_headers} ${render_util_sources})
+SOURCE_GROUP("util" FILES ${render_util_files})
+
+FILE(GLOB render_resources_headers resources/*.h)
+FILE(GLOB render_resources_sources resources/*.cc)
+SET(render_resources_files ${render_resources_headers} ${render_resources_sources})
+SOURCE_GROUP("resources" FILES ${render_resources_files})
+
+FILE(GLOB render_shading_headers shading/*.h)
+FILE(GLOB render_shading_sources shading/*.cc)
+SET(render_shading_files ${render_shading_headers} ${render_shading_sources})
+SOURCE_GROUP("shading" FILES ${render_shading_files})
+
+FILE(GLOB render_dx12_headers dx12/*.h)
+FILE(GLOB render_dx12_sources dx12/*.cc)
+SET(render_dx12_files ${render_dx12_headers} ${render_dx12_sources})
+SOURCE_GROUP("dx12" FILES ${render_dx12_files})
+
+# Metal code is Objective-C/C++ interlaced
+FILE(GLOB render_metal_headers metal/*.h)
+FILE(GLOB render_metal_sources metal/*.mm)
+SET(render_metal_files ${render_metal_headers} ${render_metal_sources})
+SOURCE_GROUP("metal" FILES ${render_metal_files})
+
+FILE(GLOB render_gl4_headers gl4/*.h)
+FILE(GLOB render_gl4_sources gl4/*.cc)
+SET(render_gl4_files ${render_gl4_headers} ${render_gl4_sources})
+SOURCE_GROUP("gl4" FILES ${render_gl4_files})
+
+FILE(GLOB render_vulkan_headers vulkan/*.h)
+FILE(GLOB render_vulkan_sources vulkan/*.cc)
+SET(render_vulkan_files ${render_vulkan_headers} ${render_vulkan_sources})
+SOURCE_GROUP("vulkan" FILES ${render_vulkan_files})
+
+SET(render_implementation_libs "")
+SET(render_implementation_deps "")
+SET(render_implementation_shaders "")
+IF(${J_RENDERER_DX12})
+	SET(render_implementation_files ${render_dx12_files})
+	MESSAGE("Building DX12 renderer...")
+	IF(NOT WIN32)
+		MESSAGE(FATAL_ERROR "DX12 is only supported on Windows based platforms!")
+	ENDIF()
+	FILE(GLOB render_implementation_shaders shaders/dx12/*.dx)
+ELSEIF(${J_RENDERER_METAL})
+	SET(render_implementation_files ${render_metal_files})
+	MESSAGE("Building Metal renderer...")
+	IF (NOT APPLE)
+		MESSAGE(FATAL_ERROR "Metal is only supported on iOS/OSX based platforms!")
+	ENDIF()
+	FIND_LIBRARY(METAL_FRAMEWORK Metal)
+	FIND_LIBRARY(METALKIT_FRAMEWORK MetalKit)
+	SET(render_implementation_libs ${METAL_FRAMEWORK} ${METALKIT_FRAMEWORK})
+	FILE(GLOB render_implementation_shaders shaders/metal/*.metal)
+	
+	SET_SOURCE_FILES_PROPERTIES(${render_implementation_shaders} PROPERTIES XCODE_EXPLICIT_FILE_TYPE "metal")
+	SET_SOURCE_FILES_PROPERTIES(${render_implementation_shaders} PROPERTIES LANGUAGE "mm")
+ELSEIF(${J_RENDERER_GL4})
+	SET(render_implementation_files ${render_gl4_files})
+	MESSAGE("Building GL4 renderer...")
+	SET(render_implementation_libs glfw_ext glew_ext)
+	SET(render_implementation_deps glfw_ext glew_ext)
+	FILE(GLOB render_implementation_shaders shaders/gl4/*.gl4)
+ELSEIF(${J_RENDERER_VULKAN})
+	SET(render_implementation_files ${render_vulkan_files})
+	MESSAGE("Building Vulkan renderer...")
+	FILE(GLOB render_implementation_shaders shaders/spir/*.spir)
+ENDIF()
+SOURCE_GROUP("shaders" FILES ${render_implementation_shaders})
+
+SET(render_all_files ${render_files} ${render_display_files} ${render_shading_files} ${render_resources_files} ${render_util_files} ${render_implementation_files} ${render_implementation_shaders})
+
+ADD_LIBRARY(render STATIC ${render_all_files})
+JARVIS_SETUP_TARGET(render)
+TARGET_LINK_LIBRARIES(render core ${render_implementation_libs})
+ADD_DEPENDENCIES(render core ${render_implementation_deps})
+TARGET_INCLUDE_DIRECTORIES(render PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+IF(${J_RENDERER_METAL})
+	ADD_CUSTOM_COMMAND(TARGET render POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:render>/default.metallib "${JARVIS_ROOT}/bin/default.metallib")
+	ADD_DEFINITIONS(-DMETAL_DEFAULT_LIB=@"${JARVIS_ROOT}/bin/default.metallib")
+ENDIF()

@@ -10,14 +10,8 @@
 #include <string.h>
 
 #if __CONST_EXPR_SUPPORTED__
-// const expression for string hashing
-constexpr uint32 __EnumStringHash(const char* ptr)
-{
-    return !*ptr ? 5381 : (__EnumStringHash(ptr + 1) * 33) ^ *ptr;
-}
-
-#define __SWITCHSTRING(x) switch (__EnumStringHash(x))
-#define __FROMSTRING(x) case __EnumStringHash(#x) : return x;
+#define __SWITCHSTRING(x) switch (__StringHash(x))
+#define __FROMSTRING(x) case __StringHash(#x) : return x;
 #define __DEFAULT(x) default: return x;
 #define __TOSTRING(x) case x : return #x;
 #else
@@ -26,3 +20,33 @@ constexpr uint32 __EnumStringHash(const char* ptr)
 #define __DEFAULT(x) return x;
 #define __TOSTRING(x) case x : return #x;
 #endif
+
+#define __ENUM_OR_OPERATOR(x) \
+    inline friend x operator|(x lhs, x rhs) \
+    { \
+        return static_cast<x>(static_cast<int32>(lhs) | static_cast<int32>(rhs)); \
+    } \
+    inline friend void operator|=(x lhs, x rhs) \
+    { \
+        lhs = static_cast<x>(static_cast<int32>(lhs) | static_cast<int32>(rhs)); \
+    }
+
+#define __ENUM_AND_OPERATOR(x) \
+    inline friend x operator&(x lhs, x rhs) \
+    { \
+        return static_cast<x>(static_cast<int32>(lhs) & static_cast<int32>(rhs)); \
+    } \
+    inline friend void operator&=(x lhs, x rhs) \
+    { \
+        lhs = static_cast<x>(static_cast<int32>(lhs) & static_cast<int32>(rhs)); \
+    }
+
+#define __ENUM_XOR_OPERATOR(x) \
+    inline friend x operator^(x lhs, x rhs) \
+    { \
+        return static_cast<x>(static_cast<int32>(lhs) ^ static_cast<int32>(rhs)); \
+    } \
+    inline friend void operator^=(x lhs, x rhs) \
+    { \
+        lhs = static_cast<x>(static_cast<int32>(lhs) ^ static_cast<int32>(rhs)); \
+    }

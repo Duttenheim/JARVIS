@@ -10,13 +10,6 @@
 
 #define __SingletonDecl(type) \
 	public: \
-	template<class... ARGS> \
-	static type* Create(ARGS&&... args) \
-	{ \
-		j_assert(type::singleton == nullptr); \
-		type* obj = new type(args...); \
-		return obj; \
-	} \
 	static type* Instance() \
 	{ \
 		j_assert(type::singleton != nullptr); \
@@ -29,7 +22,9 @@
 	type* type::singleton = nullptr;
 
 #define __SingletonCtor() \
+    j_assert(singleton == nullptr); \
 	singleton = this;
 
 #define __SingletonDtor() \
+    j_assert(singleton != nullptr); \
 	singleton = nullptr;

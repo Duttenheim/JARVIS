@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iterator>
+#include <algorithm>
 
 #define JARVIS_MEM_INIT	 0xFF
 #define JARVIS_MEM_DEBUG (0)
@@ -116,12 +117,13 @@ template <class TYPE>
 inline static void
 Move(TYPE* from, TYPE* to, uint32 elements)
 {
-	TYPE* end = from + elements;
-	while (from != end)
-	{
-		*to = std::move(*from);
-		++from; ++to;
-	}
+    uint32 i;
+    for (i = 0; i < elements; i++)
+    {
+        TYPE* toPtr = to + i;
+        TYPE* fromPtr = from + i;
+        *toPtr = std::move(*fromPtr);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -194,4 +196,4 @@ Fill(void* buf, uint32 size, uint8 val)
 	std::memset(buf, val, size);
 }
 
-}}}
+}}} // namespace JARVIS::Core::Memory

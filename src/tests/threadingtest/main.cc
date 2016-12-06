@@ -12,17 +12,17 @@
 #include "util/string.h"
 #include "threads/thread.h"
 #include "threads/persistentthread.h"
-#include "rand.h"
-#include <iostream>
 #include "threads/threadpool.h"
+#include "application.h"
+#include <iostream>
 
 using namespace JARVIS::Core;
 
-int __cdecl
-main(int argc, const char** argv)
+
+JARVIS_MAIN
 {    
     Ptr<Thread> thread = Thread::Create();
-    Ptr<Function<void()>> threadProc = Function<void()>::Create([]()
+    auto threadProc = Functional::Lambda([]()
     {
         printf("Hej!\n");
     });
@@ -33,15 +33,22 @@ main(int argc, const char** argv)
 	byte* outputs = (byte*)String("Outputs").CharPtr();
 	byte* uniforms = (byte*)String("Uniforms").CharPtr();
    
+    /*
     Ptr<Threading::ThreadJobFunc> specialThreadProc =
 	Threading::ThreadJobFunc::Create([](byte* input, byte* output, byte* uniform) -> void
 	{
         printf("Hej från specialfunktion!\n");
     });
+    */
+    auto f = Function<void(byte* input, byte* output, byte* uniform)>::Create([](byte* input, byte* output, byte* uniform){});
+
+    auto specialThreadProc = Functional::Lambda([](byte* input, byte* output, byte* uniform) -> void
+	{
+        printf("Hej från specialfunktion!\n");
+    });
     
+    // create a persistent thread which will be a lightweight workhorse
     auto ctx = Threading::ThreadJobContext{inputs, outputs, uniforms};
-	thread->Start(specialThreadProc, inputs, outputs, uniforms);
-    
     Ptr<PersistentThread> pthread = PersistentThread::Create();
     pthread->Start();
     pthread->Enqueue(specialThreadProc, ctx);
@@ -50,6 +57,8 @@ main(int argc, const char** argv)
     pthread->Enqueue(specialThreadProc, ctx);
     while (pthread->Working());
 
+    // create a pool of 16 threads which can all be enqueued.
+    // threads will quit when the job is done.
 	Ptr<ThreadPool> pool = ThreadPool::Create(16);
 	uint32 i;
 	for (i = 0; i < 16; i++)

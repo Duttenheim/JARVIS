@@ -7,21 +7,19 @@
 	(C) 2015 See the LICENSE file.
 */
 #include "config.h"
-#include "ptr.h"
 #include "util/array.h"
 #include "util/string.h"
 #include "util/map.h"
-#include "rand.h"
+#include "enum.h"
+#include "util/timer.h"
+#include "application.h"
 #include <iostream>
 #include <vector>
 #include <map>
-#include "enum.h"
-#include "util/timer.h"
 
 using namespace JARVIS::Core;
 
-int __cdecl
-main(int argc, const char** argv)
+JARVIS_MAIN
 {
 	Ptr<Timer> timer = Timer::Create();
 	uint32 i;

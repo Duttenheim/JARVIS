@@ -24,7 +24,6 @@ class ThreadPool : public Ref
 {
     __ClassDecl(ThreadPool);
 public:
-
     /// constructor
     ThreadPool(uint32 threads);
     /// destructor

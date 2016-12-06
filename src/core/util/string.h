@@ -12,6 +12,7 @@
 */
 //------------------------------------------------------------------------------
 #include <string.h>
+#include "array.h"
 namespace JARVIS { 
 namespace Core
 {
@@ -28,8 +29,13 @@ public:
 	String(const String& rhs);
 	/// move constructor from other string
 	String(String&& rhs);
+    /// construct empty string
+    String(std::nullptr_t);
 	/// destructor
 	virtual ~String();
+    
+    /// clear string
+    void Clear();
 
 	/// set buffer from c string
 	void Set(const char* str);
@@ -50,6 +56,27 @@ public:
     void operator=(const String& str);
 	/// implicit conversion to c string
 	operator const char*() const;
+    /// comparison between strings
+    bool operator==(const String& rhs) const;
+    /// comparison between char pointers
+    bool operator==(const char* rhs) const;
+    
+    /// compare if one string is smaller than other
+    bool operator<(const String& rhs) const;
+    /// compare if one string is snaller than another char ptr
+    bool operator<(const char* rhs) const;
+    /// compare if one string is bigger than other
+    bool operator>(const String& rhs) const;
+    /// compare if one string is bigger than another char ptr
+    bool operator>(const char* rhs) const;
+    /// compare if smaller or same
+    bool operator<=(const String& rhs) const;
+    /// compare if smaller or same with char pointer
+    bool operator<=(const char* rhs) const;
+    /// compare if bigger or same
+    bool operator>=(const String& rhs) const;
+    /// compare if bigger or same with char pointer
+    bool operator>=(const char* rhs) const;
 
 	/// append c string 
 	void Append(const char* str);
@@ -59,11 +86,40 @@ public:
 	void Append(const String& str);
 	/// append range of other string
 	void Append(const String& str, uint32 length);
+    
+    /// split string into segments
+    Array<String> Split(const String& tokens) const;
+    /// find first index of character
+    int32 FindFirst(char c, uint32 offset = 0) const;
+    /// find last index of character
+    int32 FindLast(char c, uint32 offset = 0) const;
+    /// extract string to string, returns match if failed, inclusive means you include match
+    String ExtractToString(const String& match, bool inclusive = false) const;
+    /// extract to end from string, returns match if failed, inclusive means you include match
+    String ExtractToEndFromString(const String& match, bool inclusive = false) const;
+    /// extract string to index
+    String ExtractToIndex(int32 index) const;
+    /// extract from beginning to first occurrence of char
+    String ExtractToFirstChar(char c) const;
+    /// extract from beginning to last occurrence of char
+    String ExtractToLastChar(char c) const;
+    /// extract to end from first occurrence of char
+    String ExtractToEndFromFirst(char c) const;
+    /// extract to end from last occurrence of char
+    String ExtractToEndFromLast(char c) const;
+    
+    /// replace character with other characters
+    void Replace(const char find, const char replace);
+    
+    /// create new string using the printf syntax
+    static Core::String Sprintf(const char* format, ...);
 
 	/// get length of string
 	const uint32 Length() const;
 	/// get c pointer
 	const char* CharPtr() const;
+    /// generate hash for string
+    const uint32 Hash() const;
 private:
 
 	/// delete heap buffer if valid
@@ -129,15 +185,27 @@ String::String(const String& rhs) :
 /**
 */
 inline
-String::String(String&& rhs) :
-	heapBuffer(nullptr),
-	heapBufferLength(0),
-	length(0)
+String::String(String&& rhs)
 {
-	this->Set(rhs.CharPtr());
+    this->heapBuffer = rhs.heapBuffer;
+    this->heapBufferLength = rhs.heapBufferLength;
+    this->length = rhs.length;
+    if (this->heapBuffer == nullptr) Memory::Copy<char>(rhs.stackBuffer, this->stackBuffer, rhs.length);
+    
     rhs.length = 0;
     rhs.stackBuffer[0] = 0;
 	rhs.heapBuffer = nullptr;
+    rhs.heapBufferLength = 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline
+String::String(std::nullptr_t) :
+    String()
+{
+    // empty
 }
 
 //------------------------------------------------------------------------------
@@ -154,6 +222,18 @@ String::~String()
 /**
 */
 inline void
+String::Clear()
+{
+    this->Delete();
+    this->heapBuffer = nullptr;
+    this->heapBufferLength = 0;
+    this->length = 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
 String::Set(const char* str)
 {
 	this->Set(str, std::strlen(str));
@@ -162,7 +242,7 @@ String::Set(const char* str)
 //------------------------------------------------------------------------------
 /**
 */
-void
+inline void
 String::Set(const char* str, uint32 length)
 {
 	if (nullptr == str)
@@ -297,6 +377,98 @@ String::operator const char*() const
 //------------------------------------------------------------------------------
 /**
 */
+inline bool
+String::operator==(const String& rhs) const
+{
+    return strcmp(this->CharPtr(), rhs.CharPtr()) == 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::operator==(const char* rhs) const
+{
+    return strcmp(this->CharPtr(), rhs) == 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::operator<(const String& rhs) const
+{
+    return strcmp(this->CharPtr(), rhs.CharPtr()) < 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::operator<(const char* rhs) const
+{
+    return strcmp(this->CharPtr(), rhs) < 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::operator>(const String& rhs) const
+{
+    return strcmp(this->CharPtr(), rhs.CharPtr()) > 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::operator>(const char* rhs) const
+{
+    return strcmp(this->CharPtr(), rhs) > 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::operator>=(const String& rhs) const
+{
+    return strcmp(this->CharPtr(), rhs.CharPtr()) >= 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::operator>=(const char* rhs) const
+{
+    return strcmp(this->CharPtr(), rhs) >= 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::operator<=(const String& rhs) const
+{
+    return strcmp(this->CharPtr(), rhs.CharPtr()) <= 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline bool
+String::operator<=(const char* rhs) const
+{
+    return strcmp(this->CharPtr(), rhs) <= 0;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Add string to this string.
+    @param str The string to concatenate with.
+*/
 inline void
 String::Append(const char* str)
 {
@@ -305,8 +477,11 @@ String::Append(const char* str)
 
 //------------------------------------------------------------------------------
 /**
+    Add string but with limited size
+    @param str The string to concatenate with this string.
+    @param length The size of str to use (in characters).
 */
-void
+inline void
 String::Append(const char* str, uint32 length)
 {
 	uint32 len = this->length + length;
@@ -329,16 +504,17 @@ String::Append(const char* str, uint32 length)
 			Memory::Copy<char>(this->stackBuffer, buf, this->length);
 		}
 		Memory::Copy<char>(str, buf + this->length, length);
-		this->heapBuffer[len] = 0;
-		this->heapBufferLength = len;
 		this->heapBuffer = buf;
-
+        this->heapBuffer[len] = 0;
+		this->heapBufferLength = len;
 	}
 	this->length = len;
 }
 
 //------------------------------------------------------------------------------
 /**
+    Add string to this string.
+    @param str The string to concatenate with.
 */
 inline void
 String::Append(const String& str)
@@ -348,6 +524,9 @@ String::Append(const String& str)
 
 //------------------------------------------------------------------------------
 /**
+    Add string but with limited size
+    @param str The string to concatenate with this string.
+    @param length The size of str to use (in characters).
 */
 inline void
 String::Append(const String& str, uint32 length)
@@ -357,6 +536,239 @@ String::Append(const String& str, uint32 length)
 
 //------------------------------------------------------------------------------
 /**
+    Split string into tokens.
+    @tokens A string contanining characters used to subdivide string into fragments.
+    @return Array of strings, where each element represents a string fragment terminated with any character in tokens.
+*/
+inline Array<String>
+String::Split(const String& tokens) const
+{
+    Array<String> ret;
+    String copy(*this);
+    char* ptr = const_cast<char*>(copy.CharPtr());
+    char* tok = strtok(ptr, tokens.CharPtr());
+    while (tok != nullptr)
+    {
+        ret.Append(String(tok));
+        tok = strtok(nullptr, tokens.CharPtr());
+    }
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Find first occurrence of character.
+    @param c The character to locate.
+    @param offset The offset from the start of the buffer to start looking.
+    @return index or -1 if c is not located.
+*/
+inline int32
+String::FindFirst(char c, uint32 offset) const
+{
+    if (this->length > 0)
+    {
+        j_assert(offset < this->length);
+        const char* ptr = strchr(this->CharPtr() + offset, c);
+        if (ptr != nullptr) return ptr - this->CharPtr();
+    }
+    return -1;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Find last occurrence of character.
+    @param c The character to locate.
+    @param offset The offset from the start of the buffer to start looking.
+    @return index or -1 if c is not located.
+*/
+inline int32
+String::FindLast(char c, uint32 offset) const
+{
+    if (this->length > 0)
+    {
+        j_assert(this->length - offset > 0);
+        const char* ptr = strrchr(this->CharPtr() - offset, c);
+        if (ptr != nullptr) return ptr - this->CharPtr();
+    }
+    return -1;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Extract from beginning of string leading up to matching string
+    @param match The string to locate.
+    @param inclusive If true (default false) will also include rhs in result.
+    @return new string from start until match is encountered.
+*/
+inline String
+String::ExtractToString(const String& match, bool inclusive) const
+{
+    if (this->length > 0 && match.length > 0)
+    {
+        const char* ptr = this->CharPtr();
+        const char* other = match.CharPtr();
+        const char* offset = strstr(ptr, other);
+        uint32 len = inclusive ? match.length : 0;
+        if (offset != nullptr) return String(ptr, offset - ptr + len);
+        else                   return *this;
+    }
+    return nullptr;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Extract from located string segment leading up to the end of the string.
+    @param match The string to locate.
+    @param inclusive If true (default false) will also include rhs in result.
+    @return new string from match up until end.
+*/
+inline String
+String::ExtractToEndFromString(const String& match, bool inclusive) const
+{
+    if (this->length > 0 && match.length > 0)
+    {
+        const char* ptr = this->CharPtr();
+        const char* other = match.CharPtr();
+        const char* offset = strstr(ptr, other);
+        uint32 len = inclusive ? 0 : match.length;
+        if (offset != nullptr) return String(offset + len);
+        else                   return *this;
+    }
+    return nullptr;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Extracts part of string from beginning leading to index.
+    @param index Location within string buffer to split the string on.
+*/
+inline String
+String::ExtractToIndex(int32 index) const
+{
+    j_assert(index < this->length);
+    String ret(this->CharPtr(), index);
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Extracts part of the string from beginning up until character.
+    Locates the first occurrence of said character.
+    @param c Character to end the new string on.
+*/
+inline String
+String::ExtractToFirstChar(char c) const
+{
+    String ret;
+    int32 index = this->FindFirst(c);
+    if (index != -1)
+    {
+        ret.Set(this->CharPtr(), index);
+    }
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Extracts part of the string from beginning up until character.
+    Locates the last occurrence of said character.
+    @param c Character to end the new string on.
+*/
+inline String
+String::ExtractToLastChar(char c) const
+{
+    String ret;
+    int32 index = this->FindLast(c);
+    if (index != -1)
+    {
+        ret.Set(this->CharPtr(), index);
+    }
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Extracts portion of string starting at character up until the end.
+    Locates the first occurrence of said character.
+    @param c Character to start the new string from.
+*/
+inline String
+String::ExtractToEndFromFirst(char c) const
+{
+    String ret;
+    int32 index = this->FindFirst(c);
+    if (index != -1)
+    {
+        ret.Set(this->CharPtr() + index);
+    }
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Extracts portion of string starting at character up until the end.
+    Locates the last occurrence of said character.
+    @param c Character to start the new string from.
+*/
+inline String
+String::ExtractToEndFromLast(char c) const
+{
+    String ret;
+    int32 index = this->FindLast(c);
+    if (index != -1)
+    {
+        ret.Set(this->CharPtr() + index);
+    }
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Replaces every occurence of one char with another.
+    @param find Character to locate
+    @param replace Character to replace 'find' with.
+*/
+inline void
+String::Replace(const char find, const char replace)
+{
+    char* str = const_cast<char*>(this->CharPtr());
+    uint32 index;
+    for (index = 0; index < this->length; index++)
+    {
+        if (str[index] == find) str[index] = replace;
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline Core::String
+String::Sprintf(const char* format, ...)
+{
+    String ret;
+    va_list argList;
+    va_start(argList, format);
+    char buf[4096];
+    vsnprintf(buf, sizeof(buf), format, argList);
+    va_end(argList);
+    ret.Set(buf);
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Return length of string.
+*/
+inline const uint32
+String::Length() const
+{
+    return this->length;
+}
+
+//------------------------------------------------------------------------------
+/**
+    Returns string as const char*
+    @return If string fits in the 64 byte stack buffer, it is returned, otherwise the heap buffer is used.
 */
 inline const char*
 String::CharPtr() const
@@ -367,8 +779,31 @@ String::CharPtr() const
 
 //------------------------------------------------------------------------------
 /**
+    Generate 32 bit hash from string.
 */
-void
+inline const uint32
+String::Hash() const
+{
+    uint32 hash = 0;
+    const char* ptr = this->CharPtr();
+    uint32 len = this->length;
+    uint32 i;
+    for (i = 0; i < len; i++)
+    {
+        hash += ptr[i];
+        hash += hash << 10;
+        hash ^= hash >>  6;
+    }
+    hash += hash << 3;
+    hash ^= hash >> 11;
+    hash += hash << 15;
+    return hash;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline void
 String::Delete()
 {
 	if (nullptr != this->heapBuffer)

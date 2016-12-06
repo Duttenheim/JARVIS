@@ -3,16 +3,18 @@
 /**
 	@class JARVIS::Core::Ptr
 	
-	Implements a smart pointer which decrease and increase its internal reference count.
-	The smart pointer internally keeps track of the total ref count, and if it reaches 0 performs an automatic delete.
-
-	Classes used as a template to Ptr must inherit from Ref in order for it to compile.
-
-	This class is outside the namespace because it will look annyoing 
+	Implements a smart pointer which keeps track of how many times it's referenced.
+        Assigning a smart pointer to an object will bump the reference count.
+        Assigning a valid smart pointer to nullptr will diminish the reference count.
+ 
+	If at any point the reference count reaches 0, the object is automatically deleted.
+	Classes used as a template to Ptr must inherit from Ref in order to be a Ptr valid type.
 	
 	(C) 2015 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
+namespace JARVIS {
+namespace Core {
 template <class TYPE>
 class Ptr
 {
@@ -60,10 +62,6 @@ public:
 	void operator=(std::nullptr_t);
 	/// assignment operator for c pointer
 	void operator=(TYPE* rhs);
-	/// test if invalid (against nullptr)
-	bool operator==(std::nullptr_t) const;
-	/// test if valid (against nullptr)
-	bool operator!=(std::nullptr_t) const;
 
 	/// standard equality operator
 	bool operator==(const Ptr<TYPE>& rhs);
@@ -80,7 +78,7 @@ public:
 			this->ptr = p;
 			if (0 != this->ptr) this->ptr->Retain();
 		}
-}
+    }
 
 	/// assignment operator for smart pointer of other type
 	template<class OTHERTYPE> void operator=(Ptr<OTHERTYPE>&& rhs)
@@ -228,26 +226,6 @@ Ptr<TYPE>::operator=(TYPE* rhs)
 /**
 */
 template <class TYPE>
-inline bool
-Ptr<TYPE>::operator==(std::nullptr_t) const
-{
-	return this->ptr == nullptr;
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-template <class TYPE>
-inline bool
-Ptr<TYPE>::operator!=(std::nullptr_t) const
-{
-	return this->ptr != nullptr;
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-template <class TYPE>
 bool
 Ptr<TYPE>::operator==(const Ptr<TYPE>& rhs)
 {
@@ -314,4 +292,15 @@ inline
 Ptr<TYPE>::operator bool() const
 {
 	return nullptr != this->ptr;
+}
+
+}} // namespace JARVIS::Core
+
+//------------------------------------------------------------------------------
+/**
+    Use name alias in order to avoid writing Core::Ptr everywhere...
+*/
+namespace JARVIS {
+template <class TYPE>
+using Ptr = Core::Ptr<TYPE>;
 }
