@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 #include <thread>
 #include "threading.h"
-#include "functional/function.h"
+#include "function.h"
 namespace JARVIS {
 namespace Threading
 {

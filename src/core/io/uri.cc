@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
-/**
-    @class JARVIS::Core::URI
- 	(C) 2015 See the LICENSE file.
-*/
+//  @class JARVIS::Core::URI
+// 	(C) 2015 See the LICENSE file.
+//------------------------------------------------------------------------------
+#include "config.h"
 #include "uri.h"
 #include "assigns.h"
 namespace JARVIS {

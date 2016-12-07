@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
-/**
-    @class JARVIS::Core::Assigns
- 	(C) 2016 See the LICENSE file.
-*/
+//  @class JARVIS::Core::Assigns
+// 	(C) 2016 See the LICENSE file.
+//------------------------------------------------------------------------------
+#include "config.h"
 #include "assigns.h"
 namespace JARVIS {
 namespace Core

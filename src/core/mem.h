@@ -20,9 +20,9 @@ namespace Core {
 namespace Memory
 {
 
-static void Fill(void* buf, uint32 size, uint8 val);
-template <class TYPE> static void Fill(TYPE* buf, uint32 elements, const TYPE& val);
-template <class TYPE> static void FillDuffs(TYPE* buf, uint32 elements, const TYPE& val);
+static void Fill(void* buf, SizeT size, uint8 val);
+template <class TYPE> static void Fill(TYPE* buf, SizeT elements, const TYPE& val);
+template <class TYPE> static void FillDuffs(TYPE* buf, SizeT elements, const TYPE& val);
 
 //------------------------------------------------------------------------------
 /**
@@ -55,7 +55,7 @@ Delete(void* ptr)
 */
 template <class TYPE> 
 inline static TYPE*
-Alloc(uint32 elements)
+Alloc(SizeT elements)
 {
 	TYPE* buf = (TYPE*)std::malloc(sizeof(TYPE) * elements);
 	j_assert(buf != nullptr);
@@ -71,7 +71,7 @@ Alloc(uint32 elements)
 	@param size			Number of bytes to allocate.
 */
 inline static byte*
-Alloc(uint32 size)
+Alloc(SizeT size)
 {
 	byte* buf = (byte*)std::malloc(size);
 	j_assert(buf != nullptr);
@@ -101,7 +101,7 @@ Free(void* ptr)
 */
 template <class TYPE>
 inline static void
-Copy(const TYPE* from, TYPE* to, uint32 elements)
+Copy(const TYPE* from, TYPE* to, SizeT elements)
 {
 	std::memcpy((void*)to, (void*)from, sizeof(TYPE) * elements);
 }
@@ -114,7 +114,7 @@ Copy(const TYPE* from, TYPE* to, uint32 elements)
 	@param size			Number of bytes to copy.
 */
 inline static void 
-Copy(const void* from, void* to, uint32 size)
+Copy(const void* from, void* to, SizeT size)
 {
 	std::memcpy(to, from, size);
 }
@@ -161,7 +161,7 @@ Move(void* from, void* to, uint32 size)
 */
 template <class TYPE>
 inline static void
-FillDuffs(TYPE* buf, uint32 elements, const TYPE& val)
+FillDuffs(TYPE* buf, SizeT elements, const TYPE& val)
 {
 	TYPE *to = buf;
     auto count = elements;
@@ -191,7 +191,7 @@ FillDuffs(TYPE* buf, uint32 elements, const TYPE& val)
 */
 template <class TYPE>
 inline static void
-Fill(TYPE* buf, uint32 elements, const TYPE& val)
+Fill(TYPE* buf, SizeT elements, const TYPE& val)
 {
 	std::fill(buf, buf + elements, val);
 }
@@ -204,7 +204,7 @@ Fill(TYPE* buf, uint32 elements, const TYPE& val)
 	@param val			The byte value we want to fill with.
 */
 inline static void
-Fill(void* buf, uint32 size, uint8 val)
+Fill(void* buf, SizeT size, uint8 val)
 {
 	std::memset(buf, val, size);
 }

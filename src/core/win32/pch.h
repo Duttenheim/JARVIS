@@ -3,7 +3,7 @@
 /**
 	@file core/win32/pch.h
 
-	Main configure file for types and OS-specific stuff.
+	Main configure file for types and Win32-specific stuff.
 
 	(C) 2015 See the LICENSE file.
 */

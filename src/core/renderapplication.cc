@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
-/**
-    @class JARVIS::Core::RenderApplication
- 	(C) 2016 See the LICENSE file.
-*/
+//  @class JARVIS::Core::RenderApplication
+// 	(C) 2016 See the LICENSE file.
+//------------------------------------------------------------------------------
+#include "config.h"
 #include "renderapplication.h"
 namespace JARVIS {
 namespace Core

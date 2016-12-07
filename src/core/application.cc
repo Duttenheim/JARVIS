@@ -1,8 +1,9 @@
 //------------------------------------------------------------------------------
-/**
-    @class JARVIS::Core::Application
- 	(C) 2015 See the LICENSE file.
-*/
+//  @class JARVIS::Core::Application
+// 	(C) 2015 See the LICENSE file.
+//------------------------------------------------------------------------------
+
+#include "config.h"
 #include "application.h"
 #include "io/assigns.h"
 namespace JARVIS {

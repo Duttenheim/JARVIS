@@ -10,7 +10,7 @@
 	If at any point the reference count reaches 0, the object is automatically deleted.
 	Classes used as a template to Ptr must inherit from Ref in order to be a Ptr valid type.
     
-    Ptr is kept in the main namespace to avoid ambiguity when using the Core namespace, and to avoid
+    Ptr is kept in the main (JARVIS) namespace to avoid ambiguity when using the Core namespace, and to avoid
     having to write Core::Ptr everywhere.
 	
 	(C) 2015 See the LICENSE file.

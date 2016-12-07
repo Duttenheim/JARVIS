@@ -1,12 +1,11 @@
 #pragma once
 //------------------------------------------------------------------------------
-/**
-	@file core/singleton.h
-
-	Singleton macros.
-
-	(C) 2015 See the LICENSE file.
-*/
+//	@file core/singleton.h
+//
+//	Singleton macros.
+//
+//	(C) 2015 See the LICENSE file.
+//------------------------------------------------------------------------------
 
 #define __SingletonDecl(type) \
 	public: \

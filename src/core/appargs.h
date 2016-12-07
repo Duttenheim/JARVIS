@@ -8,6 +8,7 @@
 	(C) 2016 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
+#include "config.h"
 namespace JARVIS {
 namespace Core
 {

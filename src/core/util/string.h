@@ -24,7 +24,7 @@ public:
 	/// construct from c string
 	String(const char* buf);
 	/// construct from c string with a given size
-	String(const char* buf, uint32 size);
+	String(const char* buf, SizeT size);
 	/// construct from other string
 	String(const String& rhs);
 	/// move constructor from other string
@@ -40,11 +40,11 @@ public:
 	/// set buffer from c string
 	void Set(const char* str);
 	/// set buffer from c string starting at offset and copying length
-	void Set(const char* str, uint32 length);
+	void Set(const char* str, SizeT length);
 	/// set buffer from other string
 	void Set(const String& str);
 	/// set buffer from other string starting at offset and copying length characters
-	void Set(const String& str, uint32 length);
+	void Set(const String& str, SizeT length);
 
 	/// addition-assign operator with c string
 	void operator+=(const char* str);
@@ -81,18 +81,18 @@ public:
 	/// append c string 
 	void Append(const char* str);
 	/// append range of c string
-	void Append(const char* str, uint32 length);
+	void Append(const char* str, SizeT length);
 	/// append from other string
 	void Append(const String& str);
 	/// append range of other string
-	void Append(const String& str, uint32 length);
+	void Append(const String& str, SizeT length);
     
     /// split string into segments
     Array<String> Split(const String& tokens) const;
     /// find first index of character
-    int32 FindFirst(char c, uint32 offset = 0) const;
+	ptrdiff FindFirst(char c, uint32 offset = 0) const;
     /// find last index of character
-    int32 FindLast(char c, uint32 offset = 0) const;
+	ptrdiff FindLast(char c, uint32 offset = 0) const;
     /// extract string to string, returns match if failed, inclusive means you include match
     String ExtractToString(const String& match, bool inclusive = false) const;
     /// extract to end from string, returns match if failed, inclusive means you include match
@@ -115,7 +115,7 @@ public:
     static Core::String Sprintf(const char* format, ...);
 
 	/// get length of string
-	const uint32 Length() const;
+	const SizeT Length() const;
 	/// get c pointer
 	const char* CharPtr() const;
     /// generate hash for string
@@ -129,8 +129,8 @@ private:
 
 	char stackBuffer[StackBufferSize];
 	char* heapBuffer;
-	uint32 heapBufferLength;
-	uint32 length;
+	SizeT heapBufferLength;
+	SizeT length;
 };
 
 //------------------------------------------------------------------------------
@@ -161,7 +161,7 @@ String::String(const char* buf) :
 /**
 */
 inline
-String::String(const char* buf, uint32 size) :
+String::String(const char* buf, SizeT size) :
 	heapBuffer(nullptr),
 	heapBufferLength(0),
 	length(0)
@@ -243,7 +243,7 @@ String::Set(const char* str)
 /**
 */
 inline void
-String::Set(const char* str, uint32 length)
+String::Set(const char* str, SizeT length)
 {
 	if (nullptr == str)
 	{
@@ -289,7 +289,7 @@ String::Set(const String& str)
 /**
 */
 inline void
-String::Set(const String& str, uint32 length)
+String::Set(const String& str, SizeT length)
 {
 	this->Set(str.CharPtr(), length);
 }
@@ -482,9 +482,9 @@ String::Append(const char* str)
     @param length The size of str to use (in characters).
 */
 inline void
-String::Append(const char* str, uint32 length)
+String::Append(const char* str, SizeT length)
 {
-	uint32 len = this->length + length;
+	SizeT len = this->length + length;
 	if (len < StackBufferSize)
 	{
 		Memory::Copy<char>(str, this->stackBuffer + this->length, length);
@@ -529,7 +529,7 @@ String::Append(const String& str)
     @param length The size of str to use (in characters).
 */
 inline void
-String::Append(const String& str, uint32 length)
+String::Append(const String& str, SizeT length)
 {
 	this->Append(str.CharPtr(), length);
 }
@@ -562,7 +562,7 @@ String::Split(const String& tokens) const
     @param offset The offset from the start of the buffer to start looking.
     @return index or -1 if c is not located.
 */
-inline int32
+inline ptrdiff
 String::FindFirst(char c, uint32 offset) const
 {
     if (this->length > 0)
@@ -581,7 +581,7 @@ String::FindFirst(char c, uint32 offset) const
     @param offset The offset from the start of the buffer to start looking.
     @return index or -1 if c is not located.
 */
-inline int32
+inline ptrdiff
 String::FindLast(char c, uint32 offset) const
 {
     if (this->length > 0)
@@ -608,7 +608,7 @@ String::ExtractToString(const String& match, bool inclusive) const
         const char* ptr = this->CharPtr();
         const char* other = match.CharPtr();
         const char* offset = strstr(ptr, other);
-        uint32 len = inclusive ? match.length : 0;
+		SizeT len = inclusive ? match.length : 0;
         if (offset != nullptr) return String(ptr, offset - ptr + len);
         else                   return *this;
     }
@@ -630,7 +630,7 @@ String::ExtractToEndFromString(const String& match, bool inclusive) const
         const char* ptr = this->CharPtr();
         const char* other = match.CharPtr();
         const char* offset = strstr(ptr, other);
-        uint32 len = inclusive ? 0 : match.length;
+		SizeT len = inclusive ? 0 : match.length;
         if (offset != nullptr) return String(offset + len);
         else                   return *this;
     }
@@ -660,7 +660,7 @@ inline String
 String::ExtractToFirstChar(char c) const
 {
     String ret;
-    int32 index = this->FindFirst(c);
+    ptrdiff index = this->FindFirst(c);
     if (index != -1)
     {
         ret.Set(this->CharPtr(), index);
@@ -678,7 +678,7 @@ inline String
 String::ExtractToLastChar(char c) const
 {
     String ret;
-    int32 index = this->FindLast(c);
+	ptrdiff index = this->FindLast(c);
     if (index != -1)
     {
         ret.Set(this->CharPtr(), index);
@@ -696,7 +696,7 @@ inline String
 String::ExtractToEndFromFirst(char c) const
 {
     String ret;
-    int32 index = this->FindFirst(c);
+	ptrdiff index = this->FindFirst(c);
     if (index != -1)
     {
         ret.Set(this->CharPtr() + index);
@@ -714,7 +714,7 @@ inline String
 String::ExtractToEndFromLast(char c) const
 {
     String ret;
-    int32 index = this->FindLast(c);
+	ptrdiff index = this->FindLast(c);
     if (index != -1)
     {
         ret.Set(this->CharPtr() + index);
@@ -759,7 +759,7 @@ String::Sprintf(const char* format, ...)
 /**
     Return length of string.
 */
-inline const uint32
+inline const SizeT
 String::Length() const
 {
     return this->length;
@@ -786,8 +786,8 @@ String::Hash() const
 {
     uint32 hash = 0;
     const char* ptr = this->CharPtr();
-    uint32 len = this->length;
-    uint32 i;
+	SizeT len = this->length;
+	SizeT i;
     for (i = 0; i < len; i++)
     {
         hash += ptr[i];

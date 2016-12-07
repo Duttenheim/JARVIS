@@ -10,7 +10,7 @@
 #else
 #define STATIC_ASSERT assert
 #define CONST_EXPR const
-#pragma message ("static assert will not truly be static if constexpr is not present...")
+#pragma message ("When not compiling with C++11, constexpr and static_assert won't be const or static.")
 #endif
 
 namespace JARVIS {

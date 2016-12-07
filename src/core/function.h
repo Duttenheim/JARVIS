@@ -47,9 +47,9 @@ public:
 	virtual ~Function();
     
     /// assignment operator from function
-    template void operator=(const Function<RET(PARAMS...)>& rhs);
+    void operator=(const Function<RET(PARAMS...)>& rhs);
     /// move operator from function
-    template void operator=(Function<RET(PARAMS...)>&& rhs);
+    void operator=(Function<RET(PARAMS...)>&& rhs);
     
     /// compare if function is null pointer
     const bool operator==(std::nullptr_t ptr) const;

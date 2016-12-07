@@ -1,11 +1,11 @@
+#pragma once
 //------------------------------------------------------------------------------
-/**
-    @file core/config.h
-    
-	Main configure file for types and generic OS-specific stuff.
-	
-	(C) 2015 See the LICENSE file.
-*/
+//  @file core/config.h
+//    
+//	Main configure file for types and generic OS-specific stuff.
+//	
+//	(C) 2015 See the LICENSE file.
+//------------------------------------------------------------------------------
 #ifdef __WIN32__
 #include "win32/pch.h"
 #elif __APPLE__
@@ -34,6 +34,9 @@ typedef int16_t		int16;
 typedef uint8_t		uint8;
 typedef int8_t		int8;
 typedef uint8_t		uchar;
+typedef ptrdiff_t	ptrdiff;
+typedef size_t		SizeT;
+typedef ptrdiff_t	IndexT;
 
 // eh, windows already defines byte, so don't redefine byte if we are running windows
 #ifndef __WIN32__
@@ -63,6 +66,7 @@ using Tuple = std::tuple<TYPE...>;
 
 #if __WIN32__
 #define align_16 __declspec(align(16))
+#pragma warning (disable : 4996)	// CRT secure warning
 #elif __APPLE__ || __UNIX__
 #define align_16 __attribute__((aligned(16))) __attribute((packed))
 #else
@@ -110,10 +114,11 @@ using Tuple = std::tuple<TYPE...>;
 
 namespace JARVIS {
 
+// define shorthand aliases for common types
 template <class TYPE>
 using Array = Core::Array<TYPE>;
-
 using String = Core::String;
 using Ref = Core::Ref;
+
 }
 #endif

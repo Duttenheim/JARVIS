@@ -12,6 +12,7 @@ SET(core
 	constness.h
 	debug.h
 	enum.h
+	function.h
 	mem.h
 	poolalloc.h
 	ptr.h
@@ -49,11 +50,6 @@ SET(core_threads
 )
 SOURCE_GROUP("threads" FILES ${core_threads})
 
-SET(core_functional
-	functional/function.h
-)
-SOURCE_GROUP("functional" FILES ${core_functional})
-
 SET(core_network
 	network/socket.h
 	network/socket.cc
@@ -84,6 +80,8 @@ IF(WIN32)
 		win32/pch.h
 		win32/win32socket.h
 		win32/win32socket.cc
+		win32/sysfunc.h
+		win32/sysfunc.cc
 	)
 	SOURCE_GROUP("os" FILES ${core_os})
 ELSEIF(APPLE)	
@@ -102,6 +100,8 @@ ELSEIF(APPLE)
 ELSEIF(ANDROID)
 	SET(core_os
 		android/pch.h
+		posix/posixsocket.h
+		posix/posixsocket.cc
 		android/sysfunc.h
 		android/sysfunc.cc
 	)
@@ -111,11 +111,13 @@ ELSE()
 		posix/pch.h
 		posix/posixsocket.h
 		posix/posixsocket.cc
+		posix/sysfunc.h
+		posix/sysfunc.cc
 	)
 	SOURCE_GROUP("os" FILES ${core_os})
 ENDIF()
 
-ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_threads} ${core_functional} ${core_math} ${core_os} ${core_io} ${core_network})
+ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_threads} ${core_math} ${core_os} ${core_io} ${core_network})
 JARVIS_SETUP_TARGET(core)
 TARGET_INCLUDE_DIRECTORIES(core PUBLIC ${JARVIS_SOURCE_DIR}/src/core)
 TARGET_LINK_LIBRARIES(core ext ${core_os_libs})

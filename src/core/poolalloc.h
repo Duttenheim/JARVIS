@@ -5,7 +5,7 @@
 	
     Implements a pool-based custom memory allocator.
     
-    Concept and most code from:
+    Concept and the majority of the code from:
     https://github.com/floooh/oryol/blob/master/code/Modules/Core/Memory/poolAllocator.h
 	
 	(C) 2015 See the LICENSE file.

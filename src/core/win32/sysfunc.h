@@ -1,25 +1,27 @@
 #pragma once
 //------------------------------------------------------------------------------
 /**
-	@class JARVIS::Win32::Socket
+	@class JARVIS::Win32::SysFunc
 	
-	Implements a WINSOCK interface.
+	Implements Windows-specific system functions
 	
-	(C) 2016  See the LICENSE file.
+	(C) 2016 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
-#include "ref.h"
 namespace JARVIS {
 namespace Win32
 {
-class Socket : public Core::Ref
+class SysFunc
 {
-	__ClassDecl(Socket);
 public:
 	/// constructor
-	Socket();
+	SysFunc();
 	/// destructor
-	virtual ~Socket();
+	virtual ~SysFunc();
+
+	/// get location of exe
+	Core::String BinDir();
 private:
 };
+
 }} // namespace JARVIS::Win32
