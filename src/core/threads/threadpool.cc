@@ -116,6 +116,18 @@ ThreadPool::Running(const Ptr<ThreadPoolJob>& job)
 
 //------------------------------------------------------------------------------
 /**
+*/
+void
+ThreadPool::Sync()
+{
+    while (this->pendingJobs.Size() > 0 || this->Working())
+    {
+        this->Update();
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
     Helper function for waiting for a thread to finish.
     Joins the thread if it's running and kill is true.
 */

@@ -3,7 +3,7 @@
 /**
 	@class JARVIS::Math::Mat3
 	
-    3x3 Matrix implementation
+    3x3 Matrix implementation, well, not at the moment
 	
 	(C) 2015 See the LICENSE file.
 */

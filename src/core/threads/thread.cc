@@ -13,7 +13,7 @@ namespace Threading
 /**
 */
 Thread::Thread() :
-    running({false}),
+    running(false),
     thread(nullptr)
 {
     // empty

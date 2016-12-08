@@ -20,14 +20,50 @@
 
 #include <random>
 
+
+class A
+{
+public:
+    
+    virtual void PrintMe()
+    {
+        printf("Hello, I am class A!\n");
+    }
+
+    int x, y, z;
+};
+
+class B : public A
+{
+public:
+    B(int i) : i(i), j(1), k(1) {};
+    
+    void DontPrintMe()
+    {
+       printf("Don't!!\n");
+    }
+    void PrintMe()
+    {
+        printf("Hello, I am class B number %d!\n", this->i);
+    }
+
+    int i, j, k;
+};
+
+
 using namespace JARVIS::Math;
 using namespace JARVIS::Core;
 using namespace JARVIS::Threading;
 #define NUM_OPS 2000000
 
+void blorf(int i)
+{
+
+}
+
 JARVIS_MAIN
 {
-    
+
     Vec4 v1(1,2,3,4), v2(5,6,7,8);
     Vec4 v3 = v1 + v2;
     Vec4 v4(1);
@@ -64,7 +100,7 @@ JARVIS_MAIN
             out[i] = Vec4::cross(in[i] + Vec4(1,2,3,4), u[0]);
         }
         const Vec4& vec = out[i-1];
-        printf("Result: %f, %f, %f, %f\n", vec.x(), vec.y(), vec.z(), vec.w());
+        //printf("Result: %f, %f, %f, %f\n", vec.x(), vec.y(), vec.z(), vec.w());
     });
     
     Ptr<Timer> timer = Timer::Create();
@@ -87,7 +123,9 @@ JARVIS_MAIN
     for (uint32 i = 0; i < 16; i++)
         pool->Enqueue(specialThreadProc, ctx);
     
-    do { pool->Update(); } while(pool->Working());
+    // sync pool
+    pool->Sync();
+
     timer->Stop();
     printf("Time taken to complete cluster of jobs: %fs\n", timer->Time());
     
@@ -102,12 +140,12 @@ JARVIS_MAIN
                 std::mt19937 mt(rd());
                 std::uniform_int_distribution<uint32> dist(100, 1000);
                 Threading::Sleep(dist(mt));
-                printf("Thread number %d\n", threadIdx);
+                //printf("Thread number %d\n", threadIdx);
             });
             pool->Enqueue(proc, ctx);
             threadIdx++;
         }
-        pool->Update();
+        pool->Sync();
         
         Threading::Sleep(10);
     }

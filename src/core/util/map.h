@@ -31,9 +31,9 @@ public:
 	Map();
 	/// destructor
 	virtual ~Map();
-
-	/// kvp
-	typedef std::tuple<KEY, VALUE> Kvp;
+    
+    /// forward declare struct
+    struct Kvp;
 
 	/// key-lookup operator for read only access
 	const VALUE& operator[](const KEY& key) const;
@@ -75,6 +75,46 @@ public:
 
 	/// get size of map
 	const uint32 Size() const;
+    
+    struct Kvp
+    {
+        /// constructor from tuple
+        Kvp(std::tuple<KEY, VALUE>&& tuple)
+        {
+            this->tuple = tuple;
+        }
+        /// constructor from key-value pair
+        Kvp(const KEY& key, const VALUE& value)
+        {
+            this->tuple = std::make_tuple(key, value);
+        }
+        
+        std::tuple<KEY, VALUE> tuple;
+        
+        /// less than operator
+        bool operator<(const Kvp& rhs) const
+        {
+            return std::get<0>(this->tuple) < std::get<0>(rhs.tuple);
+        }
+        
+        /// equality operator
+        bool operator==(const Kvp& rhs) const
+        {
+            return std::get<0>(this->tuple) == std::get<0>(rhs.tuple);
+        }
+        
+        /// inequality operator
+        bool operator!=(const Kvp& rhs) const
+        {
+            return std::get<0>(this->tuple) != std::get<0>(rhs.tuple);
+        }
+        
+        /// greater than operator
+        bool operator>(const Kvp& rhs) const
+        {
+            return std::get<0>(this->tuple) > std::get<0>(rhs.tuple);
+        }
+    };
 
 private:
 	bool inMassInsertion;
@@ -106,52 +146,12 @@ JARVIS::Core::Map<KEY, VALUE>::~Map()
 /**
 */
 template <class KEY, class VALUE>
-inline bool
-operator<(const std::tuple<KEY, VALUE>& lhs, const std::tuple<KEY, VALUE>& rhs)
-{
-	return std::get<0>(lhs) < std::get<0>(rhs);
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-template <class KEY, class VALUE>
-inline bool
-operator>(const std::tuple<KEY, VALUE>& lhs, const std::tuple<KEY, VALUE>& rhs)
-{
-	return std::get<0>(lhs) > std::get<0>(rhs);
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-template <class KEY, class VALUE>
-inline bool
-operator==(const std::tuple<KEY, VALUE>& lhs, const std::tuple<KEY, VALUE>& rhs)
-{
-	return std::get<0>(lhs) == std::get<0>(rhs);
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-template <class KEY, class VALUE>
-inline bool
-operator!=(const std::tuple<KEY, VALUE>& lhs, const std::tuple<KEY, VALUE>& rhs)
-{
-	return std::get<0>(lhs) != std::get<0>(rhs);
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-template <class KEY, class VALUE>
 inline VALUE&
 Map<KEY, VALUE>::operator[](const KEY& key)
 {
-	int32 index = this->data.SearchBinary(std::forward_as_tuple(key, VALUE()));
+	int32 index = this->data.SearchBinary(Kvp(std::forward_as_tuple(key, VALUE())));
 	j_assert(index != -1);
-	return std::get<1>(this->data[index]);
+	return std::get<1>(this->data[index].tuple);
 }
 
 //------------------------------------------------------------------------------
@@ -163,14 +163,14 @@ Map<KEY, VALUE>::operator[](const KEY& key) const
 {
 	int32 index = this->data.SearchBinary(std::forward_as_tuple(key, VALUE()));
 	j_assert(index != -1);
-	return std::get<1>(this->data[index]);
+	return std::get<1>(this->data[index].tuple);
 }
 
 //------------------------------------------------------------------------------
 /**
 */
 template <class KEY, class VALUE>
-inline const std::tuple<KEY, VALUE>&
+inline const typename Map<KEY, VALUE>::Kvp&
 Map<KEY, VALUE>::Pair(const uint32 index) const
 {
 	j_assert(index < this->data.Size());
@@ -217,7 +217,7 @@ template <class KEY, class VALUE>
 inline void
 Map<KEY, VALUE>::Insert(const KEY& key, const VALUE& value)
 {
-	this->data.InsertOrdered(std::forward_as_tuple(key, value));
+	this->data.InsertOrdered(Kvp(std::forward_as_tuple(key, value)));
 }
 
 //------------------------------------------------------------------------------
@@ -237,7 +237,7 @@ template <class KEY, class VALUE>
 inline bool
 Map<KEY, VALUE>::Contains(const KEY& key)
 {
-	return this->data.SearchBinary(std::forward_as_tuple(key, VALUE())) != -1;
+	return this->data.SearchBinary(Kvp(std::forward_as_tuple(key, VALUE()))) != -1;
 }
 
 //------------------------------------------------------------------------------
@@ -257,7 +257,7 @@ template <class KEY, class VALUE>
 inline void
 Map<KEY, VALUE>::Remove(const KEY& key)
 {
-    uint32 index = this->data.SearchBinary(std::forward_as_tuple(key, VALUE()));
+    uint32 index = this->data.SearchBinary(Kvp(std::forward_as_tuple(key, VALUE())));
     j_assert(index != -1);
     this->data.RemoveIndex(index);
 }

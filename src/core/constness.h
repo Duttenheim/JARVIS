@@ -21,10 +21,10 @@ inline CONST_EXPR uint32 __StringHash(const char* ptr)
     return !*ptr ? 5381 : (__StringHash(ptr + 1) * 33) ^ *ptr;
 }
 
-// forwarding function which doesn't require template repetition
+// forwarding function which doesn't require std
 template <class T>
 inline CONST_EXPR T&&
-Forward(T f) { return std::forward<T>(f); };
+Forward(T f) { return std::forward(f); };
 
 template <class T>
 inline CONST_EXPR T&&
@@ -35,7 +35,7 @@ Move(T f) { return std::move(f); }
 // convenience functions which are to be used when one doesn't want verbose calls
 template <class T>
 inline CONST_EXPR T&&
-Fw(T f) { return std::forward<T>(f); }
+Fw(T f) { return std::forward(f); }
 
 // same as above but for moves
 template <class T>

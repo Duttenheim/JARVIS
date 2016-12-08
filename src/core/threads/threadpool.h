@@ -34,7 +34,17 @@ public:
         
         ThreadPoolJob() : func(nullptr), ctx({nullptr, nullptr, nullptr}), idx(-1) {};
         ThreadPoolJob(const ThreadPoolJob& rhs) : func(rhs.func), ctx(rhs.ctx), idx(rhs.idx) {};
-        ~ThreadPoolJob() { this->func = nullptr; this->idx = -1; }
+        ThreadPoolJob(ThreadPoolJob&& rhs)
+        {
+            this->func = rhs.func;
+            this->idx = rhs.idx;
+            this->ctx = rhs.ctx;
+            
+            rhs.func = nullptr;
+            rhs.idx = -1;
+            rhs.ctx = {nullptr, nullptr, nullptr};
+        }
+        virtual ~ThreadPoolJob() { this->func = nullptr; this->idx = -1; }
         void operator=(ThreadPoolJob&& rhs)
         {
             this->func = rhs.func;
@@ -60,6 +70,8 @@ public:
     void Wait(const Ptr<ThreadPoolJob>& job);
     /// check if thread is running
     bool Running(const Ptr<ThreadPoolJob>& job);
+    /// waits for all jobs to finish
+    void Sync();
 
     /// returns false if there are no pending jobs
     const bool Working() const;
@@ -81,6 +93,6 @@ private:
 inline const bool
 ThreadPool::Working() const
 {
-    return this->activeThreads.Size() != 0;
+    return this->activeThreads.Size() > 0;
 }
 }} // namespace JARVIS::Core

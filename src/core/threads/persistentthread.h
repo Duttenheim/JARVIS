@@ -42,7 +42,6 @@ private:
     Array<Threading::ThreadJobContext> contexts;
     std::atomic<bool> working;
     Ptr<Thread> thread;
-    //std::thread* thread;
 };
 
 //------------------------------------------------------------------------------

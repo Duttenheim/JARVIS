@@ -153,8 +153,8 @@ private:
     __m128_vec v;
 };
 
-//CONST_EXPR __m128_vec Vec4::zero;
-//CONST_EXPR __m128_vec Vec4::one;
+CONST_EXPR __m128_vec Vec4::zero;
+CONST_EXPR __m128_vec Vec4::one;
 
 //------------------------------------------------------------------------------
 /**
