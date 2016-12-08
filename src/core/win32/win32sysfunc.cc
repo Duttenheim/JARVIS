@@ -4,18 +4,26 @@
 // (C) 2016 Individual contributors, see AUTHORS file
 //------------------------------------------------------------------------------
 #include "config.h"
-#include "sysfunc.h"
+#include "win32sysfunc.h"
 
 namespace JARVIS {
 namespace Win32
 {
 
+int SysFunc::WSAStatus = 0;
+LPWSADATA SysFunc::WSAData;
 //------------------------------------------------------------------------------
 /**
 */
 SysFunc::SysFunc()
 {
-	// empty
+	// setup WSA if not already
+	if (SysFunc::WSAStatus == 0)
+	{
+		SysFunc::WSAData = new WSADATA;
+		SysFunc::WSAStatus = WSAStartup(MAKEWORD(2, 2), SysFunc::WSAData);
+		j_assert(SysFunc::WSAStatus == 0);
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -23,7 +31,8 @@ SysFunc::SysFunc()
 */
 SysFunc::~SysFunc()
 {
-	// empty
+	WSACleanup();
+	delete SysFunc::WSAData;
 }
 
 #define MAXPATHLEN 1024

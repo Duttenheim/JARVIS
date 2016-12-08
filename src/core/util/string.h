@@ -90,15 +90,15 @@ public:
     /// split string into segments
     Array<String> Split(const String& tokens) const;
     /// find first index of character
-	ptrdiff FindFirst(char c, uint32 offset = 0) const;
+	ptrdiff FindFirst(char c, IndexT offset = 0) const;
     /// find last index of character
-	ptrdiff FindLast(char c, uint32 offset = 0) const;
+	ptrdiff FindLast(char c, IndexT offset = 0) const;
     /// extract string to string, returns match if failed, inclusive means you include match
     String ExtractToString(const String& match, bool inclusive = false) const;
     /// extract to end from string, returns match if failed, inclusive means you include match
     String ExtractToEndFromString(const String& match, bool inclusive = false) const;
     /// extract string to index
-    String ExtractToIndex(int32 index) const;
+    String ExtractToIndex(IndexT index) const;
     /// extract from beginning to first occurrence of char
     String ExtractToFirstChar(char c) const;
     /// extract from beginning to last occurrence of char
@@ -361,6 +361,7 @@ String::operator=(const char* str)
 inline void
 String::operator=(const String& str)
 {
+	j_assert(this != &str);
     this->Delete();
     this->Set(str);
 }
@@ -563,7 +564,7 @@ String::Split(const String& tokens) const
     @return index or -1 if c is not located.
 */
 inline ptrdiff
-String::FindFirst(char c, uint32 offset) const
+String::FindFirst(char c, IndexT offset) const
 {
     if (this->length > 0)
     {
@@ -582,7 +583,7 @@ String::FindFirst(char c, uint32 offset) const
     @return index or -1 if c is not located.
 */
 inline ptrdiff
-String::FindLast(char c, uint32 offset) const
+String::FindLast(char c, IndexT offset) const
 {
     if (this->length > 0)
     {
@@ -643,7 +644,7 @@ String::ExtractToEndFromString(const String& match, bool inclusive) const
     @param index Location within string buffer to split the string on.
 */
 inline String
-String::ExtractToIndex(int32 index) const
+String::ExtractToIndex(IndexT index) const
 {
     j_assert(index < this->length);
     String ret(this->CharPtr(), index);

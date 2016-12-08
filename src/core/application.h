@@ -9,13 +9,7 @@
 	(C) 2015 See the LICENSE file.
  */
 //------------------------------------------------------------------------------
-#ifdef __WIN32__
-#include "win32/sysfunc.h"
-#elif __APPLE__
-#include "apple/sysfunc.h"
-#elif __UNIX__
-#include "posix/sysfunc.h"
-#endif
+#include "sysfunc.h"
 #include "appargs.h"
 namespace JARVIS {
 namespace Core
@@ -57,13 +51,7 @@ protected:
     friend class JARVISAppDelegate;
     friend class JARVISViewDelegate;
     
-#if __APPLE__
-    Apple::SysFunc sysfunc;
-#elif __WIN32__
-    Win32::SysFunc sysfunc;
-#elif __LINUX__
-    Posix::SysFunc sysfunc;
-#endif
+	SysFunc sysfunc;
     
     AppArgs args;
     State state;

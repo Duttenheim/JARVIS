@@ -39,6 +39,7 @@
 #include <strsafe.h>
 #include <wininet.h>
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #include <rpc.h>
 #include <dbghelp.h>
 #include <intrin.h>

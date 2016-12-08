@@ -1,27 +1,25 @@
 #pragma once
 //------------------------------------------------------------------------------
 /**
-	@class JARVIS::Win32::SysFunc
+	@class JARVIS::Util::Queue
 	
-	Implements Windows-specific system functions
+	Implements a LIFO list.
 	
 	(C) 2016 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
 namespace JARVIS {
-namespace Win32
+namespace Util
 {
-class SysFunc
+template <class TYPE>
+class Queue
 {
 public:
 	/// constructor
-	SysFunc();
+	Queue();
 	/// destructor
-	virtual ~SysFunc();
-
-	/// get location of exe
-	Core::String BinDir();
+	virtual ~Queue();
 private:
+	Util::Array<TYPE> arr;
 };
-
-}} // namespace JARVIS::Win32
+}} // namespace JARVIS::Util

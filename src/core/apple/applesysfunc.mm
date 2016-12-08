@@ -3,7 +3,7 @@
     @class JARVIS::Apple::SysFunc
  	(C) 2015 See the LICENSE file.
 */
-#include "sysfunc.h"
+#include "applesysfunc.h"
 #include "application.h"
 
 @interface JARVISAppDelegate<NSApplicationDelegate> : NSObject

@@ -24,6 +24,7 @@
 #include <initializer_list>
 #include <limits.h>
 #include <float.h>
+#include <atomic>
 
 typedef uint64_t    uint64;
 typedef int64_t     int64;
@@ -36,7 +37,7 @@ typedef int8_t		int8;
 typedef uint8_t		uchar;
 typedef ptrdiff_t	ptrdiff;
 typedef size_t		SizeT;
-typedef ptrdiff_t	IndexT;
+typedef size_t		IndexT;
 
 // eh, windows already defines byte, so don't redefine byte if we are running windows
 #ifndef __WIN32__
@@ -73,7 +74,7 @@ using Tuple = std::tuple<TYPE...>;
 #endif
 
 // hmm, maybe move this to each platforms pch.h
-#if __WIN32__
+#if __WIN32__ && __J_EXE_WINDOWS__
     #define JARVIS_MAIN  using namespace JARVIS; \
     int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd)
 #else

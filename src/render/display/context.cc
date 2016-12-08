@@ -3,6 +3,7 @@
     @class JARVIS::Base::Context
  	(C) 2015 See the LICENSE file.
 */
+#include "config.h"
 #include "context.h"
 #include "../context.h"
 namespace JARVIS {

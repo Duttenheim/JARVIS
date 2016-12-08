@@ -10,7 +10,7 @@
  */
 //------------------------------------------------------------------------------
 #include "util/string.h"
-#include "functional/function.h"
+#include "function.h"
 #include "../context.h"
 #include "../rendertarget.h"
 

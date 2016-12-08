@@ -3,6 +3,7 @@
     @class JARVIS::GL4::VertexBuffer
  	(C) 2015 See the LICENSE file.
 */
+#include "config.h"
 #include "vertexbuffer.h"
 #include "types.h"
 namespace JARVIS {

@@ -11,5 +11,5 @@ SOURCE_GROUP("" FILES ${windowtest_src})
 	
 ADD_EXECUTABLE(windowtest ${windowtest_src})
 TARGET_LINK_LIBRARIES(windowtest core render)
-JARVIS_SETUP_TARGET(windowtest)
+JARVIS_SETUP_TARGET(windowtest Windows)
 SET_TARGET_PROPERTIES(windowtest PROPERTIES FOLDER "JARVIS/tests")
