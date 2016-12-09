@@ -9,56 +9,44 @@
  */
 //------------------------------------------------------------------------------
 #include "util/string.h"
+#include "interface/socket.h"
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <netinet/in.h>
 namespace JARVIS {
 namespace Apple
 {
-class Socket
+class Socket : public Interface::Socket
 {
+    __ClassDecl(Socket);
 public:
     /// constructor
     Socket();
     /// destructor
     virtual ~Socket();
     
-    /// open socket on address and port
-    void Open();
-    /// close socket, asserts it is open already
-    void Close();
-    /// returns true if socket is open
-    bool IsOpen() const;
+    /// setup socket as listener
+    void Listen(const uint16 port);
     
-    /// connects socket to address and port
-    void Connect(const Core::String& addr, const uint16 port);
-    /// disconnects socket, which makes it connectable again
-    void Disconnect();
-    /// returns true if socket is connected
-    bool IsConnected() const;
+    /// accept new connection
+    Ptr<Interface::Socket> Accept();
+    
+    /// send data on socket
+    void Send(const char* data, SizeT size);
+    /// check if any pending data is available
+    bool PendingData();
+    /// receive data, returns number of bytes actually read
+    SizeT Receive(char* data, SizeT size);
+    
+    /// close the connection
+    void Close();
     
 private:
-    bool open;
-    bool connected;
-    sockaddr ip;
-    int32 socket;
+    /// connect socket internally
+    void __Connect();
+    
+    sockaddr_in ip;
+    int32 sock;
 };
-
-//------------------------------------------------------------------------------
-/**
-*/
-inline bool
-Socket::IsOpen() const
-{
-    return this->open;
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-inline bool
-Socket::IsConnected() const
-{
-    return this->connected;
-}
 
 }} // namespace JARVIS::Apple

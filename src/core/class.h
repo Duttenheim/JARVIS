@@ -87,6 +87,14 @@ CONST_EXPR bool IsDerived()
     } \
     __InheritanceCompare(type)
 
+#define __ClassDeclAbstract(type) \
+    static Core::TypeInfo RTTI; \
+    static CONST_EXPR uint32 Hash() \
+    { \
+        return JARVIS::Core::__StringHash(#type);\
+    } \
+    __InheritanceCompare(type)
+
 #define __ClassDeclPool(type) \
     private: \
     static Core::PoolAlloc<type, 256, 256> __pool; \

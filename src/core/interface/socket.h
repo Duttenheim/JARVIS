@@ -15,7 +15,7 @@ namespace Interface
 {
 class Socket : public Ref
 {
-	__ClassDecl(Socket);
+	__ClassDeclAbstract(Socket);
 public:
 
 	enum class Protocol : uint8_t
@@ -39,11 +39,11 @@ public:
 	virtual ~Socket();
 
 	/// setup as listening device (server)
-	void Listen(const String& port);
+	void Listen(const uint16 port);
 	/// setup as connecting socket, port must be a part of address
 	void Connect(const String& address);
 	/// setup as connecting socket, port must be a part of address
-	void Connect(const String& address, const String& port);
+	void Connect(const String& address, const uint16 port);
 
 	/// block the application and accept a new connection
 	virtual Ptr<Interface::Socket> Accept() = 0;
@@ -63,7 +63,7 @@ protected:
 	/// actually connect
 	virtual void __Connect() = 0;
 
-	String port;
+	uint16 port;
 	String address;
     SocketState state;
 	Protocol proto;

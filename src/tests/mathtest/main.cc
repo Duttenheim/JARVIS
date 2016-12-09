@@ -24,30 +24,16 @@
 class A
 {
 public:
-    
-    virtual void PrintMe()
-    {
-        printf("Hello, I am class A!\n");
-    }
-
-    int x, y, z;
+    void Foobar(int i) {  printf("Foobar with integer %d\n", i); };
+    void Foobar(double d) {  printf("Foobar with integer %f\n", d); };
+protected:
+    virtual void Foobar() = 0;
 };
 
 class B : public A
 {
-public:
-    B(int i) : i(i), j(1), k(1) {};
-    
-    void DontPrintMe()
-    {
-       printf("Don't!!\n");
-    }
-    void PrintMe()
-    {
-        printf("Hello, I am class B number %d!\n", this->i);
-    }
-
-    int i, j, k;
+private:
+    void Foobar() { printf("Foobar without value\n"); }
 };
 
 
@@ -56,13 +42,11 @@ using namespace JARVIS::Core;
 using namespace JARVIS::Threading;
 #define NUM_OPS 2000000
 
-void blorf(int i)
-{
-
-}
-
 JARVIS_MAIN
 {
+
+    B* bptr = new B;
+    bptr->A::Foobar(5);
 
     Vec4 v1(1,2,3,4), v2(5,6,7,8);
     Vec4 v3 = v1 + v2;

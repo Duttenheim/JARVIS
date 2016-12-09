@@ -29,7 +29,7 @@ Socket::~Socket()
 /**
 */
 void
-Socket::Listen(const String& port)
+Socket::Listen(const uint16 port)
 {
 	j_assert(this->state == SocketState::Initial);
 	this->state = SocketState::Listening;
@@ -46,7 +46,7 @@ Socket::Connect(const String& address)
 	Array<String> fragments = address.Split(":");
 	j_assert_msg(fragments.Size() > 0, "Socket address must contain trailing :<port>");
 	this->address = fragments[0];
-	this->port = fragments[1];
+	this->port = atoi(fragments[1].CharPtr());
 
 	// open socket
 	this->__Connect();
@@ -56,7 +56,7 @@ Socket::Connect(const String& address)
 /**
 */
 void
-Socket::Connect(const String& address, const String& port)
+Socket::Connect(const String& address, const uint16 port)
 {
 	j_assert(this->state == SocketState::Initial);
 	this->address = address;
