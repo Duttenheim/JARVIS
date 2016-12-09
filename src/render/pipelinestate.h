@@ -6,22 +6,10 @@
 
 #if J_RENDERER_GL4
 #include "gl4/pipelinestate.h"
-namespace JARVIS {
-namespace Render
-{
-class PipelineState : public JARVIS::GL4::PipelineState
-{};
-__Ptr(PipelineState)
-}}
+__Wrap(Render, GL4, PipelineState);
 #elif J_RENDERER_METAL
 #include "metal/pipelinestate.h"
-namespace JARVIS {
-namespace Render
-{
-class PipelineState : public JARVIS::Metal::PipelineState
-{};
-__Ptr(PipelineState)
-}}
+__Wrap(Render, Metal, PipelineState);
 #else
 #error "PipelineState is not implemented using this renderer!"
 #endif

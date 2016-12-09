@@ -8,11 +8,11 @@ namespace JARVIS {
 namespace GL4 {
 namespace Types {
 
-using UsagePattern = Base::Buffer::UsagePattern;
-using FrequencyPattern = Base::Buffer::FrequencyPattern;
-using ImmutableFlags = Base::Buffer::ImmutableFlags;
-using AccessPattern = Base::Buffer::AccessPattern;
-using ComponentType = VertexBuffer::VertexComponent::ComponentType;
+using UsagePattern = Render::UsagePattern;
+using FrequencyPattern = Render::FrequencyPattern;
+using ImmutableFlags = Render::ImmutableFlags;
+using AccessPattern = Render::AccessPattern;
+using ComponentType = Render::ComponentType;
 
 //------------------------------------------------------------------------------
 /**

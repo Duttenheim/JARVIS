@@ -6,22 +6,10 @@
 
 #if J_RENDERER_GL4
 #include "gl4/texture.h"
-namespace JARVIS {
-namespace Render
-{
-class Texture : public JARVIS::GL4::Texture
-{};
-__Ptr(Texture)
-}}
+__Wrap(Render, GL4, Texture);
 #elif J_RENDERER_METAL
 #include "metal/texture.h"
-namespace JARVIS {
-namespace Render
-{
-class Texture : public JARVIS::Metal::Texture
-{};
-__Ptr(Texture)
-}}
+__Wrap(Render, Metal, Texture);
 #else
 #error "Texture is not implemented using this renderer!"
 #endif

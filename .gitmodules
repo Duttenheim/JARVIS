@@ -1,9 +1,9 @@
 [submodule "ext/opencv"]
 	path = ext/opencv
-	url = git@github.com:Itseez/opencv.git
+	url = https://github.com/opencv/opencv.git
 [submodule "ext/glfw_ext/glfw"]
 	path = ext/glfw_ext/glfw
-	url = git@github.com:glfw/glfw.git
+	url = https://github.com/glfw/glfw.git
 [submodule "ext/glew_ext/glew"]
 	path = ext/glew_ext/glew
 	url = https://github.com/gscept/glew.git

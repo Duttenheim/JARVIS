@@ -32,6 +32,10 @@ public:
 	/// copy constructor from raw pointer
 	Ptr(TYPE* rhs);
 
+	// make all pointer classes friends
+	template<class OTHERTYPE>
+	friend class Ptr;
+
 	/// copy constructor from smart pointer of other type
 	template<class OTHERTYPE> 
 	Ptr(const Ptr<OTHERTYPE>& rhs)

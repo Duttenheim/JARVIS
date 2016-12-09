@@ -6,22 +6,10 @@
 
 #if J_RENDERER_GL4
 #include "gl4/uniformbuffer.h"
-namespace JARVIS {
-namespace Render
-{
-class UniformBuffer : public JARVIS::GL4::UniformBuffer
-{};
-__Ptr(UniformBuffer)
-}}
+__Wrap(Render, GL4, UniformBuffer);
 #elif J_RENDERER_METAL
 #include "metal/uniformbuffer.h"
-namespace JARVIS {
-namespace Render
-{
-class UniformBuffer : public JARVIS::Metal::UniformBuffer
-{};
-__Ptr(UniformBuffer)
-}}
+__Wrap(Render, Metal, UniformBuffer);
 #else
 #error "UniformBuffer is not implemented using this renderer!"
 #endif

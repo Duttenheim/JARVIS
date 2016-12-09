@@ -24,6 +24,7 @@ SET(core
 	sysfunc.h
 	typeinfo.h
 	typeinfo.cc
+	wrap.h
 )
 
 SOURCE_GROUP("" FILES ${core})
@@ -53,9 +54,14 @@ SOURCE_GROUP("threads" FILES ${core_threads})
 
 SET(core_network
 	network/socket.h
-	network/socket.cc
 )
 SOURCE_GROUP("network" FILES ${core_network})
+
+SET(interface_network
+	interface/socket.h
+	interface/socket.cc
+)
+SOURCE_GROUP("interface" FILES ${interface_network})
 
 SET(core_math
 	math/vec4.h
@@ -123,7 +129,7 @@ IF(WIN32)
 	SET(OS_PLATFORM_LIBS "Ws2_32.lib")
 ENDIF()
 
-ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_threads} ${core_math} ${core_os} ${core_io} ${core_network})
+ADD_LIBRARY(core STATIC ${core} ${core_util} ${core_threads} ${core_math} ${core_os} ${core_io} ${core_network} ${interface_network})
 JARVIS_SETUP_TARGET(core Library)
 TARGET_INCLUDE_DIRECTORIES(core PUBLIC ${JARVIS_SOURCE_DIR}/src/core)
 TARGET_LINK_LIBRARIES(core ext ${core_os_libs} ${OS_PLATFORM_LIBS})

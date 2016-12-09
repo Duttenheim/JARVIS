@@ -112,6 +112,7 @@ using Tuple = std::tuple<TYPE...>;
 #include "enum.h"
 #include "poolalloc.h"
 #include "class.h"
+#include "wrap.h"
 
 namespace JARVIS {
 
