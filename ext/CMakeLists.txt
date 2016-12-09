@@ -7,8 +7,10 @@ IF (${J_PLATFORM_ANDROID})
 	INCLUDE(android-cmake/AndroidNdkModules.cmake)
 ENDIF()
 
-LIST(APPEND ext_subdirs "opencv")
-ADD_SUBDIRECTORY(opencv)
+IF (${J_BUILD_OPENCV})
+	LIST(APPEND ext_subdirs "opencv")
+	ADD_SUBDIRECTORY(opencv)
+ENDIF()
 
 IF(${J_RENDERER_GL4})
 	ADD_SUBDIRECTORY(glfw_ext)

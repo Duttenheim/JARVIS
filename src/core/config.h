@@ -1,11 +1,11 @@
+#pragma once
 //------------------------------------------------------------------------------
-/**
-    @file core/config.h
-    
-	Main configure file for types and generic OS-specific stuff.
-	
-	(C) 2015 See the LICENSE file.
-*/
+//  @file core/config.h
+//    
+//	Main configure file for types and generic OS-specific stuff.
+//	
+//	(C) 2015 See the LICENSE file.
+//------------------------------------------------------------------------------
 #ifdef __WIN32__
 #include "win32/pch.h"
 #elif __APPLE__
@@ -24,6 +24,7 @@
 #include <initializer_list>
 #include <limits.h>
 #include <float.h>
+#include <atomic>
 
 typedef uint64_t    uint64;
 typedef int64_t     int64;
@@ -34,6 +35,9 @@ typedef int16_t		int16;
 typedef uint8_t		uint8;
 typedef int8_t		int8;
 typedef uint8_t		uchar;
+typedef ptrdiff_t	ptrdiff;
+typedef size_t		SizeT;
+typedef size_t		IndexT;
 
 // eh, windows already defines byte, so don't redefine byte if we are running windows
 #ifndef __WIN32__
@@ -63,13 +67,14 @@ using Tuple = std::tuple<TYPE...>;
 
 #if __WIN32__
 #define align_16 __declspec(align(16))
+#pragma warning (disable : 4996)	// CRT secure warning
 #elif __APPLE__ || __UNIX__
 #define align_16 __attribute__((aligned(16))) __attribute((packed))
 #else
 #endif
 
 // hmm, maybe move this to each platforms pch.h
-#if __WIN32__
+#if __WIN32__ && __J_EXE_WINDOWS__
     #define JARVIS_MAIN  using namespace JARVIS; \
     int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd)
 #else
@@ -107,12 +112,13 @@ using Tuple = std::tuple<TYPE...>;
 #include "enum.h"
 #include "poolalloc.h"
 #include "class.h"
+#include "wrap.h"
 
 namespace JARVIS {
 
+// define shorthand aliases for common types
 template <class TYPE>
 using Array = Core::Array<TYPE>;
-
 using String = Core::String;
 using Ref = Core::Ref;
 

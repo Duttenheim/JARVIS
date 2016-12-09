@@ -1,8 +1,7 @@
 //------------------------------------------------------------------------------
-/**
-    @class JARVIS::Core::ThreadPool
- 	(C) 2015 See the LICENSE file.
-*/
+//  @class JARVIS::Core::ThreadPool
+// 	(C) 2015 See the LICENSE file.
+//------------------------------------------------------------------------------
 #include "config.h"
 #include "threadpool.h"
 namespace JARVIS {

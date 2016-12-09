@@ -38,7 +38,7 @@ Exception(const char* exp, const char* file, int line)
 {
 	const char* format = "JARVIS encountered an exception from which it cannot recover. \n\n Expression: \n    %s \ntriggered an abortion in:\n  file '%s'\n  line %d";
 #if __WIN32__
-	uint32 len = std::strlen(exp) + strlen(file) + strlen(format);
+	size_t len = std::strlen(exp) + strlen(file) + strlen(format);
 	char* buf = new char[len];
 	sprintf_s(buf, len, format, exp, file, line);
 	::MessageBox(NULL, buf, "JARVIS NON-RECOVERABLE ERROR", MB_OK | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR);
@@ -57,7 +57,7 @@ ExceptionWithMsg(const char* exp, const char* msg, const char* file, int line)
 {
 	const char* format = "JARVIS encountered an exception from which it cannot recover. \n\n Expression: \n    %s \ntriggered an abortion. Message: %s in:\n  file '%s'\n  line %d";
 #if __WIN32__
-	uint32 len = std::strlen(exp) + strlen(file) + strlen(format);
+	size_t len = std::strlen(exp) + strlen(file) + strlen(format);
 	char* buf = new char[len];
 	sprintf_s(buf, len, format, exp, msg, file, line);
 	::MessageBox(NULL, buf, "JARVIS NON-RECOVERABLE ERROR", MB_OK | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR);
@@ -77,9 +77,8 @@ Error(const char* fmt, ...)
     va_list arg;
     va_start(arg, fmt);
 #if __WIN32__
-	uint32 len = std::strlen(exp) + strlen(file) + strlen(format);
+	size_t len = vfprintf(NULL, fmt, arg);
 	char* buf = new char[len];
-    char buf[2048];
     vsprintf(buf, fmt, arg);
 	::MessageBox(NULL, buf, "JARVIS NON-RECOVERABLE ERROR", MB_OK | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR);
 	delete[] buf;

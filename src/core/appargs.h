@@ -8,6 +8,7 @@
 	(C) 2016 See the LICENSE file.
 */
 //------------------------------------------------------------------------------
+#include "config.h"
 namespace JARVIS {
 namespace Core
 {
@@ -18,12 +19,12 @@ public:
     void Set(const char** argv, const uint32 argc);
     
     /// get flag value
-    const Core::String& Value(const Core::String& key);
+    const String& Value(const String& key);
     /// get flag (returns true if it exists)
-    bool Flag(const Core::String& key);
+    bool Flag(const String& key);
     
 private:
-    Core::Map<Core::String, Core::String> values;
+    Map<String, String> values;
 };
 
 //------------------------------------------------------------------------------
@@ -55,8 +56,8 @@ AppArgs::Set(const char** argv, const uint32 argc)
 //------------------------------------------------------------------------------
 /**
 */
-inline const Core::String&
-AppArgs::Value(const Core::String& key)
+inline const String&
+AppArgs::Value(const String& key)
 {
     j_assert(this->values.Contains(key));
     return this->values[key];
@@ -66,7 +67,7 @@ AppArgs::Value(const Core::String& key)
 /**
 */
 inline bool
-AppArgs::Flag(const Core::String& key)
+AppArgs::Flag(const String& key)
 {
     return this->values.Contains(key);
 }

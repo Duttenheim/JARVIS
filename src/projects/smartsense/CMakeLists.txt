@@ -27,5 +27,5 @@ ELSE()
 ENDIF()
 
 TARGET_LINK_LIBRARIES(${target_name} core)
-JARVIS_SETUP_TARGET(${target_name})
+JARVIS_SETUP_TARGET(${target_name} Windows)
 SET_TARGET_PROPERTIES(${target_name} PROPERTIES FOLDER "JARVIS/projects")

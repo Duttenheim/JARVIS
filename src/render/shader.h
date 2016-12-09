@@ -6,22 +6,10 @@
 
 #if J_RENDERER_GL4
 #include "gl4/shader.h"
-namespace JARVIS {
-namespace Render
-{
-class Shader : public JARVIS::GL4::Shader
-{};
-__Ptr(Shader)
-}}
+__Wrap(Render, GL4, Shader);
 #elif J_RENDERER_METAL
 #include "metal/shader.h"
-namespace JARVIS {
-namespace Render
-{
-class Shader : public JARVIS::Metal::Shader
-{};
-__Ptr(Shader)
-}}
+__Wrap(Render, Metal, Shader);
 #else
 #error "Shader is not implemented using this renderer!"
 #endif

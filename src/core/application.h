@@ -4,14 +4,12 @@
 	@class JARVIS::Core::Application
 	
     Application entry point. 
-    Inerhit this class in the project and implement own Start, Run and Exit callbacks.
+    Inherit this class in the project and implement own Start, Run and Exit callbacks.
 	
 	(C) 2015 See the LICENSE file.
  */
 //------------------------------------------------------------------------------
-#if __APPLE__
-#include "apple/sysfunc.h"
-#endif
+#include "sysfunc.h"
 #include "appargs.h"
 namespace JARVIS {
 namespace Core
@@ -19,7 +17,7 @@ namespace Core
 
 class Application
 {
-    __SingletonDecl(Application);
+    __SingletonDecl(Application)
 public:
 
     enum State
@@ -53,13 +51,7 @@ protected:
     friend class JARVISAppDelegate;
     friend class JARVISViewDelegate;
     
-#if __APPLE__
-    Apple::SysFunc sysfunc;
-#elif __WIN32__
-    Win32::SysFunc sysfunc;
-#elif __LINUX__
-    Posix::SysFunc sysfunc;
-#endif
+	SysFunc sysfunc;
     
     AppArgs args;
     State state;

@@ -14,7 +14,7 @@
 //------------------------------------------------------------------------------
 #include <functional>
 #include "util/array.h"
-#include "functional/function.h"
+#include "function.h"
 #include "thread.h"
 #include "threading.h"
 namespace JARVIS {

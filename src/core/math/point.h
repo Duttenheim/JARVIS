@@ -94,7 +94,7 @@ Point::Point(const Point& rhs)
 inline
 Point::Point(const Vec4& rhs)
 {
-    const __m128i control = _mm_setr_epi32(0, 0, 0, 0xFFFFFFFF);
+	const __m128 control = _mm_setr_ps(0, 0, 0, 0xFFFFFFFF);
     this->v.sse = _mm_sel_ps_xor(rhs.v.sse, Vec4::one.sse, control);
 }
 
@@ -104,7 +104,7 @@ Point::Point(const Vec4& rhs)
 inline
 Point::Point(const Vec3& rhs)
 {
-    const __m128i control = _mm_setr_epi32(0, 0, 0, 0xFFFFFFFF);
+    const __m128 control = _mm_setr_ps(0, 0, 0, 0xFFFFFFFF);
     this->v.sse = _mm_sel_ps_xor(rhs.v.sse, Vec4::one.sse, control);
 }
 

@@ -9,6 +9,7 @@
  */
 //------------------------------------------------------------------------------
 #include "resources/vertexbuffer.h"
+#include "types.h"
 namespace JARVIS {
 namespace GL4
 {
@@ -30,9 +31,9 @@ private:
     friend class GL4::Context;
     
     /// initialize an index buffer which can be resized
-    void InitMutable(const InitList<VertexComponent>& comps, const uint32 size, const byte* data, AccessPattern access, UsagePattern usage, FrequencyPattern frequency);
+    void InitMutable(const InitList<VertexComponent>& comps, const uint32 size, const byte* data, Render::AccessPattern access, Render::UsagePattern usage, Render::FrequencyPattern frequency);
     /// initialize an index buffer which is immutable
-    void InitImmutable(const InitList<VertexComponent>& comps, const uint32 size, const byte* data, AccessPattern access, UsagePattern usage, FrequencyPattern frequency, ImmutableFlags flags);
+    void InitImmutable(const InitList<VertexComponent>& comps, const uint32 size, const byte* data, Render::AccessPattern access, Render::UsagePattern usage, Render::FrequencyPattern frequency, Render::ImmutableFlags flags);
     
 private:
     GLuint handle;  

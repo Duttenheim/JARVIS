@@ -5,7 +5,7 @@
  
 	(C) 2015 See the LICENSE file.
 */
-#include "functional/function.h"
+#include "function.h"
 #include <thread>
 namespace JARVIS {
 namespace Threading
@@ -45,7 +45,7 @@ Sleep(uint32 ms)
     Yield slice for current thread.
 */
 static inline void
-Yield()
+YieldThread()
 {
     std::this_thread::yield();
 }

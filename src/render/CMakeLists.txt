@@ -87,7 +87,7 @@ SOURCE_GROUP("shaders" FILES ${render_implementation_shaders})
 SET(render_all_files ${render_files} ${render_display_files} ${render_shading_files} ${render_resources_files} ${render_util_files} ${render_implementation_files} ${render_implementation_shaders})
 
 ADD_LIBRARY(render STATIC ${render_all_files})
-JARVIS_SETUP_TARGET(render)
+JARVIS_SETUP_TARGET(render Library)
 TARGET_LINK_LIBRARIES(render core ${render_implementation_libs})
 ADD_DEPENDENCIES(render core ${render_implementation_deps})
 TARGET_INCLUDE_DIRECTORIES(render PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

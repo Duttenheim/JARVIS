@@ -53,7 +53,7 @@ VertexBuffer::InitMutable(InitList<JARVIS::Base::VertexBuffer::VertexComponent> 
     Buffer::InitMutable(Render::BufferType::VertexBufferType, size, data, access, usage, frequency);
     this->components = comps;
     this->vertexByteSize = 0;
-    int32 i;
+    uint32 i;
     for (i = 0; i < this->components.Size(); i++)
     {
         this->components[i].offset = this->vertexByteSize;
@@ -70,7 +70,7 @@ VertexBuffer::InitImmutable(InitList<JARVIS::Base::VertexBuffer::VertexComponent
     Buffer::InitImmutable(Render::BufferType::VertexBufferType, size, data, access, usage, frequency, flags);
     this->components = comps;
     this->vertexByteSize = 0;
-    int32 i;
+    uint32 i;
     for (i = 0; i < this->components.Size(); i++)
     {
         this->vertexByteSize += this->components[i].size;

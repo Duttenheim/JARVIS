@@ -6,22 +6,10 @@
 
 #if J_RENDERER_GL4
 #include "gl4/indexbuffer.h"
-namespace JARVIS {
-namespace Render
-{
-class IndexBuffer : public JARVIS::GL4::IndexBuffer
-{};
-__Ptr(IndexBuffer)
-}}
+__Wrap(Render, GL4, IndexBuffer);
 #elif J_RENDERER_METAL
 #include "metal/indexbuffer.h"
-namespace JARVIS {
-namespace Render
-{
-class IndexBuffer : public JARVIS::Metal::IndexBuffer
-{};
-__Ptr(IndexBuffer)
-}}
+__Wrap(Render, Metal, IndexBuffer);
 #else
 #error "IndexBuffer is not implemented using this renderer!"
 #endif

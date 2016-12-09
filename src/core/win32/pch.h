@@ -3,7 +3,7 @@
 /**
 	@file core/win32/pch.h
 
-	Main configure file for types and OS-specific stuff.
+	Main configure file for types and Win32-specific stuff.
 
 	(C) 2015 See the LICENSE file.
 */
@@ -39,6 +39,7 @@
 #include <strsafe.h>
 #include <wininet.h>
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #include <rpc.h>
 #include <dbghelp.h>
 #include <intrin.h>
