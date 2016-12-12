@@ -25,13 +25,21 @@ public:
 		UDP
 	};
 
-    enum class SocketState : uint8_t
+    enum class State : uint8_t
     {
         Initial,
         Connected,			// client is connected
         Disconnected,		// client is disconnected
 		Listening			// server is listening
     };
+
+	enum class Error : uint8_t
+	{
+		ConnectionRefused,
+		ConnectionClosed,
+		ReadFailed,
+		WriteFailed
+	};
     
 	/// constructor
 	Socket();
@@ -65,7 +73,7 @@ protected:
 
 	uint16 port;
 	String address;
-    SocketState state;
+    State state;
 	Protocol proto;
 };
 

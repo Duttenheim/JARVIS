@@ -24,7 +24,7 @@ public:
 	virtual ~Socket();
 
 	/// setup as listening device (server)
-	void Listen(const String& port);
+	void Listen(const uint16 port);
 
 	/// block the application and accept a new connection
 	Ptr<Interface::Socket> Accept();

@@ -141,8 +141,8 @@ public:
     static Vec4 normalize_fast(const Vec4& vec);
     
     /// public convenience vectors
-    static CONST_EXPR __m128_vec zero   = {{0,0,0,0}};
-    static CONST_EXPR __m128_vec one    = {{1,1,1,1}};
+	static CONST_EXPR const __m128_vec zero() { return __m128_vec{{0, 0, 0, 0}}; }
+	static CONST_EXPR const __m128_vec one()  { return __m128_vec{{1, 1, 1, 1}}; }
     
 private:
     friend class Vec3;
@@ -152,9 +152,6 @@ private:
     friend class Mat3;
     __m128_vec v;
 };
-
-CONST_EXPR __m128_vec Vec4::zero;
-CONST_EXPR __m128_vec Vec4::one;
 
 //------------------------------------------------------------------------------
 /**
@@ -568,7 +565,7 @@ Vec4::equal_any(const Math::Vec4& lhs, const Math::Vec4& rhs)
 inline Vec4
 Vec4::less(const Math::Vec4& lhs, const Math::Vec4& rhs)
 {
-    return _mm_min_ps(_mm_cmplt_ps(lhs.v.sse, rhs.v.sse), Vec4::one.sse);
+    return _mm_min_ps(_mm_cmplt_ps(lhs.v.sse, rhs.v.sse), Vec4::one().sse);
 }
 
 //------------------------------------------------------------------------------
@@ -577,7 +574,7 @@ Vec4::less(const Math::Vec4& lhs, const Math::Vec4& rhs)
 inline Vec4
 Vec4::greater(const Math::Vec4& lhs, const Math::Vec4& rhs)
 {
-    return _mm_min_ps(_mm_cmpgt_ps(lhs.v.sse, rhs.v.sse), Vec4::one.sse);
+    return _mm_min_ps(_mm_cmpgt_ps(lhs.v.sse, rhs.v.sse), Vec4::one().sse);
 }
 
 //------------------------------------------------------------------------------
@@ -586,7 +583,7 @@ Vec4::greater(const Math::Vec4& lhs, const Math::Vec4& rhs)
 inline Vec4
 Vec4::equal(const Math::Vec4& lhs, const Math::Vec4& rhs)
 {
-    return _mm_min_ps(_mm_cmpeq_ps(lhs.v.sse, rhs.v.sse), Vec4::one.sse);
+    return _mm_min_ps(_mm_cmpeq_ps(lhs.v.sse, rhs.v.sse), Vec4::one().sse);
 }
 
 //------------------------------------------------------------------------------
@@ -595,7 +592,7 @@ Vec4::equal(const Math::Vec4& lhs, const Math::Vec4& rhs)
 inline Vec4
 Vec4::normalize(const Math::Vec4& vec)
 {
-    if (Vec4::equal_all(vec, zero)) return vec;
+    if (Vec4::equal_all(vec, zero().sse)) return vec;
     return _mm_div_ps(vec.v.sse, _mm_sqrt_ps(_mm_dp_ps(vec.v.sse, vec.v.sse, 0xFF)));
 }
 
@@ -605,7 +602,7 @@ Vec4::normalize(const Math::Vec4& vec)
 inline Vec4
 Vec4::normalize_fast(const Math::Vec4& vec)
 {
-    if (Vec4::equal_all(vec, zero)) return vec;
+    if (Vec4::equal_all(vec, zero().sse)) return vec;
     return _mm_mul_ps(vec.v.sse, _mm_rsqrt_ps(_mm_dp_ps(vec.v.sse, vec.v.sse, 0xFF)));
 }
 

@@ -34,8 +34,13 @@ class align_16 Mat4
 public:
     /// constructor
     Mat4();
+	/// construct from floats
+	Mat4(float f11, float f12, float f13, float f14,
+		float f21, float f22, float f23, float f24,
+		float f31, float f32, float f33, float f34,
+		float f41, float f42, float f43, float f44);
     /// destructor
-    virtual ~Mat4();
+    virtual ~Mat4();	
     
     /// create new matrix using global X axis
     static Mat4 RotationX(const float angle);
@@ -50,9 +55,9 @@ public:
     /// create a matrix which scaled each axis individually
     static Mat4 Scaling(const float x, const float y, const float z);
     /// create a new perspective matrix
-    static Mat4 Perspective(const float width, const float height, const float near, const float far, const float zrange = 1.0f, const float up = 1.0f);
+    static Mat4 Perspective(const float width, const float height, const float nearPlane, const float farPlane, const float zrange = 1.0f, const float up = 1.0f);
     /// create a new perspective matrix for off-center
-    static Mat4 PerspectiveOffCenter(const float left, const float right, const float top, const float bottom, const float near, const float far, const float zrange = 1.0f, const float up = 1.0f);
+    static Mat4 PerspectiveOffCenter(const float left, const float right, const float top, const float bottom, const float nearPlane, const float farPlane, const float zrange = 1.0f, const float up = 1.0f);
 
     
     /// multiply two matrices
@@ -83,6 +88,18 @@ Mat4::Mat4()
 /**
 */
 inline
+Mat4::Mat4(float f11, float f12, float f13, float f14, float f21, float f22, float f23, float f24, float f31, float f32, float f33, float f34, float f41, float f42, float f43, float f44)
+{
+	m.sse[0] = _mm_setr_ps(f14, f13, f12, f11);
+	m.sse[1] = _mm_setr_ps(f24, f23, f22, f21);
+	m.sse[2] = _mm_setr_ps(f34, f33, f32, f31);
+	m.sse[3] = _mm_setr_ps(f44, f43, f42, f41);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline
 Mat4::~Mat4()
 {
     // empty
@@ -91,8 +108,7 @@ Mat4::~Mat4()
 //------------------------------------------------------------------------------
 /**
 */
-inline
-Mat4
+inline Mat4
 Mat4::RotationX(const float angle)
 {
     Mat4 res;
@@ -106,8 +122,7 @@ Mat4::RotationX(const float angle)
 //------------------------------------------------------------------------------
 /**
 */
-inline
-Mat4
+inline Mat4
 Mat4::RotationY(const float angle)
 {
     Mat4 res;
@@ -121,8 +136,7 @@ Mat4::RotationY(const float angle)
 //------------------------------------------------------------------------------
 /**
 */
-inline
-Mat4
+inline Mat4
 Mat4::RotationZ(const float angle)
 {
     Mat4 res;
@@ -175,7 +189,7 @@ Math::Mat4::Scaling(const float x, const float y, const float z)
 //------------------------------------------------------------------------------
 /**
 */
-Mat4
+inline Mat4
 Mat4::Multiply(const Mat4& lhs, const Mat4& rhs)
 {
     Mat4 res;
@@ -200,8 +214,7 @@ Mat4::Multiply(const Mat4& lhs, const Mat4& rhs)
 //------------------------------------------------------------------------------
 /**
 */
-inline
-Vec4
+inline Vec4
 Mat4::Transform(const Vec4& vec, const Mat4& mat)
 {
     __m128 x = _mm_dp_ps(vec.v.sse, mat.m.sse[0], 0xF1);
@@ -214,16 +227,15 @@ Mat4::Transform(const Vec4& vec, const Mat4& mat)
 //------------------------------------------------------------------------------
 /**
 */
-inline
-Mat4
-Mat4::Perspective(const float width, const float height, const float near, const float far, const float zrange, const float up)
+inline Mat4
+Mat4::Perspective(const float width, const float height, const float nearPlane, const float farPlane, const float zrange, const float up)
 {
     Mat4 res;
-    const float dist = far / (near - far);
-    res.m.sse[0] = _mm_setr_ps(2.0f * near/width, 0, 0, 0);
-    res.m.sse[1] = _mm_setr_ps(0, 2.0f * near/height*up, 0, 0);
+    const float dist = farPlane / (nearPlane - farPlane);
+    res.m.sse[0] = _mm_setr_ps(2.0f * nearPlane /width, 0, 0, 0);
+    res.m.sse[1] = _mm_setr_ps(0, 2.0f * nearPlane /height*up, 0, 0);
     res.m.sse[2] = _mm_setr_ps(0, 0, dist * zrange, -1);
-    res.m.sse[3] = _mm_setr_ps(0, 0, dist * near * zrange, 0);
+    res.m.sse[3] = _mm_setr_ps(0, 0, dist * nearPlane * zrange, 0);
     return res;
 }
 
@@ -231,9 +243,8 @@ Mat4::Perspective(const float width, const float height, const float near, const
 /**
     TODO: implement me!
 */
-inline
-Mat4
-Mat4::PerspectiveOffCenter(const float left, const float right, const float top, const float bottom, const float near, const float far, const float zrange, const float up)
+inline Mat4
+Mat4::PerspectiveOffCenter(const float left, const float right, const float top, const float bottom, const float near, const float farPlane, const float zrange, const float up)
 {
     Mat4 res;
     return res;
@@ -242,8 +253,7 @@ Mat4::PerspectiveOffCenter(const float left, const float right, const float top,
 //------------------------------------------------------------------------------
 /**
 */
-inline
-const float*
+inline const float*
 Mat4::Get() const
 {
     return this->m.fv;
