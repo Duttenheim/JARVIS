@@ -27,14 +27,14 @@ Socket::Socket() :
 */
 Socket::~Socket()
 {
-	if (this->state == SocketState::Connected) this->Close();
+	if (this->state == State::Connected) this->Close();
 }
 
 //------------------------------------------------------------------------------
 /**
 */
 void
-Socket::Listen(const String& port)
+Socket::Listen(const uint16 port)
 {
 	Interface::Socket::Listen(port);
 	j_assert(this->sock == 0);
@@ -52,11 +52,12 @@ Socket::Listen(const String& port)
 	// convert port to string
 	this->address = "localhost";
 	this->port = port;
-	j_assert(this->port.Length() < 6);
 	addrinfo* res = nullptr;
 
-	// resolve IP
-	int stat = getaddrinfo(NULL, this->port.CharPtr(), &this->context, &res);
+	// resolve address
+	char portstr[6];
+	itoa(this->port, portstr, 10);
+	int stat = getaddrinfo(NULL, portstr, &this->context, &res);
 	j_assert(stat == 0);
 	this->context = *res;
 
@@ -87,11 +88,12 @@ Socket::__Connect()
 	this->context.ai_protocol = this->proto == Protocol::TCP ? IPPROTO_TCP : IPPROTO_UDP;
 
 	// convert port to string
-	j_assert(this->port.Length() < 6);
 	addrinfo* res = nullptr;
 
 	// resolve IP
-	int stat = getaddrinfo(this->address.CharPtr(), this->port.CharPtr(), &this->context, &res);
+	char portstr[6];
+	itoa(this->port, portstr, 10);
+	int stat = getaddrinfo(this->address.CharPtr(), portstr, &this->context, &res);
 	j_assert(stat == 0);
 	this->context = *res;
 
@@ -111,7 +113,7 @@ Socket::__Connect()
 	stat = select(1, &set, &set, nullptr, nullptr);
 	j_assert(stat != SOCKET_ERROR);
 
-	this->state = SocketState::Connected;
+	this->state = State::Connected;
 }
 
 //------------------------------------------------------------------------------
@@ -125,7 +127,7 @@ Socket::Close()
 	j_assert(this->sock != 0);
 	j_assert(shutdown(this->sock, SD_SEND) != SOCKET_ERROR);
 	closesocket(this->sock);
-	this->state = SocketState::Initial;
+	this->state = State::Initial;
 	this->sock = 0;
 }
 
@@ -145,7 +147,7 @@ Socket::Accept()
 	int stat = select(1, &set, &set, nullptr, nullptr);
 	j_assert(stat != SOCKET_ERROR);
 
-	newSock->state = SocketState::Connected;
+	newSock->state = State::Connected;
 	return newSock;
 }
 

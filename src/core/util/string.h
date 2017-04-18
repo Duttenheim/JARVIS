@@ -13,6 +13,10 @@
 //------------------------------------------------------------------------------
 #include <string.h>
 #include "array.h"
+#include "math/mat3.h"
+#include "math/mat4.h"
+#include "math/vec3.h"
+#include "math/vec4.h"
 namespace JARVIS { 
 namespace Core
 {
@@ -107,6 +111,23 @@ public:
     String ExtractToEndFromFirst(char c) const;
     /// extract to end from last occurrence of char
     String ExtractToEndFromLast(char c) const;
+
+	/// convert string to integer
+	int32 ToInt() const;
+	/// convert string to unsigned integer
+	uint32 ToUint() const;
+	/// convert string to float
+	float ToFloat() const;
+	/// convert string to double
+	double ToDouble() const;
+	/// convert string to vec3
+	Math::Vec3 ToVec3() const;
+	/// convert string to vec4
+	Math::Vec4 ToVec4() const;
+	/// convert string to mat3
+	Math::Mat3 ToMat3() const;
+	/// convert string to mat4
+	Math::Mat4 ToMat4() const;
     
     /// replace character with other characters
     void Replace(const char find, const char replace);
@@ -725,7 +746,111 @@ String::ExtractToEndFromLast(char c) const
 
 //------------------------------------------------------------------------------
 /**
-    Replaces every occurence of one char with another.
+*/
+inline int32
+String::ToInt() const
+{
+	int32 res;
+	if (this->heapBuffer != 0)	res = atoi(this->heapBuffer);
+	else						res = atoi(this->stackBuffer);
+	return res;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline uint32
+String::ToUint() const
+{
+	uint32 res;
+	if (this->heapBuffer != 0)	res = atoi(this->heapBuffer);
+	else						res = atoi(this->stackBuffer);
+	return res;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline float
+String::ToFloat() const
+{
+	float res;
+	if (this->heapBuffer != 0)	res = (float)atof(this->heapBuffer);
+	else						res = (float)atof(this->stackBuffer);
+	return res;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline double
+String::ToDouble() const
+{
+	double res;
+	if (this->heapBuffer != 0)	res = atof(this->heapBuffer);
+	else						res = atof(this->stackBuffer);
+	return res;
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline JARVIS::Math::Vec3
+String::ToVec3() const
+{
+	float v1, v2, v3;
+	const char* buf;
+	if (this->heapBuffer != 0)	buf = this->heapBuffer;
+	else						buf = this->stackBuffer;
+	j_assert(sscanf(buf, "%f, %f, %f", &v1, &v2, &v3) == 3);
+	return Math::Vec3(v1, v2, v3);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline JARVIS::Math::Vec4
+String::ToVec4() const
+{
+	float v1, v2, v3, v4;
+	const char* buf;
+	if (this->heapBuffer != 0)	buf = this->heapBuffer;
+	else						buf = this->stackBuffer;
+	j_assert(sscanf(buf, "%f, %f, %f, %f", &v1, &v2, &v3, &v4) == 4);
+	return Math::Vec4(v1, v2, v3, v4);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline JARVIS::Math::Mat3
+String::ToMat3() const
+{
+	float f11, f12, f13, f21, f22, f23, f31, f32, f33;
+	const char* buf;
+	if (this->heapBuffer != 0)	buf = this->heapBuffer;
+	else						buf = this->stackBuffer;
+	j_assert(sscanf(buf, "%f, %f, %f, %f, %f, %f, %f, %f, %f", &f11, &f12, &f13, &f21, &f22, &f23, &f31, &f32, &f33) == 9);
+	return Math::Mat3(f11, f12, f13, f21, f22, f23, f31, f32, f33);
+}
+
+//------------------------------------------------------------------------------
+/**
+*/
+inline JARVIS::Math::Mat4
+String::ToMat4() const
+{
+	float f11, f12, f13, f14, f21, f22, f23, f24, f31, f32, f33, f34, f41, f42, f43, f44;
+	const char* buf;
+	if (this->heapBuffer != 0)	buf = this->heapBuffer;
+	else						buf = this->stackBuffer;
+	j_assert(sscanf(buf, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", &f11, &f12, &f13, &f14, &f21, &f22, &f23, &f24, &f31, &f32, &f33, &f34, &f41, &f42, &f43, &f44) == 16);
+	return Math::Mat4(f11, f12, f13, f14, f21, f22, f23, f24, f31, f32, f33, f34, f41, f42, f43, f44);
+}
+
+//------------------------------------------------------------------------------
+/**
+    Replaces every occurrence of one char with another.
     @param find Character to locate
     @param replace Character to replace 'find' with.
 */

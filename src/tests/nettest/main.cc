@@ -21,7 +21,6 @@ JARVIS_MAIN
 	{
 		Ptr<Network::Socket> sock = Network::Socket::Create();
 		sock->Listen(81);
-
 		
 		while (true)
 		{
@@ -39,7 +38,7 @@ JARVIS_MAIN
 	else
 	{
 		Ptr<Network::Socket> sock = Network::Socket::Create();
-		sock->Connect(args.Value("-address"), atoi(args.Value("-port").CharPtr()));
+		sock->Connect(args.Value("-address"), args.Value("-port").ToUint());
 		String html("<html><body>Hej!</body></html>");
 		sock->Send(html.CharPtr(), html.Length());
 	}
