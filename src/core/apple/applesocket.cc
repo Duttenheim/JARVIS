@@ -11,6 +11,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+
 using namespace JARVIS::Core;
 namespace JARVIS {
 namespace Apple
@@ -44,24 +45,22 @@ Socket::Listen(const uint16 port)
 
 	Memory::Fill(&this->ip, sizeof(this->ip), 0);
     int family;
-    int protocol;
 #ifdef JARVIS_USE_IPV6
 	family = AF_INET6;
-    protocol = PF_INET6;
 #else
 	family = AF_INET;
-    protocol = PF_INET;
 #endif
     this->sock = socket(
         family,
         this->proto == Protocol::TCP ? SOCK_STREAM : SOCK_DGRAM,
-        protocol
+        this->proto == Protocol::TCP ? IPPROTO_TCP : IPPROTO_UDP
     );
-    j_assert(this->sock != -1)
+    j_assert(this->sock != -1);
     
+    this->ip.sin_len = sizeof(this->ip);
     this->ip.sin_port = htons(port);
     this->ip.sin_family = family;
-    this->ip.sin_addr.s_addr = htonl(INADDR_ANY);
+    this->ip.sin_addr.s_addr = INADDR_ANY;
     int stat = bind(this->sock, (sockaddr*)&this->ip, sizeof(this->ip));
     j_assert(stat >= 0);
     
@@ -149,25 +148,32 @@ Socket::__Connect()
     j_assert(this->sock == 0);
 
 	Memory::Fill(&this->ip, sizeof(this->ip), 0);
-    int family = AF_UNSPEC;
-    int protocol;
+    int family;
 #ifdef JARVIS_USE_IPV6
-    protocol = PF_INET6;
+	family = AF_INET6;
 #else
-    protocol = PF_INET;
+	family = AF_INET;
 #endif
     this->sock = socket(
         family,
         this->proto == Protocol::TCP ? SOCK_STREAM : SOCK_DGRAM,
-        protocol
+        this->proto == Protocol::TCP ? IPPROTO_TCP : IPPROTO_UDP
     );
-    j_assert(this->sock != -1)
+    j_assert(this->sock != -1);
+    
+    // resolve IP
+    addrinfo* res = nullptr;
+	//int stat = getaddrinfo(this->address.CharPtr(), this->port, &this->context, &res);
+	//j_assert(stat == 0);
+    this->context = *res;
     
     // connect socket
     this->ip.sin_port = htons(port);
+    this->ip.sin_len = sizeof(this->ip);
     this->ip.sin_family = family;
-    this->ip.sin_addr.s_addr = htonl(INADDR_ANY);
-    int stat = connect(this->sock, (sockaddr*)&this->ip, sizeof(sockaddr));
+    //this->ip.sin_addr.s_addr = this->context.
+    //int stat = connect(this->sock, (sockaddr*)&this->ip, sizeof(sockaddr));
+    //j_assert(stat >= 0);
 }
 
 }} // namespace JARVIS::Apple

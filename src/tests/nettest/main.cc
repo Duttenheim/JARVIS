@@ -20,7 +20,7 @@ JARVIS_MAIN
 	if (args.Flag("-server"))
 	{
 		Ptr<Network::Socket> sock = Network::Socket::Create();
-		sock->Listen("81");
+		sock->Listen(81);
 
 		
 		while (true)
@@ -39,7 +39,7 @@ JARVIS_MAIN
 	else
 	{
 		Ptr<Network::Socket> sock = Network::Socket::Create();
-		sock->Connect(args.Value("-address"), args.Value("-port"));
+		sock->Connect(args.Value("-address"), atoi(args.Value("-port").CharPtr()));
 		String html("<html><body>Hej!</body></html>");
 		sock->Send(html.CharPtr(), html.Length());
 	}

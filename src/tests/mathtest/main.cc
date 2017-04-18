@@ -20,34 +20,22 @@
 
 #include <random>
 
-
-class A
-{
-public:
-    void Foobar(int i) {  printf("Foobar with integer %d\n", i); };
-    void Foobar(double d) {  printf("Foobar with integer %f\n", d); };
-protected:
-    virtual void Foobar() = 0;
-};
-
-class B : public A
-{
-private:
-    void Foobar() { printf("Foobar without value\n"); }
-};
-
-
 using namespace JARVIS::Math;
 using namespace JARVIS::Core;
 using namespace JARVIS::Threading;
 #define NUM_OPS 2000000
 
+float* makearray(const int size)
+{
+    int foobar = size;
+    float arr[foobar];
+    return arr;
+}
+
 JARVIS_MAIN
 {
-
-    B* bptr = new B;
-    bptr->A::Foobar(5);
-
+    float* arr = makearray(50);
+    
     Vec4 v1(1,2,3,4), v2(5,6,7,8);
     Vec4 v3 = v1 + v2;
     Vec4 v4(1);
