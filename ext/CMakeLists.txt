@@ -10,6 +10,8 @@ ENDIF()
 IF (${J_BUILD_OPENCV})
 	LIST(APPEND ext_subdirs "opencv")
 	ADD_SUBDIRECTORY(opencv)
+	SET(OPENCV_EXTRA_MODULES_PATH opencv_contrib/modules)
+	#ADD_SUBDIRECTORY(opencv_contrib)
 ENDIF()
 
 IF(${J_RENDERER_GL4})

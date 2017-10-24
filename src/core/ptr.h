@@ -101,7 +101,7 @@ public:
 	/// assignment operator for c pointer of other type
 	template<class OTHERTYPE> void operator=(OTHERTYPE* rhs)
 	{
-        static_assert(std::is_base_of<TYPE, OTHERTYPE>::value);
+        static_assert(std::is_base_of<TYPE, OTHERTYPE>::value, "Trying to cast from one type to another incompatible one");
 		TYPE* p = static_cast<TYPE*>(rhs);
 		if (p != this->ptr)
 		{

@@ -7,7 +7,6 @@
 	(C) 2015 See the LICENSE file.
 */
 #include "config.h"
-#define NULL 0
 #include <opencv2/opencv.hpp>
 #include <opencv2/xfeatures2d.hpp>
 #define NULL nullptr_t

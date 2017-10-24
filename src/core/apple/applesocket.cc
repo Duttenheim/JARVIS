@@ -31,7 +31,7 @@ Socket::Socket() :
 */
 Socket::~Socket()
 {
-    if (this->state == SocketState::Connected) this->Close();
+    if (this->state == State::Connected) this->Close();
 }
 
 //------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ Socket::Accept()
     int stat = poll(&fd, 1, 0);
     j_assert(stat >= 0);
     
-    newSock->state = SocketState::Connected;
+    newSock->state = State::Connected;
     return newSock;
     //int stat = select(
 }
@@ -135,7 +135,7 @@ Socket::Close()
     j_assert(this->sock != 0);
     j_assert(shutdown(this->sock, SHUT_RDWR) >= 0);
     close(this->sock);
-    this->state = SocketState::Initial;
+    this->state = State::Initial;
     this->sock = 0;
 }
 

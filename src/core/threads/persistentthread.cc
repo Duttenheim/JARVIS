@@ -13,7 +13,7 @@ namespace Threading
 /**
 */
 PersistentThread::PersistentThread() :
-    working({false}),
+    working(false),
 	thread(nullptr)
 {
 	// empty

@@ -11,7 +11,7 @@ namespace Interface
 /**
 */
 Socket::Socket() :
-	state(SocketState::Initial),
+	state(State::Initial),
 	proto(Protocol::TCP)
 {
 	// empty
@@ -31,8 +31,8 @@ Socket::~Socket()
 void
 Socket::Listen(const uint16 port)
 {
-	j_assert(this->state == SocketState::Initial);
-	this->state = SocketState::Listening;
+	j_assert(this->state == State::Initial);
+	this->state = State::Listening;
 	this->port = port;
 }
 
@@ -40,10 +40,10 @@ Socket::Listen(const uint16 port)
 /**
 */
 void
-Socket::Connect(const String& address)
+Socket::Connect(const Core::String& address)
 {
-	j_assert(this->state == SocketState::Initial);
-	Array<String> fragments = address.Split(":");
+	j_assert(this->state == State::Initial);
+	Array<Core::String> fragments = address.Split(":");
 	j_assert_msg(fragments.Size() > 0, "Socket address must contain trailing :<port>");
 	this->address = fragments[0];
 	this->port = atoi(fragments[1].CharPtr());
@@ -56,9 +56,9 @@ Socket::Connect(const String& address)
 /**
 */
 void
-Socket::Connect(const String& address, const uint16 port)
+Socket::Connect(const Core::String& address, const uint16 port)
 {
-	j_assert(this->state == SocketState::Initial);
+	j_assert(this->state == State::Initial);
 	this->address = address;
 	this->port = port;
 
@@ -72,7 +72,7 @@ Socket::Connect(const String& address, const uint16 port)
 void
 Socket::Close()
 {
-	this->state = SocketState::Initial;
+	this->state = State::Initial;
 }
 
 //------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ Socket::Close()
 void
 Socket::Send(const char* data, SizeT size)
 {
-	j_assert(this->state == SocketState::Connected);
+	j_assert(this->state == State::Connected);
 }
 
 //------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ Socket::Send(const char* data, SizeT size)
 SizeT
 Socket::Receive(char* data, SizeT size)
 {
-	j_assert(this->state == SocketState::Connected);
+	j_assert(this->state == State::Connected);
 	return 0;
 }
 
@@ -100,7 +100,7 @@ Socket::Receive(char* data, SizeT size)
 bool
 Socket::PendingData()
 {
-	j_assert(this->state == SocketState::Connected);
+	j_assert(this->state == State::Connected);
 	return false;
 }
 

@@ -113,13 +113,13 @@ using Tuple = std::tuple<TYPE...>;
 #include "poolalloc.h"
 #include "class.h"
 #include "wrap.h"
+#include "util/string.h"
 
 namespace JARVIS {
 
 // define shorthand aliases for common types
 template <class TYPE>
 using Array = Core::Array<TYPE>;
-using String = Core::String;
 using Ref = Core::Ref;
 
 }

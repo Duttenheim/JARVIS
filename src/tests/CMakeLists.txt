@@ -9,7 +9,6 @@ ADD_SUBDIRECTORY(mathtest)
 ADD_SUBDIRECTORY(windowtest)
 ADD_SUBDIRECTORY(nettest)
 
-
+ADD_SUBDIRECTORY(opencvtest)
 IF (${J_BUILD_OPENCV})
-	ADD_SUBDIRECTORY(opencvtest)
 ENDIF()
